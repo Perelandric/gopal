@@ -39,6 +39,7 @@ fmt.Printf("\nSending to PayPal: %s\n%s\n\n", url, body)
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Authorization", pp.tokeninfo.auth_token())
 		if idempotent_id != "" {
+fmt.Println("Sending idempotent_id ", idempotent_id)
 			req.Header.Set("PayPal-Request-Id", idempotent_id)
 		}
 	}

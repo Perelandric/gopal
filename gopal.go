@@ -34,7 +34,7 @@ func (pp *PayPal) ForPath(pathname string) (*PayPalPath, error) {
 
 	pathurl = pp.hosturl.ResolveReference(pathurl)
 
-	var ppp = &PayPalPath{pp, pathurl.Path, "", "", ""}
+	var ppp = &PayPalPath{pp, pathurl.Path, "", "", "", make(map[string]*Payment)}
 	var q = pathurl.Query()
 
 	q.Set("status", "request")
@@ -105,6 +105,12 @@ type PayPalPath struct {
 	request_url string
 	return_url string
 	cancel_url string
+	pending map[string]*Payment
+}
+
+func (ppp *PayPalPath) Execute(req *http.Request) error {
+	var query = req.URL.Query()
+	return ppp.pending[query.Get("uuid")].execute(query)
 }
 
 func (ppp *PayPalPath) Path() string {

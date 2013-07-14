@@ -1,6 +1,11 @@
 package gopal
 
+import "fmt"
 import "encoding/json"
+import "net/url"
+import "path"
+import "strconv"
+import "time"
 
 func (ppp *PayPalPath) PayPalPayment() (*Payment, error) {
 	var err = ppp.paypal.authenticate()
@@ -8,7 +13,7 @@ func (ppp *PayPalPath) PayPalPayment() (*Payment, error) {
 		return nil, err
 	}
 
-	return &Payment {
+	var pymt = &Payment {
 		payment: payment {
 			Intent: Sale,
 			Redirect_urls: redirects {
@@ -21,8 +26,24 @@ func (ppp *PayPalPath) PayPalPayment() (*Payment, error) {
 			Transactions: make([]*Transaction, 0),
 //			Payment_error: nil,
 		},
-		pp_auth: ppp.paypal,
-	}, nil
+		path: ppp,
+		uuid: "",
+	}
+
+    for {
+        // TODO Clearly this needs to be improved
+        pymt.uuid = strconv.FormatInt(time.Now().UnixNano(), 36)
+        var _, ok = ppp.pending[pymt.uuid]
+		if ok {
+            continue
+        }
+        ppp.pending[pymt.uuid] = pymt
+        break
+    }
+	pymt.payment.Redirect_urls.Return_url += "&uuid=" + pymt.uuid
+	pymt.payment.Redirect_urls.Cancel_url += "&uuid=" + pymt.uuid
+
+	return pymt, nil
 }
 
 func (ppp *PayPalPath) CreditCardPayment() error {
@@ -32,10 +53,11 @@ func (ppp *PayPalPath) CreditCardPayment() error {
 
 type Payment struct {
 	payment
-	pp_auth *PayPal
+	path *PayPalPath
+	uuid string
 }
 
-func (pay *Payment) AddTransaction(amt float64, curr, desc string) (*Transaction, error) {
+func (pymt *Payment) AddTransaction(amt float64, curr, desc string) (*Transaction, error) {
 	var t = &Transaction{
 		transaction{
 			Amount: amount {
@@ -48,40 +70,40 @@ func (pay *Payment) AddTransaction(amt float64, curr, desc string) (*Transaction
 			Description: desc,
 		},
 	}
-	pay.payment.Transactions = append(pay.payment.Transactions, t)
+	pymt.payment.Transactions = append(pymt.payment.Transactions, t)
 	return t, nil
 }
 
-func (pay *Payment) Execute() (string, int, error) {
+func (pymt *Payment) Send() (string, int, error) {
 	var err error
 	var to = ""
 	var code = 500
 	var body []byte
 	var resp []byte
 
-	body, err = json.Marshal(&pay.payment)
+	body, err = json.Marshal(&pymt.payment)
 	if err != nil {
 		return to, code, err
 	}
 
-	resp, err = pay.pp_auth.make_request("POST", "payments/payment", string(body), "send_" + pay.payment.Id, false)
+	resp, err = pymt.path.paypal.make_request("POST", "payments/payment", string(body), "send_" + pymt.uuid, false)
 	if err != nil {
 		return to, code, err
 	}
 
-	err = json.Unmarshal(resp, &pay.payment)
+	err = json.Unmarshal(resp, &pymt.payment)
 	if err != nil {
 		return to, code, err
 	}
 
-	if pay.payment.Payment_error != nil {
-		return to, code, pay.payment.Payment_error.to_error()
+	if pymt.payment.Payment_error != nil {
+		return to, code, pymt.payment.Payment_error.to_error()
 	}
 
-	to = pay.payment.Redirect_urls.Cancel_url
+	to = pymt.payment.Redirect_urls.Cancel_url
 
-	if pay.payment.State == Created {
-		for _, link := range pay.payment.Links {
+	if pymt.payment.State == Created {
+		for _, link := range pymt.payment.Links {
 			if link.Rel == "approval_url" {
 				to = link.Href
 				break
@@ -93,6 +115,25 @@ func (pay *Payment) Execute() (string, int, error) {
 	return to, code, err
 }
 
+func (pymt *Payment) execute(query url.Values) error {
+	if pymt == nil {
+		return fmt.Errorf("No payment found")
+	}
+	var payerid = query.Get("PayerID")
+	if payerid == "" {
+		return fmt.Errorf("PayerID is missing")
+	}
+	var pathname = path.Join("payments/payment", pymt.Id, "execute")
+	var body = fmt.Sprintf(`{"payer_id":%q}`, payerid)
+
+	var _, err = pymt.path.paypal.make_request("POST", pathname, body, "execute_" + pymt.uuid, false)
+
+	if err != nil {
+		return err
+	}
+// TODO I should remove the Payment object from Pending at this point?
+	return nil
+}
 
 type Transaction struct {
 	transaction
