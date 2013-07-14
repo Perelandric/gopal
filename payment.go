@@ -1,8 +1,6 @@
 package gopal
 
 import "encoding/json"
-import "bytes"
-import "fmt"
 
 func (ppp *PayPalPath) PayPalPayment() (*Payment, error) {
 	var err = ppp.paypal.authenticate()
@@ -66,14 +64,10 @@ func (pay *Payment) Execute() (string, int, error) {
 		return to, code, err
 	}
 
-fmt.Println(string(body))
-
-	resp, err = pay.pp_auth.make_request("POST", "payments/payment", bytes.NewReader(body), false)
+	resp, err = pay.pp_auth.make_request("POST", "payments/payment", string(body), "send_" + pay.payment.Id, false)
 	if err != nil {
 		return to, code, err
 	}
-
-fmt.Printf("\n%s\n", resp)
 
 	err = json.Unmarshal(resp, &pay.payment)
 	if err != nil {

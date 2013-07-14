@@ -2,15 +2,16 @@ package gopal
 
 import "net/http"
 import "path"
-import "io"
 import "io/ioutil"
 import "fmt"
+import "strings"
 
 
 // TODO: What about `PayPal-Request-Id` mentioned in docs for idempotency
 
-func (pp *PayPal) make_request(method, subdir string, body io.Reader, auth_req bool) ([]byte, error) {
+func (pp *PayPal) make_request(method, subdir string, body, idempotent_id string, auth_req bool) ([]byte, error) {
 	var err error
+	var result []byte
 	var req *http.Request
 	var resp *http.Response
     var url = "https://api"
@@ -21,8 +22,9 @@ func (pp *PayPal) make_request(method, subdir string, body io.Reader, auth_req b
     }
     url = url + ".paypal.com/" + path.Join("v1", subdir)
 
-fmt.Println(url)
-    req, err = http.NewRequest(method, url, body)
+fmt.Printf("\nSending to PayPal: %s\n%s\n\n", url, body)
+
+    req, err = http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -36,6 +38,9 @@ fmt.Println(url)
 	} else {
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Authorization", pp.tokeninfo.auth_token())
+		if idempotent_id != "" {
+			req.Header.Set("PayPal-Request-Id", idempotent_id)
+		}
 	}
 
 	resp, err = pp.client.Do(req)
@@ -44,7 +49,11 @@ fmt.Println(url)
     }
     defer resp.Body.Close()
 
-    return ioutil.ReadAll(resp.Body)
+    result, err = ioutil.ReadAll(resp.Body)
+
+fmt.Printf("\nReceived from PayPal: \n%s\n\n", result)
+
+	return result, err
 }
 
 
