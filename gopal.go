@@ -1,9 +1,9 @@
 package gopal
 
+import "fmt"
 import "net/http"
 import "net/url"
 import "time"
-import "encoding/json"
 
 func New(sandbox bool, id, secret, host string) (*PayPal, error) {
 	var hosturl, err = url.Parse(host)
@@ -59,7 +59,6 @@ func (pp *PayPal) is_authenticated() bool {
 func (pp *PayPal) authenticate() error {
 	// If an error is returned, zero the tokeninfo
 	var err error
-	var data []byte
 	var duration time.Duration
 
 	// No need to authenticate if the previous has not yet expired
@@ -74,14 +73,7 @@ func (pp *PayPal) authenticate() error {
 	}()
 
 	// (re)authenticate
-	data, err = pp.make_request("POST", "/oauth2/token", "grant_type=client_credentials", "", true)
-
-	if err != nil {
-		return err
-	}
-
-	// Parse the JSON response
-	err = json.Unmarshal(data, &pp.tokeninfo)
+	err = pp.make_request("POST", "/oauth2/token", "grant_type=client_credentials", "", &pp.tokeninfo, true)
 	if err != nil {
 		return err
 	}
@@ -108,9 +100,20 @@ type PayPalPath struct {
 	pending map[string]*Payment
 }
 
+func (ppp *PayPalPath) Send(pymt *Payment) (string, int, error) {
+	if pymt == nil || ppp.pending[pymt.uuid] != pymt {
+		return "", 0, fmt.Errorf("Unknown payment.")
+	}
+	return pymt.send()
+}
+
 func (ppp *PayPalPath) Execute(req *http.Request) error {
 	var query = req.URL.Query()
 	return ppp.pending[query.Get("uuid")].execute(query)
+}
+
+func (ppp *PayPalPath) Cancel(req *http.Request) {
+	delete(ppp.pending, req.URL.Query().Get("uuid"))
 }
 
 func (ppp *PayPalPath) Path() string {

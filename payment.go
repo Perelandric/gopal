@@ -63,9 +63,6 @@ func (pymt *Payment) AddTransaction(amt float64, curr, desc string) (*Transactio
 			Amount: amount {
 				Currency: curr,
 				Total: amt,
-				Details: details {
-					Subtotal: amt,
-				},
 			},
 			Description: desc,
 		},
@@ -74,24 +71,18 @@ func (pymt *Payment) AddTransaction(amt float64, curr, desc string) (*Transactio
 	return t, nil
 }
 
-func (pymt *Payment) Send() (string, int, error) {
+func (pymt *Payment) send() (string, int, error) {
 	var err error
 	var to = ""
 	var code = 500
 	var body []byte
-	var resp []byte
 
 	body, err = json.Marshal(&pymt.payment)
 	if err != nil {
 		return to, code, err
 	}
 
-	resp, err = pymt.path.paypal.make_request("POST", "payments/payment", string(body), "send_" + pymt.uuid, false)
-	if err != nil {
-		return to, code, err
-	}
-
-	err = json.Unmarshal(resp, &pymt.payment)
+	err = pymt.path.paypal.make_request("POST", "payments/payment", string(body), "send_" + pymt.uuid, &pymt.payment, false)
 	if err != nil {
 		return to, code, err
 	}
@@ -103,12 +94,7 @@ func (pymt *Payment) Send() (string, int, error) {
 	to = pymt.payment.Redirect_urls.Cancel_url
 
 	if pymt.payment.State == Created {
-		for _, link := range pymt.payment.Links {
-			if link.Rel == "approval_url" {
-				to = link.Href
-				break
-			}
-		}
+		to, _ = pymt.payment.Links.get("approval_url")
 		code = 303
 	}
 
@@ -126,29 +112,37 @@ func (pymt *Payment) execute(query url.Values) error {
 	var pathname = path.Join("payments/payment", pymt.Id, "execute")
 	var body = fmt.Sprintf(`{"payer_id":%q}`, payerid)
 
-	var _, err = pymt.path.paypal.make_request("POST", pathname, body, "execute_" + pymt.uuid, false)
-
+	var err = pymt.path.paypal.make_request("POST", pathname, body, "execute_" + pymt.uuid, pymt, false)
 	if err != nil {
 		return err
+	}
+
+	if pymt.State != Approved {
+		return fmt.Errorf("Payment not approved")
 	}
 // TODO I should remove the Payment object from Pending at this point?
 	return nil
 }
 
+
+
+
 type Transaction struct {
 	transaction
 }
 func (t *Transaction) SetDetails(shipping, subtotal, tax, fee float64) {
-	t.Amount.Details.Shipping = shipping
-	t.Amount.Details.Subtotal = subtotal
-	t.Amount.Details.Tax = tax
-	t.Amount.Details.Fee = fee
+	t.Amount.Details = &details {
+		Shipping: shipping,
+		Subtotal: subtotal,
+		Tax: tax,
+		Fee: fee,
+	}
 }
 func (t *Transaction) SetShippingAddress(recip_name string, typ AddressType, addrss Address) {
 	if t.Item_list == nil {
 		t.Item_list = new(item_list)
 	}
-	t.Item_list.Shipping_address = &shipping_address{
+	t.Item_list.Shipping_address = &shipping_address {
 		Recipient_name: recip_name,
 		Type: typ,
 		Address: addrss,
@@ -182,7 +176,7 @@ type payment struct {
 	Redirect_urls redirects			`json:"redirect_urls,omitempty"`
 	Id string						`json:"id,omitempty"`
 	State State						`json:"state,omitempty"`
-	Links []links					`json:"links,omitempty"`
+	Links links					`json:"links,omitempty"`
 
 	// 
 	Payment_error *payment_error	`json:"payment_error,omitempty"`
@@ -216,9 +210,9 @@ type item struct {
 	Sku string		`json:"sku,omitempty"`
 }
 type amount struct {
-	Currency string	`json:"currency,omitempty"`
-	Total float64	`json:"total,omitempty,string"`
-	Details details	`json:"details,omitempty"`
+	Currency string		`json:"currency,omitempty"`
+	Total float64		`json:"total,omitempty,string"`
+	Details *details	`json:"details,omitempty"`
 }
 type details struct {
 	Shipping float64	`json:"shipping,omitempty"`
@@ -248,15 +242,25 @@ type sale struct {
 type authorization struct {
 	_trans
 	Valid_until string	`json:"valid_until,omitempty"`
-	Links []links		`json:"links,omitempty"`
+	Links links			`json:"links,omitempty"`
 }
 type capture struct {
 	_trans
 	Is_final_capture bool	`json:"is_final_capture,omitempty"`
-	Links []links			`json:"links,omitempty"`
+	Links links				`json:"links,omitempty"`
 }
 
-type links struct {
+type links []link
+func (l links) get(s string) (string, string) {
+	for i, _ := range l {
+		if l[i].Rel == s {
+			return l[i].Href, l[i].Method
+		}
+	}
+	return "", ""
+}
+
+type link struct {
 	Href string		`json:"href,omitempty"`
 	Rel string		`json:"rel,omitempty"`
 	Method string	`json:"method,omitempty"`

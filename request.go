@@ -5,11 +5,10 @@ import "path"
 import "io/ioutil"
 import "fmt"
 import "strings"
+import "encoding/json"
 
 
-// TODO: What about `PayPal-Request-Id` mentioned in docs for idempotency
-
-func (pp *PayPal) make_request(method, subdir string, body, idempotent_id string, auth_req bool) ([]byte, error) {
+func (pp *PayPal) make_request(method, subdir string, body, idempotent_id string, jsn interface{}, auth_req bool) error {
 	var err error
 	var result []byte
 	var req *http.Request
@@ -26,7 +25,7 @@ fmt.Printf("\nSending to PayPal: %s\n%s\n\n", url, body)
 
     req, err = http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
-		return nil, err
+		return err
 	}
     req.Header.Set("Accept", "application/json")
 	req.Header.Set("Accept-Language", "en_US")
@@ -46,15 +45,18 @@ fmt.Println("Sending idempotent_id ", idempotent_id)
 
 	resp, err = pp.client.Do(req)
     if err != nil {
-        return nil, err
+        return err
     }
     defer resp.Body.Close()
 
     result, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
 
 fmt.Printf("\nReceived from PayPal: \n%s\n\n", result)
 
-	return result, err
+	return json.Unmarshal(result, jsn)
 }
 
 
