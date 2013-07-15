@@ -74,11 +74,6 @@ func (pp *PayPal) authenticate() error {
 		return err
 	}
 
-	if pp.tokeninfo.identity_error != nil {
-		err = pp.tokeninfo.identity_error.to_error()
-		return err
-	}
-
 	// Set the duration to expire 3 minutes early to avoid expiration during a request cycle
 	duration = time.Duration(pp.tokeninfo.Expires_in) * time.Second - 3 * time.Minute
 	pp.tokeninfo.expiration = time.Now().Add(duration)

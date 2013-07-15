@@ -1,7 +1,6 @@
 package gopal
 
 import "fmt"
-import "encoding/json"
 import "net/url"
 import "path"
 import "strconv"
@@ -24,7 +23,6 @@ func (ppp *PayPalPath) PayPalPayment() (*Payment, error) {
 				Payment_method: PayPalMethod,
 			},
 			Transactions: make([]*Transaction, 0),
-//			Payment_error: nil,
 		},
 		path: ppp,
 		uuid: "",
@@ -75,20 +73,10 @@ func (pymt *Payment) send() (string, int, error) {
 	var err error
 	var to = ""
 	var code = 500
-	var body []byte
 
-	body, err = json.Marshal(&pymt.payment)
+	err = pymt.path.paypal.make_request("POST", "payments/payment", &pymt.payment, "send_" + pymt.uuid, &pymt.payment, false)
 	if err != nil {
 		return to, code, err
-	}
-
-	err = pymt.path.paypal.make_request("POST", "payments/payment", string(body), "send_" + pymt.uuid, &pymt.payment, false)
-	if err != nil {
-		return to, code, err
-	}
-
-	if pymt.payment.Payment_error != nil {
-		return to, code, pymt.payment.Payment_error.to_error()
 	}
 
 	to = pymt.payment.Redirect_urls.Cancel_url
@@ -116,6 +104,9 @@ func (pymt *Payment) execute(query url.Values) error {
 	}
 
 	pathname = path.Join("payments/payment", pymt.Id, "execute")
+
+// TODO Maybe make_request() should check the resulting unmarshaled body for a PayPal error object?
+// 		Every object I pass to take the body would need to implement an interface to allow this.
 
 	err = pymt.path.paypal.make_request("POST", pathname, `{"payer_id":"`+payerid+`"}`, "execute_" + pymt.uuid, pymt, false)
 	if err != nil {
@@ -153,7 +144,7 @@ func (t *Transaction) SetShippingAddress(recip_name string, typ AddressType, add
 		Address: addrss,
 	}
 }
-func (t *Transaction) AddItem(qty uint, price float64, curr, name, sku string) error {
+func (t *Transaction) AddItem(qty uint, price float64, curr, name, sku string) {
 	if t.Item_list == nil {
 		t.Item_list = new(item_list)
 	}
@@ -164,7 +155,6 @@ func (t *Transaction) AddItem(qty uint, price float64, curr, name, sku string) e
 		Currency: curr,
 		Sku: sku,
 	})
-	return nil
 }
 
 // The _times are assigned by PayPal in responses
@@ -184,7 +174,7 @@ type payment struct {
 	Links links					`json:"links,omitempty"`
 
 	// 
-	Payment_error *payment_error	`json:"payment_error,omitempty"`
+	*payment_error	`json:"payment_error,omitempty"`
 }
 
 type payment_list struct {

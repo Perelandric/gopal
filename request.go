@@ -9,7 +9,7 @@ import "strings"
 import "encoding/json"
 
 
-func (pp *PayPal) make_request(method, subdir string, body interface{}, idempotent_id string, jsn interface{}, auth_req bool) error {
+func (pp *PayPal) make_request(method, subdir string, body interface{}, idempotent_id string, jsn errorable, auth_req bool) error {
 	var err error
 	var result []byte
 	var req *http.Request
@@ -69,7 +69,18 @@ fmt.Println("Sending idempotent_id ", idempotent_id)
 
 fmt.Printf("\nReceived from PayPal: \n%s\n\n", result)
 
-	return json.Unmarshal(result, jsn)
+	err = json.Unmarshal(result, jsn)
+	if err != nil {
+		return err
+	}
+
+	err = jsn.to_error()
+	if err != nil {
+		// Specific management for PayPal response errors
+		return err
+	}
+
+	return nil
 }
 
 
