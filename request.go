@@ -2,17 +2,19 @@ package gopal
 
 import "net/http"
 import "path"
+import "io"
 import "io/ioutil"
 import "fmt"
 import "strings"
 import "encoding/json"
 
 
-func (pp *PayPal) make_request(method, subdir string, body, idempotent_id string, jsn interface{}, auth_req bool) error {
+func (pp *PayPal) make_request(method, subdir string, body interface{}, idempotent_id string, jsn interface{}, auth_req bool) error {
 	var err error
 	var result []byte
 	var req *http.Request
 	var resp *http.Response
+	var body_reader io.Reader
     var url = "https://api"
 
 	// use sandbox url if requested
@@ -21,9 +23,20 @@ func (pp *PayPal) make_request(method, subdir string, body, idempotent_id string
     }
     url = url + ".paypal.com/" + path.Join("v1", subdir)
 
-fmt.Printf("\nSending to PayPal: %s\n%s\n\n", url, body)
+	if str, ok := body.(string); ok {
+		body_reader = strings.NewReader(str)
+	} else {
+		result, err = json.Marshal(body)
+		if err != nil {
+			return err
+		}
+		body_reader = strings.NewReader(string(result))
+		result = nil
+	}
 
-    req, err = http.NewRequest(method, url, strings.NewReader(body))
+fmt.Printf("\nSending to PayPal: %s\n%s\n\n", url, body_reader)
+
+    req, err = http.NewRequest(method, url, body_reader)
 	if err != nil {
 		return err
 	}

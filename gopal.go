@@ -52,17 +52,13 @@ func (pp *PayPal) ForPath(pathname string) (*PayPalPath, error) {
 	return ppp, nil
 }
 
-func (pp *PayPal) is_authenticated() bool {
-	return time.Now().Before(pp.tokeninfo.expiration)
-}
-
 func (pp *PayPal) authenticate() error {
 	// If an error is returned, zero the tokeninfo
 	var err error
 	var duration time.Duration
 
 	// No need to authenticate if the previous has not yet expired
-	if pp.is_authenticated() {
+	if time.Now().Before(pp.tokeninfo.expiration) {
 		return nil
 	}
 

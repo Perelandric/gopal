@@ -102,17 +102,22 @@ func (pymt *Payment) send() (string, int, error) {
 }
 
 func (pymt *Payment) execute(query url.Values) error {
+	var err error
+	var payerid string
+	var pathname string
+
 	if pymt == nil {
 		return fmt.Errorf("No payment found")
 	}
-	var payerid = query.Get("PayerID")
+
+	payerid = query.Get("PayerID")
 	if payerid == "" {
 		return fmt.Errorf("PayerID is missing")
 	}
-	var pathname = path.Join("payments/payment", pymt.Id, "execute")
-	var body = fmt.Sprintf(`{"payer_id":%q}`, payerid)
 
-	var err = pymt.path.paypal.make_request("POST", pathname, body, "execute_" + pymt.uuid, pymt, false)
+	pathname = path.Join("payments/payment", pymt.Id, "execute")
+
+	err = pymt.path.paypal.make_request("POST", pathname, `{"payer_id":"`+payerid+`"}`, "execute_" + pymt.uuid, pymt, false)
 	if err != nil {
 		return err
 	}
