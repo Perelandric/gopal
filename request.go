@@ -6,6 +6,7 @@ import "io"
 import "io/ioutil"
 import "fmt"
 import "strings"
+import "bytes"
 import "encoding/json"
 
 
@@ -23,10 +24,13 @@ func (pp *PayPal) make_request(method, subdir string, body interface{}, idempote
     }
     url = url + ".paypal.com/" + path.Join("v1", subdir)
 
-	if str, ok := body.(string); ok {
-		body_reader = strings.NewReader(str)
-	} else {
-		result, err = json.Marshal(body)
+	switch val := body.(type) {
+	case string:
+		body_reader = strings.NewReader(val)
+	case []byte:
+		body_reader = bytes.NewReader(val)
+	default:
+		result, err = json.Marshal(val)
 		if err != nil {
 			return err
 		}
