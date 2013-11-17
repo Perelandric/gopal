@@ -5,12 +5,25 @@ import "net/http"
 import "net/url"
 import "time"
 
-func New(sandbox bool, id, secret, host string) (*PayPal, error) {
+const (
+	Sandbox = c_type(false)
+	Live = c_type(true)
+)
+
+type c_type bool
+func (self c_type) getType() bool {
+	return bool(self)
+}
+type connection_type interface {
+	getType() bool
+}
+
+func NewConnection(live connection_type, id, secret, host string) (*PayPal, error) {
 	var hosturl, err = url.Parse(host)
 	if err != nil {
 		return nil, err
 	}
-	var pp = &PayPal{sandbox:sandbox, id:id, secret:secret, hosturl:hosturl, client:http.Client{}}
+	var pp = &PayPal{live:live, id:id, secret:secret, hosturl:hosturl, client:http.Client{}}
 	err = pp.authenticate()
 	if err != nil {
 		return nil, err
@@ -19,37 +32,23 @@ func New(sandbox bool, id, secret, host string) (*PayPal, error) {
 }
 
 type PayPal struct {
-	sandbox bool
+	live connection_type
 	id, secret string
 	hosturl *url.URL
 	client http.Client
 	tokeninfo tokeninfo
 }
 
-func (pp *PayPal) ForPath(pathname string) (*PayPalPath, error) {
-	var pathurl, err = url.Parse(pathname)
-	if err != nil {
-		return nil, err
+func (pp *PayPal) PathGroup(request, valid, cancel string) (*PathGroup, error) {
+	for _, p := range [3]*string{&request, &valid, &cancel} {
+		var u, err = url.Parse(*p)
+		if err != nil {
+			return nil, err
+		}
+		*p = pp.hosturl.ResolveReference(u).String()
 	}
 
-	pathurl = pp.hosturl.ResolveReference(pathurl)
-
-	var ppp = &PayPalPath{pp, pathurl.Path, "", "", "", make(map[string]*Payment)}
-	var q = pathurl.Query()
-
-	q.Set("status", "request")
-	pathurl.RawQuery = q.Encode()
-	ppp.request_url = pathurl.String()
-
-	q.Set("status", "valid")
-	pathurl.RawQuery = q.Encode()
-	ppp.return_url = pathurl.String()
-
-	q.Set("status", "cancel")
-	pathurl.RawQuery = q.Encode()
-	ppp.cancel_url = pathurl.String()
-
-	return ppp, nil
+	return &PathGroup{pp, request, valid, cancel, make(map[string]*Payment)}, nil
 }
 
 func (pp *PayPal) authenticate() error {
@@ -82,38 +81,40 @@ func (pp *PayPal) authenticate() error {
 }
 
 
-type PayPalPath struct {
+
+
+type PathGroup struct {
 	paypal *PayPal
-	pathname string
 	request_url string
 	return_url string
 	cancel_url string
 	pending map[string]*Payment
 }
 
-func (ppp *PayPalPath) Send(pymt *Payment) (string, int, error) {
+func (ppp *PathGroup) Send(pymt *Payment) (string, int, error) {
 	if pymt == nil || ppp.pending[pymt.uuid] != pymt {
 		return "", 0, fmt.Errorf("Unknown payment.")
 	}
 	return pymt.send()
 }
 
-func (ppp *PayPalPath) Execute(req *http.Request) error {
+func (ppp *PathGroup) Execute(req *http.Request) error {
 	var query = req.URL.Query()
 	return ppp.pending[query.Get("uuid")].execute(query)
 }
 
-func (ppp *PayPalPath) Cancel(req *http.Request) {
+func (ppp *PathGroup) Cancel(req *http.Request) {
 	delete(ppp.pending, req.URL.Query().Get("uuid"))
 }
 
-func (ppp *PayPalPath) Path() string {
-	return ppp.pathname
-}
-func (ppp *PayPalPath) FullPath() string {
+// TODO: Do I need this method?
+func (ppp *PathGroup) FullPath() string {
 	return ppp.request_url
 }
 
+
+
+// Authorization response
 type tokeninfo struct {
 	Scope string			`json:"scope,omitempty"`
 	Access_token string		`json:"access_token,omitempty"`

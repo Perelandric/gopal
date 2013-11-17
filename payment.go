@@ -6,18 +6,43 @@ import "path"
 import "strconv"
 import "time"
 
-func (ppp *PayPalPath) PayPalPayment() (*Payment, error) {
+func (ppp *PathGroup) PayPalPayment() (*Payment, error) {
+
+	// Make sure we're still authenticated. Will refresh if not.
 	var err = ppp.paypal.authenticate()
 	if err != nil {
 		return nil, err
 	}
 
-	var pymt = &Payment {
+	var uuid string
+
+    for {
+        // TODO Clearly this needs to be improved
+        uuid = strconv.FormatInt(time.Now().UnixNano(), 36)
+        var _, ok = ppp.pending[uuid]
+		if ok {
+            continue
+        }
+        break
+    }
+
+	u, err := url.Parse(ppp.return_url)
+	var q = u.Query()
+	q.Set("uuid", uuid)
+	u.RawQuery = q.Encode()
+	var return_url = u.String()
+
+	u, err = url.Parse(ppp.cancel_url)
+	q.Set("uuid", uuid)
+	u.RawQuery = q.Encode()
+	var cancel_url = u.String()
+
+	ppp.pending[uuid] = &Payment {
 		payment: payment {
 			Intent: Sale,
 			Redirect_urls: redirects {
-				Return_url: ppp.return_url,
-				Cancel_url: ppp.cancel_url,
+				Return_url: return_url,
+				Cancel_url: cancel_url,
 			},
 			Payer: payer {
 				Payment_method: PayPalMethod,
@@ -25,33 +50,20 @@ func (ppp *PayPalPath) PayPalPayment() (*Payment, error) {
 			Transactions: make([]*Transaction, 0),
 		},
 		path: ppp,
-		uuid: "",
+		uuid: uuid,
 	}
 
-    for {
-        // TODO Clearly this needs to be improved
-        pymt.uuid = strconv.FormatInt(time.Now().UnixNano(), 36)
-        var _, ok = ppp.pending[pymt.uuid]
-		if ok {
-            continue
-        }
-        ppp.pending[pymt.uuid] = pymt
-        break
-    }
-	pymt.payment.Redirect_urls.Return_url += "&uuid=" + pymt.uuid
-	pymt.payment.Redirect_urls.Cancel_url += "&uuid=" + pymt.uuid
-
-	return pymt, nil
+	return ppp.pending[uuid], nil
 }
 
-func (ppp *PayPalPath) CreditCardPayment() error {
+func (ppp *PathGroup) CreditCardPayment() error {
 	return nil
 }
 
 
 type Payment struct {
 	payment
-	path *PayPalPath
+	path *PathGroup
 	uuid string
 }
 
@@ -156,6 +168,8 @@ func (t *Transaction) AddItem(qty uint, price float64, curr, name, sku string) {
 		Sku: sku,
 	})
 }
+
+
 
 // The _times are assigned by PayPal in responses
 type _times struct {
