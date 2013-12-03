@@ -15,9 +15,6 @@ type payer_info struct {
 	Shipping_address *ShippingAddress			`json:"shipping_address,omitempty"`
 }
 type Address struct {
-	address
-}
-type address struct {
 	Line1 string		`json:"line1,omitempty"`
 	Line2 string		`json:"line2,omitempty"`
 	City string			`json:"city,omitempty"`
@@ -29,7 +26,7 @@ type address struct {
 type ShippingAddress struct {
 	Recipient_name string	`json:"recipient_name,omitempty"`
 	Type AddressType		`json:"type,omitempty"`
-	address
+	Address
 }
 
 type identity_address struct {
@@ -83,7 +80,7 @@ type credit_card struct {
     Cvv2 string                 `json:"cvv2,omitempty"`
     First_name string           `json:"first_name,omitempty"`
     Last_name string            `json:"last_name,omitempty"`
-    Billing_address *address    `json:"billing_address,omitempty"`
+    Billing_address *Address    `json:"billing_address,omitempty"`
     State State					`json:"state,omitempty"`
     Valid_until string          `json:"valid_until,omitempty"`
 }
