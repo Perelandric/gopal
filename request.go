@@ -1,4 +1,5 @@
 package gopal
+/*
 
 import "fmt"
 import "net/http"
@@ -87,3 +88,4 @@ fmt.Println(string(result))
 }
 
 
+*/

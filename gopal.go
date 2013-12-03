@@ -1,24 +1,18 @@
 package gopal
 
-import "fmt"
 import "net/http"
 import "net/url"
 import "time"
+import "fmt"
+import "path"
+import "io"
+import "io/ioutil"
+import "strings"
+import "bytes"
+import "encoding/json"
 
-const (
-	Sandbox = c_type(false)
-	Live = c_type(true)
-)
 
-type c_type bool
-func (self c_type) getType() bool {
-	return bool(self)
-}
-type connection_type interface {
-	getType() bool
-}
-
-func NewConnection(live connection_type, id, secret, host string) (*Connection, error) {
+func NewConnection(live connection_type_i, id, secret, host string) (*Connection, error) {
 	var hosturl, err = url.Parse(host)
 	if err != nil {
 		return nil, err
@@ -32,7 +26,7 @@ func NewConnection(live connection_type, id, secret, host string) (*Connection, 
 }
 
 type Connection struct {
-	live connection_type
+	live connection_type_i
 	id, secret string
 	hosturl *url.URL
 	client http.Client
@@ -82,28 +76,6 @@ func (self *Connection) authenticate() error {
 
 
 
-
-type PathGroup struct {
-	connection *Connection
-	return_url string
-	cancel_url string
-	pending map[string]*Payment
-}
-
-func (self *PathGroup) GetPayment(req *http.Request) (*Payment, error) {
-	var query = req.URL.Query()
-	var uuid = query.Get("uuid")
-	var pymt, _ = self.pending[uuid]
-
-	if pymt == nil || pymt.uuid != uuid {
-		return nil, fmt.Errorf("Unknown payment")
-	}
-	pymt.url_values = query
-	return pymt, nil
-}
-
-
-
 // Authorization response
 type tokeninfo struct {
 	Scope string			`json:"scope,omitempty"`
@@ -126,113 +98,80 @@ func (ti *tokeninfo) auth_token() string {
 }
 
 
-type Intent string
-const Sale = Intent("sale")
-const Authorize = Intent("authorize")
+func (pp *Connection) make_request(method, subdir string, body interface{}, idempotent_id string, jsn errorable, auth_req bool) error {
+	var err error
+	var result []byte
+	var req *http.Request
+	var resp *http.Response
+	var body_reader io.Reader
+    var url = "https://api"
+
+	// use sandbox url if requested
+    if pp.live == Sandbox {
+        url += ".sandbox"
+    }
+    url = url + ".paypal.com/" + path.Join("v1", subdir)
+
+	switch val := body.(type) {
+	case string:
+		body_reader = strings.NewReader(val)
+	case []byte:
+		body_reader = bytes.NewReader(val)
+	default:
+		result, err = json.Marshal(val)
+		if err != nil {
+			return err
+		}
+		body_reader = bytes.NewReader(result)
+		result = nil
+	}
+
+    req, err = http.NewRequest(method, url, body_reader)
+	if err != nil {
+		return err
+	}
+
+	if auth_req {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req.SetBasicAuth(pp.id, pp.secret)
+	} else {
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", pp.tokeninfo.auth_token())
+		if idempotent_id != "" {
+			req.Header.Set("PayPal-Request-Id", idempotent_id)
+		}
+	}
+    req.Header.Set("Accept", "application/json")
+	req.Header.Set("Accept-Language", "en_US")
 
 
-type AddressType string
-const Residential = AddressType("residential")
-const Business = AddressType("business")
-const Mailbox = AddressType("mailbox")
+	resp, err = pp.client.Do(req)
+    if err != nil {
+        return err
+    }
+    defer resp.Body.Close()
 
 
+    result, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
 
+fmt.Println(string(result))
+	err = json.Unmarshal(result, jsn)
+//var x,y = json.Marshal(jsn)
+//fmt.Printf("=++++++++++++++++++\n%s\n%v\n",x,y)
+	if err != nil {
+		return err
+	}
 
-type PaymentMethod string
-func (self PaymentMethod) payment_method() PaymentMethod {
-	return self
+	err = jsn.to_error()
+	if err != nil {
+		// Specific management for PayPal response errors
+		return err
+	}
+
+	return nil
 }
-type payment_method_i interface {
-	payment_method() PaymentMethod
-}
-const CreditCard = PaymentMethod("credit_card")
-const PayPal = PaymentMethod("paypal")
-
-
-
-
-type CreditCardType string
-func (self CreditCardType) credit_card_type() CreditCardType {
-	return self
-}
-type credit_card_type_i interface {
-	credit_card_type() CreditCardType
-}
-const Visa = CreditCardType("visa")
-const MasterCard = CreditCardType("mastercard")
-const Discover = CreditCardType("discover")
-const Amex = CreditCardType("amex")
-
-
-
-
-type State string
-
-// payment
-const Created = State("created")
-const Approved = State("approved")
-const Canceled = State("canceled")
-
-// payment/refund
-const Failed = State("failed")
-
-// refund/sale/capture/authorization
-const Pending = State("pending")
-
-// refund/sale/capture
-const Completed = State("completed")
-
-// sale/capture
-const Refunded = State("refunded")
-const PartiallyRefunded = State("partially_refunded")
-
-// payment/credit_card/authorization
-const Expired = State("expired")
-
-// credit_card
-const Ok = State("ok")
-
-// authorization
-const Authorized = State("authorized")
-const Captured = State("captured")
-const PartiallyCaptured = State("partially_captured")
-const Voided = State("voided")
-
-
-
-
-type CurrencyType string
-func (self CurrencyType) currency_type() CurrencyType {
-	return self
-}
-type currency_type_i interface {
-	currency_type() CurrencyType
-}
-const AUD = CurrencyType("AUD") // Australian dollar
-const BRL = CurrencyType("BRL") // Brazilian real**
-const CAD = CurrencyType("CAD") // Canadian dollar
-const CZK = CurrencyType("CZK") // Czech koruna
-const DKK = CurrencyType("DKK") // Danish krone
-const EUR = CurrencyType("EUR") // Euro
-const HKD = CurrencyType("HKD") // Hong Kong dollar
-const HUF = CurrencyType("HUF") // Hungarian forint
-const ILS = CurrencyType("ILS") // Israeli new shekel
-const JPY = CurrencyType("JPY") // Japanese yen*
-const MYR = CurrencyType("MYR") // Malaysian ringgit**
-const MXN = CurrencyType("MXN") // Mexican peso
-const TWD = CurrencyType("TWD") // New Taiwan dollar*
-const NZD = CurrencyType("NZD") // New Zealand dollar
-const NOK = CurrencyType("NOK") // Norwegian krone
-const PHP = CurrencyType("PHP") // Philippine peso
-const PLN = CurrencyType("PLN") // Polish złoty
-const GBP = CurrencyType("GBP") // Pound sterling
-const SGD = CurrencyType("SGD") // Singapore dollar
-const SEK = CurrencyType("SEK") // Swedish krona
-const CHF = CurrencyType("CHF") // Swiss franc
-const THB = CurrencyType("THB") // Thai baht
-const TRY = CurrencyType("TRY") // Turkish lira**
-const USD = CurrencyType("USD") // United States dollar
-
 
 
