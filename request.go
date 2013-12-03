@@ -1,5 +1,6 @@
 package gopal
 
+import "fmt"
 import "net/http"
 import "path"
 import "io"
@@ -9,7 +10,7 @@ import "bytes"
 import "encoding/json"
 
 
-func (pp *PayPal) make_request(method, subdir string, body interface{}, idempotent_id string, jsn errorable, auth_req bool) error {
+func (pp *Connection) make_request(method, subdir string, body interface{}, idempotent_id string, jsn errorable, auth_req bool) error {
 	var err error
 	var result []byte
 	var req *http.Request
@@ -68,8 +69,10 @@ func (pp *PayPal) make_request(method, subdir string, body interface{}, idempote
 		return err
 	}
 
-
+fmt.Println(string(result))
 	err = json.Unmarshal(result, jsn)
+//var x,y = json.Marshal(jsn)
+//fmt.Printf("=++++++++++++++++++\n%s\n%v\n",x,y)
 	if err != nil {
 		return err
 	}

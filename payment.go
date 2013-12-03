@@ -6,108 +6,140 @@ import "path"
 import "strconv"
 import "time"
 
-func (ppp *PathGroup) PayPalPayment() (*Payment, error) {
+func (self *PathGroup) CreatePayment(method payment_method_i) (*Payment, error) {
 
-	// Make sure we're still authenticated. Will refresh if not.
-	var err = ppp.paypal.authenticate()
-	if err != nil {
-		return nil, err
+	if method == PayPal {
+		// Make sure we're still authenticated. Will refresh if not.
+		var err = self.connection.authenticate()
+		if err != nil {
+			return nil, err
+		}
+
+		var uuid string
+
+		for {	// TODO Clearly this needs to be improved
+			uuid = strconv.FormatInt(time.Now().UnixNano(), 36)
+			var _, ok = self.pending[uuid]
+			if ok {
+				continue
+			}
+			break
+		}
+
+		var return_url, cancel_url = self.return_url, self.cancel_url
+
+		for _, uptr := range [...]*string{&return_url, &cancel_url} {
+			u, _ := url.Parse(*uptr)
+			var q = u.Query()
+			q.Set("uuid", uuid)
+			u.RawQuery = q.Encode()
+			*uptr = u.String()
+		}
+
+		self.pending[uuid] = &Payment {
+			payment: payment {
+				Intent: Sale,
+				Redirect_urls: redirects {
+					Return_url: return_url,
+					Cancel_url: cancel_url,
+				},
+				Payer: payer {
+					Payment_method: method.payment_method(), // PayPal
+				},
+				Transactions: make([]*transaction, 0),
+			},
+			url_values: nil,
+			pathGroup: self,
+			uuid: uuid,
+		}
+
+		return self.pending[uuid], nil
+	}
+	return nil, nil
+}
+
+
+
+
+/***************************
+
+	Payment object methods
+
+***************************/
+
+func (self *Payment) AddTransaction(trans Transaction) {
+	var t = transaction {
+		Amount: amount {
+			Currency: trans.Currency.currency_type(),
+			Total: trans.Total,
+		},
+		Description: trans.Description,
+	}
+	if trans.Details != nil {
+		t.Amount.Details = &Details {
+			Subtotal: trans.Details.Subtotal,
+			Tax: trans.Details.Tax,
+			Shipping: trans.Details.Shipping,
+		}
+	//	Fee: "0",	// This field is only for paypal response data
 	}
 
-	var uuid string
+	if trans.item_list != nil {
+		var list = *trans.item_list
+		t.Item_list = &list
+	}
 
-    for {
-        // TODO Clearly this needs to be improved
-        uuid = strconv.FormatInt(time.Now().UnixNano(), 36)
-        var _, ok = ppp.pending[uuid]
-		if ok {
-            continue
-        }
-        break
+	if trans.ShippingAddress != nil {
+		if t.Item_list == nil {
+			t.Item_list = new(item_list)
+		}
+		t.Item_list.Shipping_address = trans.ShippingAddress
+	}
+	self.payment.Transactions = append(self.payment.Transactions, &t)
+}
+
+func (self *Payment) Authorize() (to string, code int, err error) {
+	defer func() {
+		if err != nil {
+			self.Cancel()
+		}
+	}()
+
+	if self == nil || self.pathGroup.pending[self.uuid] != self {
+        err = fmt.Errorf("Unknown payment.")
+		return to, code, err
     }
 
-	u, err := url.Parse(ppp.return_url)
-	var q = u.Query()
-	q.Set("uuid", uuid)
-	u.RawQuery = q.Encode()
-	var return_url = u.String()
+	err = self.pathGroup.connection.make_request("POST", "payments/payment", &self.payment, "send_" + self.uuid, &self.payment, false)
 
-	u, err = url.Parse(ppp.cancel_url)
-	q.Set("uuid", uuid)
-	u.RawQuery = q.Encode()
-	var cancel_url = u.String()
-
-	ppp.pending[uuid] = &Payment {
-		payment: payment {
-			Intent: Sale,
-			Redirect_urls: redirects {
-				Return_url: return_url,
-				Cancel_url: cancel_url,
-			},
-			Payer: payer {
-				Payment_method: PayPalMethod,
-			},
-			Transactions: make([]*Transaction, 0),
-		},
-		path: ppp,
-		uuid: uuid,
-	}
-
-	return ppp.pending[uuid], nil
-}
-
-func (ppp *PathGroup) CreditCardPayment() error {
-	return nil
-}
-
-
-type Payment struct {
-	payment
-	path *PathGroup
-	uuid string
-}
-
-func (pymt *Payment) AddTransaction(amt float64, curr, desc string) (*Transaction, error) {
-	var t = &Transaction{
-		transaction{
-			Amount: amount {
-				Currency: curr,
-				Total: amt,
-			},
-			Description: desc,
-		},
-	}
-	pymt.payment.Transactions = append(pymt.payment.Transactions, t)
-	return t, nil
-}
-
-func (pymt *Payment) send() (string, int, error) {
-	var err error
-	var to = ""
-	var code = 500
-
-	err = pymt.path.paypal.make_request("POST", "payments/payment", &pymt.payment, "send_" + pymt.uuid, &pymt.payment, false)
-	if err != nil {
-		return to, code, err
-	}
-
-	to = pymt.payment.Redirect_urls.Cancel_url
-
-	if pymt.payment.State == Created {
-		to, _ = pymt.payment.Links.get("approval_url")
-		code = 303
+	if err == nil {
+		switch self.payment.State {
+		case Created:
+			// Set url to redirect to PayPal site to begin approval process
+			to, _ = self.payment.Links.get("approval_url")
+			code = 303
+		default:
+			// otherwise cancel the payment and return an error
+			err = UnexpectedResponse
+		}
 	}
 
 	return to, code, err
 }
 
-func (pymt *Payment) execute(query url.Values) error {
+func (self *Payment) Execute() error {
 	var err error
 	var payerid string
 	var pathname string
 
-	if pymt == nil {
+	if self == nil {
 		return fmt.Errorf("No payment found")
+	}
+
+	var query = self.url_values
+
+	if query == nil {
+		return fmt.Errorf("Attempt to execute a payment that has not been approved")
 	}
 
 	payerid = query.Get("PayerID")
@@ -115,56 +147,43 @@ func (pymt *Payment) execute(query url.Values) error {
 		return fmt.Errorf("PayerID is missing")
 	}
 
-	pathname = path.Join("payments/payment", pymt.Id, "execute")
+	pathname = path.Join("payments/payment", self.Id, "execute")
 
 // TODO Maybe make_request() should check the resulting unmarshaled body for a PayPal error object?
 // 		Every object I pass to take the body would need to implement an interface to allow this.
 
-	err = pymt.path.paypal.make_request("POST", pathname, `{"payer_id":"`+payerid+`"}`, "execute_" + pymt.uuid, pymt, false)
+	err = self.pathGroup.connection.make_request("POST", pathname, `{"payer_id":"`+payerid+`"}`, "execute_" + self.uuid, self, false)
 	if err != nil {
 		return err
 	}
 
-	if pymt.State != Approved {
+	if self.State != Approved {
 		return fmt.Errorf("Payment not approved")
 	}
 // TODO I should remove the Payment object from Pending at this point?
 	return nil
 }
 
+func (self *Payment) Cancel() error {
+	if self == nil {
+		return fmt.Errorf("Payment not found")
+	}
+	// TODO: Should I have some sort of status check? Like for canceling a payment that is complete?
+	delete(self.pathGroup.pending, self.uuid)
+	return nil
+}
 
 
 
-type Transaction struct {
-	transaction
-}
-func (t *Transaction) SetDetails(shipping, subtotal, tax, fee float64) {
-	t.Amount.Details = &details {
-		Shipping: shipping,
-		Subtotal: subtotal,
-		Tax: tax,
-		Fee: fee,
+func (t *Transaction) AddItem(qty uint, price float64, curr currency_type_i, name, sku string) {
+	if t.item_list == nil {
+		t.item_list = new(item_list)
 	}
-}
-func (t *Transaction) SetShippingAddress(recip_name string, typ AddressType, addrss Address) {
-	if t.Item_list == nil {
-		t.Item_list = new(item_list)
-	}
-	t.Item_list.Shipping_address = &shipping_address {
-		Recipient_name: recip_name,
-		Type: typ,
-		Address: addrss,
-	}
-}
-func (t *Transaction) AddItem(qty uint, price float64, curr, name, sku string) {
-	if t.Item_list == nil {
-		t.Item_list = new(item_list)
-	}
-	t.Item_list.Items = append(t.Item_list.Items, &item {
+	t.item_list.Items = append(t.item_list.Items, &item {
 		Quantity: qty,
 		Name: name,
 		Price: price,
-		Currency: curr,
+		Currency: curr.currency_type(),
 		Sku: sku,
 	})
 }
@@ -177,18 +196,24 @@ type _times struct {
     Update_time string  `json:"update_time,omitempty"`
 }
 
+
+type Payment struct {
+	payment
+	pathGroup *PathGroup
+	uuid string
+	url_values url.Values	// Holds values from response from PayPal
+}
 type payment struct {
 	_times
 	Intent Intent					`json:"intent,omitempty"`
 	Payer payer						`json:"payer,omitempty"`
-	Transactions []*Transaction		`json:"transactions,omitempty"`
+	Transactions []*transaction		`json:"transactions,omitempty"`
 	Redirect_urls redirects			`json:"redirect_urls,omitempty"`
 	Id string						`json:"id,omitempty"`
 	State State						`json:"state,omitempty"`
-	Links links					`json:"links,omitempty"`
+	Links links						`json:"links,omitempty"`
 
-	// 
-	*payment_error	`json:"payment_error,omitempty"`
+	*payment_error
 }
 
 type payment_list struct {
@@ -196,11 +221,24 @@ type payment_list struct {
 	Count int			`json:"count,omitempty"`
 }
 
-type transaction struct {
-	Amount amount			`json:"amount,omitempty"`
-	Description string		`json:"description,omitempty"`
-	Item_list *item_list	`json:"item_list,omitempty"`
+type Transaction struct {
+	Total float64
+	Currency CurrencyType
+	Description string
+	Details *Details
+	ShippingAddress *ShippingAddress
+	*item_list
 }
+type transaction struct {
+	Amount amount						`json:"amount"`	// Required object
+	Description string					`json:"description,omitempty"`
+	Item_list *item_list				`json:"item_list,omitempty"`
+	Related_resources related_resources	`json:"related_resources,omitempty`
+}
+
+	// TODO: I need to define this somehow
+	// array of sale, authorization, capture, or refund, objects
+type related_resources []interface{}
 
 type payment_execution struct {
 	Payer_id string				`json:"payer_id,omitempty"`
@@ -209,25 +247,26 @@ type payment_execution struct {
 
 type item_list struct {
 	Items []*item						`json:"items,omitempty"`
-	Shipping_address *shipping_address	`json:"shipping_address,omitempty"`
+	Shipping_address *ShippingAddress	`json:"shipping_address,omitempty"`
 }
 type item struct {
-	Quantity uint	`json:"quantity,omitempty,string"`
-	Name string		`json:"name,omitempty"`
-	Price float64	`json:"price,omitempty,string"`
-	Currency string	`json:"currency,omitempty"`
-	Sku string		`json:"sku,omitempty"`
+	Quantity uint			`json:"quantity,omitempty,string"`
+	Name string				`json:"name,omitempty"`
+	Price float64			`json:"price,omitempty,string"`
+	Currency CurrencyType	`json:"currency,omitempty"`
+	Sku string				`json:"sku,omitempty"`
 }
 type amount struct {
-	Currency string		`json:"currency,omitempty"`
-	Total float64		`json:"total,omitempty,string"`
-	Details *details	`json:"details,omitempty"`
+	Currency CurrencyType	`json:"currency,omitempty"`		// Required
+	Total float64			`json:"total,omitempty,string"`	// Required
+	Details *Details		`json:"details,omitempty"`
 }
-type details struct {
-	Shipping float64	`json:"shipping,omitempty"`
-	Subtotal float64	`json:"subtotal,omitempty,string"`
+
+type Details struct {
+	Shipping float64	`json:"shipping,omitempty,string"`
+	Subtotal float64	`json:"subtotal,omitempty,string"` // Apparently must be greater than 0
 	Tax float64			`json:"tax,omitempty,string"`
-	Fee float64			`json:"fee,omitempty,string"`
+	Fee float64			`json:"fee,omitempty,string"`	// Response only
 }
 
 type _trans struct {

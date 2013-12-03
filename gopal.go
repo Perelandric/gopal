@@ -18,20 +18,20 @@ type connection_type interface {
 	getType() bool
 }
 
-func NewConnection(live connection_type, id, secret, host string) (*PayPal, error) {
+func NewConnection(live connection_type, id, secret, host string) (*Connection, error) {
 	var hosturl, err = url.Parse(host)
 	if err != nil {
 		return nil, err
 	}
-	var pp = &PayPal{live:live, id:id, secret:secret, hosturl:hosturl, client:http.Client{}}
-	err = pp.authenticate()
+	var conn = &Connection{live:live, id:id, secret:secret, hosturl:hosturl, client:http.Client{}}
+	err = conn.authenticate()
 	if err != nil {
 		return nil, err
 	}
-	return pp, nil
+	return conn, nil
 }
 
-type PayPal struct {
+type Connection struct {
 	live connection_type
 	id, secret string
 	hosturl *url.URL
@@ -39,43 +39,43 @@ type PayPal struct {
 	tokeninfo tokeninfo
 }
 
-func (pp *PayPal) PathGroup(request, valid, cancel string) (*PathGroup, error) {
-	for _, p := range [3]*string{&request, &valid, &cancel} {
+func (self *Connection) PathGroup(valid, cancel string) (*PathGroup, error) {
+	for _, p := range [...]*string{&valid, &cancel} {
 		var u, err = url.Parse(*p)
 		if err != nil {
 			return nil, err
 		}
-		*p = pp.hosturl.ResolveReference(u).String()
+		*p = self.hosturl.ResolveReference(u).String()
 	}
 
-	return &PathGroup{pp, request, valid, cancel, make(map[string]*Payment)}, nil
+	return &PathGroup{self, valid, cancel, make(map[string]*Payment)}, nil
 }
 
-func (pp *PayPal) authenticate() error {
+func (self *Connection) authenticate() error {
 	// If an error is returned, zero the tokeninfo
 	var err error
 	var duration time.Duration
 
 	// No need to authenticate if the previous has not yet expired
-	if time.Now().Before(pp.tokeninfo.expiration) {
+	if time.Now().Before(self.tokeninfo.expiration) {
 		return nil
 	}
 
 	defer func() {
 		if err != nil {
-			pp.tokeninfo = tokeninfo{}
+			self.tokeninfo = tokeninfo{}
 		}
 	}()
 
 	// (re)authenticate
-	err = pp.make_request("POST", "/oauth2/token", "grant_type=client_credentials", "", &pp.tokeninfo, true)
+	err = self.make_request("POST", "/oauth2/token", "grant_type=client_credentials", "", &self.tokeninfo, true)
 	if err != nil {
 		return err
 	}
 
 	// Set the duration to expire 3 minutes early to avoid expiration during a request cycle
-	duration = time.Duration(pp.tokeninfo.Expires_in) * time.Second - 3 * time.Minute
-	pp.tokeninfo.expiration = time.Now().Add(duration)
+	duration = time.Duration(self.tokeninfo.Expires_in) * time.Second - 3 * time.Minute
+	self.tokeninfo.expiration = time.Now().Add(duration)
 
 	return nil
 }
@@ -84,32 +84,22 @@ func (pp *PayPal) authenticate() error {
 
 
 type PathGroup struct {
-	paypal *PayPal
-	request_url string
+	connection *Connection
 	return_url string
 	cancel_url string
 	pending map[string]*Payment
 }
 
-func (ppp *PathGroup) Send(pymt *Payment) (string, int, error) {
-	if pymt == nil || ppp.pending[pymt.uuid] != pymt {
-		return "", 0, fmt.Errorf("Unknown payment.")
-	}
-	return pymt.send()
-}
-
-func (ppp *PathGroup) Execute(req *http.Request) error {
+func (self *PathGroup) GetPayment(req *http.Request) (*Payment, error) {
 	var query = req.URL.Query()
-	return ppp.pending[query.Get("uuid")].execute(query)
-}
+	var uuid = query.Get("uuid")
+	var pymt, _ = self.pending[uuid]
 
-func (ppp *PathGroup) Cancel(req *http.Request) {
-	delete(ppp.pending, req.URL.Query().Get("uuid"))
-}
-
-// TODO: Do I need this method?
-func (ppp *PathGroup) FullPath() string {
-	return ppp.request_url
+	if pymt == nil || pymt.uuid != uuid {
+		return nil, fmt.Errorf("Unknown payment")
+	}
+	pymt.url_values = query
+	return pymt, nil
 }
 
 
@@ -147,16 +137,34 @@ const Business = AddressType("business")
 const Mailbox = AddressType("mailbox")
 
 
+
+
 type PaymentMethod string
-const CreditCardMethod = PaymentMethod("credit_card")
-const PayPalMethod = PaymentMethod("paypal")
+func (self PaymentMethod) payment_method() PaymentMethod {
+	return self
+}
+type payment_method_i interface {
+	payment_method() PaymentMethod
+}
+const CreditCard = PaymentMethod("credit_card")
+const PayPal = PaymentMethod("paypal")
+
+
 
 
 type CreditCardType string
+func (self CreditCardType) credit_card_type() CreditCardType {
+	return self
+}
+type credit_card_type_i interface {
+	credit_card_type() CreditCardType
+}
 const Visa = CreditCardType("visa")
 const MasterCard = CreditCardType("mastercard")
 const Discover = CreditCardType("discover")
 const Amex = CreditCardType("amex")
+
+
 
 
 type State string
@@ -190,6 +198,41 @@ const Authorized = State("authorized")
 const Captured = State("captured")
 const PartiallyCaptured = State("partially_captured")
 const Voided = State("voided")
+
+
+
+
+type CurrencyType string
+func (self CurrencyType) currency_type() CurrencyType {
+	return self
+}
+type currency_type_i interface {
+	currency_type() CurrencyType
+}
+const AUD = CurrencyType("AUD") // Australian dollar
+const BRL = CurrencyType("BRL") // Brazilian real**
+const CAD = CurrencyType("CAD") // Canadian dollar
+const CZK = CurrencyType("CZK") // Czech koruna
+const DKK = CurrencyType("DKK") // Danish krone
+const EUR = CurrencyType("EUR") // Euro
+const HKD = CurrencyType("HKD") // Hong Kong dollar
+const HUF = CurrencyType("HUF") // Hungarian forint
+const ILS = CurrencyType("ILS") // Israeli new shekel
+const JPY = CurrencyType("JPY") // Japanese yen*
+const MYR = CurrencyType("MYR") // Malaysian ringgit**
+const MXN = CurrencyType("MXN") // Mexican peso
+const TWD = CurrencyType("TWD") // New Taiwan dollar*
+const NZD = CurrencyType("NZD") // New Zealand dollar
+const NOK = CurrencyType("NOK") // Norwegian krone
+const PHP = CurrencyType("PHP") // Philippine peso
+const PLN = CurrencyType("PLN") // Polish złoty
+const GBP = CurrencyType("GBP") // Pound sterling
+const SGD = CurrencyType("SGD") // Singapore dollar
+const SEK = CurrencyType("SEK") // Swedish krona
+const CHF = CurrencyType("CHF") // Swiss franc
+const THB = CurrencyType("THB") // Thai baht
+const TRY = CurrencyType("TRY") // Turkish lira**
+const USD = CurrencyType("USD") // United States dollar
 
 
 

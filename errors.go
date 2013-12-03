@@ -6,6 +6,7 @@ type errorable interface {
 	to_error() error
 }
 
+var UnexpectedResponse = fmt.Errorf("Paypal server returned an unexpected response")
 var AmountMismatchError = fmt.Errorf("Sum of values doesn't match total amount.")
 
 type identity_error struct {
