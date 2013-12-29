@@ -11,13 +11,12 @@ import "strings"
 import "bytes"
 import "encoding/json"
 
-
 func NewConnection(live connection_type_i, id, secret, host string) (*Connection, error) {
 	var hosturl, err = url.Parse(host)
 	if err != nil {
 		return nil, err
 	}
-	var conn = &Connection{live:live, id:id, secret:secret, hosturl:hosturl, client:http.Client{}}
+	var conn = &Connection{live: live, id: id, secret: secret, hosturl: hosturl, client: http.Client{}}
 	err = conn.authenticate()
 	if err != nil {
 		return nil, err
@@ -26,11 +25,11 @@ func NewConnection(live connection_type_i, id, secret, host string) (*Connection
 }
 
 type Connection struct {
-	live connection_type_i
+	live       connection_type_i
 	id, secret string
-	hosturl *url.URL
-	client http.Client
-	tokeninfo tokeninfo
+	hosturl    *url.URL
+	client     http.Client
+	tokeninfo  tokeninfo
 }
 
 func (self *Connection) PathGroup(valid, cancel string) (*PathGroup, error) {
@@ -42,7 +41,13 @@ func (self *Connection) PathGroup(valid, cancel string) (*PathGroup, error) {
 		*p = self.hosturl.ResolveReference(u).String()
 	}
 
-	return &PathGroup{self, valid, cancel, make(map[string]*Payment)}, nil
+	var pg = &PathGroup{connection: self, return_url: valid, cancel_url: cancel}
+	pg.Payments.pathGroup = pg
+	pg.Payments.pending = make(map[string]*Payment)
+
+	pg.Authorizations.pathGroup = pg
+
+	return pg, nil
 }
 
 func (self *Connection) authenticate() error {
@@ -68,24 +73,22 @@ func (self *Connection) authenticate() error {
 	}
 
 	// Set the duration to expire 3 minutes early to avoid expiration during a request cycle
-	duration = time.Duration(self.tokeninfo.Expires_in) * time.Second - 3 * time.Minute
+	duration = time.Duration(self.tokeninfo.Expires_in)*time.Second - 3*time.Minute
 	self.tokeninfo.expiration = time.Now().Add(duration)
 
 	return nil
 }
 
-
-
 // Authorization response
 type tokeninfo struct {
-	Scope string			`json:"scope,omitempty"`
-	Access_token string		`json:"access_token,omitempty"`
-	Refresh_token string	`json:"refresh_token,omitempty"`
-	Token_type string		`json:"token_type,omitempty"`
-	Expires_in uint			`json:"expires_in,omitempty"`
+	Scope         string `json:"scope,omitempty"`
+	Access_token  string `json:"access_token,omitempty"`
+	Refresh_token string `json:"refresh_token,omitempty"`
+	Token_type    string `json:"token_type,omitempty"`
+	Expires_in    uint   `json:"expires_in,omitempty"`
 
 	// Not sure about this field. Appears in response, but not in documentation.
-	App_id string			`json:"app_id,omitempty"`
+	App_id string `json:"app_id,omitempty"`
 
 	// Derived fields
 	expiration time.Time
@@ -93,10 +96,10 @@ type tokeninfo struct {
 	// Handles the case where an error is received instead
 	*identity_error
 }
+
 func (ti *tokeninfo) auth_token() string {
 	return ti.Token_type + " " + ti.Access_token
 }
-
 
 func (pp *Connection) make_request(method, subdir string, body interface{}, idempotent_id string, jsn errorable, auth_req bool) error {
 	var err error
@@ -104,13 +107,13 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 	var req *http.Request
 	var resp *http.Response
 	var body_reader io.Reader
-    var url = "https://api"
+	var url = "https://api"
 
 	// use sandbox url if requested
-    if pp.live == Sandbox {
-        url += ".sandbox"
-    }
-    url = url + ".paypal.com/" + path.Join("v1", subdir)
+	if pp.live == Sandbox {
+		url += ".sandbox"
+	}
+	url = url + ".paypal.com/" + path.Join("v1", subdir)
 
 	switch val := body.(type) {
 	case string:
@@ -126,7 +129,7 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 		result = nil
 	}
 
-    req, err = http.NewRequest(method, url, body_reader)
+	req, err = http.NewRequest(method, url, body_reader)
 	if err != nil {
 		return err
 	}
@@ -141,26 +144,24 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 			req.Header.Set("PayPal-Request-Id", idempotent_id)
 		}
 	}
-    req.Header.Set("Accept", "application/json")
+	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Accept-Language", "en_US")
 
-
 	resp, err = pp.client.Do(req)
-    if err != nil {
-        return err
-    }
-    defer resp.Body.Close()
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
 
-
-    result, err = ioutil.ReadAll(resp.Body)
+	result, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
 
-fmt.Println(string(result))
+	fmt.Println(string(result))
 	err = json.Unmarshal(result, jsn)
-//var x,y = json.Marshal(jsn)
-//fmt.Printf("=++++++++++++++++++\n%s\n%v\n",x,y)
+	//var x,y = json.Marshal(jsn)
+	//fmt.Printf("=++++++++++++++++++\n%s\n%v\n",x,y)
 	if err != nil {
 		return err
 	}
@@ -173,5 +174,3 @@ fmt.Println(string(result))
 
 	return nil
 }
-
-

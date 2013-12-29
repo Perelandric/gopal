@@ -3,14 +3,13 @@ package gopal
 // Types of PayPal connection (Sandbox or Live)
 type c_type bool
 func (self c_type) getType() bool {
-    return bool(self)
+	return bool(self)
 }
 type connection_type_i interface {
-    getType() bool
+	getType() bool
 }
 const Sandbox = c_type(false)
 const Live = c_type(true)
-
 
 
 
@@ -20,42 +19,39 @@ const Authorize = Intent("authorize")
 
 
 
-
 type AddressType string
+
 const Residential = AddressType("residential")
 const Business = AddressType("business")
 const Mailbox = AddressType("mailbox")
 
-
-
-
 type PaymentMethod string
+
 func (self PaymentMethod) payment_method() PaymentMethod {
 	return self
 }
+
 type payment_method_i interface {
 	payment_method() PaymentMethod
 }
+
 const CreditCard = PaymentMethod("credit_card")
 const PayPal = PaymentMethod("paypal")
 
-
-
-
 type CreditCardType string
+
 func (self CreditCardType) credit_card_type() CreditCardType {
 	return self
 }
+
 type credit_card_type_i interface {
 	credit_card_type() CreditCardType
 }
+
 const Visa = CreditCardType("visa")
 const MasterCard = CreditCardType("mastercard")
 const Discover = CreditCardType("discover")
 const Amex = CreditCardType("amex")
-
-
-
 
 type State string
 
@@ -89,16 +85,16 @@ const Captured = State("captured")
 const PartiallyCaptured = State("partially_captured")
 const Voided = State("voided")
 
-
-
-
 type CurrencyType string
+
 func (self CurrencyType) currency_type() CurrencyType {
 	return self
 }
+
 type currency_type_i interface {
 	currency_type() CurrencyType
 }
+
 const AUD = CurrencyType("AUD") // Australian dollar
 const BRL = CurrencyType("BRL") // Brazilian real**
 const CAD = CurrencyType("CAD") // Canadian dollar
@@ -123,6 +119,3 @@ const CHF = CurrencyType("CHF") // Swiss franc
 const THB = CurrencyType("THB") // Thai baht
 const TRY = CurrencyType("TRY") // Turkish lira**
 const USD = CurrencyType("USD") // United States dollar
-
-
-

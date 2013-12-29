@@ -10,10 +10,11 @@ var UnexpectedResponse = fmt.Errorf("Paypal server returned an unexpected respon
 var AmountMismatchError = fmt.Errorf("Sum of values doesn't match total amount.")
 
 type identity_error struct {
-    Error string				`json:"error,omitempty"`
-    Error_description string	`json:"error_description,omitempty"`
-    Error_uri string			`json:"error_uri,omitempty"`
+	Error             string `json:"error,omitempty"`
+	Error_description string `json:"error_description,omitempty"`
+	Error_uri         string `json:"error_uri,omitempty"`
 }
+
 func (ie *identity_error) to_error() error {
 	if ie == nil {
 		return nil
@@ -22,10 +23,11 @@ func (ie *identity_error) to_error() error {
 }
 
 type http_status_error struct {
-    Name string				`json:"name,omitempty"`
-    Message string			`json:"message,omitempty"`
-    Information_link string	`json:"information_link,omitempty"`
+	Name             string `json:"name,omitempty"`
+	Message          string `json:"message,omitempty"`
+	Information_link string `json:"information_link,omitempty"`
 }
+
 func (hse *http_status_error) to_error() error {
 	if hse == nil {
 		return nil
@@ -35,9 +37,10 @@ func (hse *http_status_error) to_error() error {
 
 type payment_error struct {
 	http_status_error
-    Debug_id string			`json:"debug_id,omitempty"`
-    Details error_details	`json:"details,omitempty"`
+	Debug_id string        `json:"debug_id,omitempty"`
+	Details  error_details `json:"details,omitempty"`
 }
+
 func (pe *payment_error) to_error() error {
 	if pe == nil {
 		return nil
@@ -46,8 +49,6 @@ func (pe *payment_error) to_error() error {
 }
 
 type error_details struct {
-    Field string	`json:"field,omitempty"`
-    Issue string	`json:"issue,omitempty"`
+	Field string `json:"field,omitempty"`
+	Issue string `json:"issue,omitempty"`
 }
-
-
