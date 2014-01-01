@@ -8,6 +8,8 @@ type PathGroup struct {
 	return_url string
 	cancel_url string
 	Payments Payments
+	Sales Sales
+	Refunds Refunds
 	Authorizations Authorizations
 //	Vault
 //	Identity
@@ -15,10 +17,10 @@ type PathGroup struct {
 
 type Payments struct {
 	pathGroup *PathGroup
-	pending map[string]*Payment
+	pending map[string]*PaymentObject
 }
 
-func (self *Payments) get(req *http.Request) (*Payment, error) {
+func (self *Payments) get(req *http.Request) (*PaymentObject, error) {
 	var query = req.URL.Query()
 	var uuid = query.Get("uuid")
 	var pymt, _ = self.pending[uuid]
@@ -30,15 +32,11 @@ func (self *Payments) get(req *http.Request) (*Payment, error) {
 	return pymt, nil
 }
 
-
-
-type Authorizations struct {
-	pathGroup *PathGroup
-	pending map[string]*Authorization
-}
-type Authorization struct {
-}
-
-func (self *Authorizations) get(req *http.Request) (*Authorization, error) {
-	return nil, nil
+func (self *Payments) Get(payment_id string) (*PaymentObject, error) {
+	var pymt = new(PaymentObject)
+    var err = self.pathGroup.connection.make_request("POST", "payments/payment/" + payment_id, nil, "", pymt, false)
+	if err != nil {
+		return nil, err
+	}
+	return pymt, nil
 }

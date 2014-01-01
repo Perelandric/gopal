@@ -43,8 +43,10 @@ func (self *Connection) PathGroup(valid, cancel string) (*PathGroup, error) {
 
 	var pg = &PathGroup{connection: self, return_url: valid, cancel_url: cancel}
 	pg.Payments.pathGroup = pg
-	pg.Payments.pending = make(map[string]*Payment)
+	pg.Payments.pending = make(map[string]*PaymentObject)
 
+	pg.Sales.pathGroup = pg
+	pg.Refunds.pathGroup = pg
 	pg.Authorizations.pathGroup = pg
 
 	return pg, nil
@@ -120,6 +122,8 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 		body_reader = strings.NewReader(val)
 	case []byte:
 		body_reader = bytes.NewReader(val)
+	case nil:
+		body_reader = bytes.NewReader(nil)
 	default:
 		result, err = json.Marshal(val)
 		if err != nil {

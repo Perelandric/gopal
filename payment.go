@@ -7,7 +7,7 @@ import "path"
 import "strconv"
 import "time"
 
-func (self *Payments) Create(method payment_method_i) (*Payment, error) {
+func (self *Payments) Create(method payment_method_i) (*PaymentObject, error) {
 
 	if method == PayPal {
 		// Make sure we're still authenticated. Will refresh if not.
@@ -37,18 +37,16 @@ func (self *Payments) Create(method payment_method_i) (*Payment, error) {
 			*uptr = u.String()
 		}
 
-		self.pending[uuid] = &Payment{
-			payment: payment{
-				Intent: Sale,
-				Redirect_urls: redirects{
-					Return_url: return_url,
-					Cancel_url: cancel_url,
-				},
-				Payer: payer{
-					Payment_method: method.payment_method(), // PayPal
-				},
-				Transactions: make([]*transaction, 0),
+		self.pending[uuid] = &PaymentObject{
+			Intent: Sale,
+			Redirect_urls: redirects{
+				Return_url: return_url,
+				Cancel_url: cancel_url,
 			},
+			Payer: payer{
+				Payment_method: method.payment_method(), // PayPal
+			},
+			Transactions: make([]*transaction, 0),
 			url_values: nil,
 			payments: self,
 			uuid:       uuid,
@@ -65,9 +63,9 @@ func (self *Payments) Create(method payment_method_i) (*Payment, error) {
 
 ***************************/
 
-func (self *Payment) AddTransaction(trans Transaction) {
+func (self *PaymentObject) AddTransaction(trans Transaction) {
 	var t = transaction{
-		Amount: amount{
+		Amount: Amount{
 			Currency: trans.Currency.currency_type(),
 			Total:    trans.Total,
 		},
@@ -93,30 +91,23 @@ func (self *Payment) AddTransaction(trans Transaction) {
 		}
 		t.Item_list.Shipping_address = trans.ShippingAddress
 	}
-	self.payment.Transactions = append(self.payment.Transactions, &t)
+	self.Transactions = append(self.Transactions, &t)
 }
 
-func (self *Payments) Authorize(req *http.Request) (to string, code int, err error) {
-	var pymt *Payment
-
-	pymt, err = self.get(req)
-	if err != nil {
-		return to, code, err
-	}
-
+func (self *PaymentObject) Authorize() (to string, code int, err error) {
 	defer func() {
 		if err != nil {
-			self.Cancel(req)
+			self.Cancel()
 		}
 	}()
 
-	err = self.pathGroup.connection.make_request("POST", "payments/payment", &pymt.payment, "send_"+pymt.uuid, &pymt.payment, false)
+	err = self.payments.pathGroup.connection.make_request("POST", "payments/payment", self, "send_"+self.uuid, self, false)
 
 	if err == nil {
-		switch pymt.payment.State {
+		switch self.State {
 		case Created:
 			// Set url to redirect to PayPal site to begin approval process
-			to, _ = pymt.payment.Links.get("approval_url")
+			to, _ = self.Links.get("approval_url")
 			code = 303
 		default:
 			// otherwise cancel the payment and return an error
@@ -125,6 +116,25 @@ func (self *Payments) Authorize(req *http.Request) (to string, code int, err err
 	}
 
 	return to, code, err
+}
+func (self *PaymentObject) Cancel() {
+	// TODO: Should I have some sort of status check? Like for canceling a payment that is complete?
+	delete(self.payments.pending, self.uuid)
+}
+
+// TODO: I'm returning a list of Sale objects because every payment can have multiple transactions.
+//		I need to find out why a payment can have multiple transactions, and see if I should eliminate that in the API
+//		Also, I need to find out why `related_resources` is an array. Can there be more than one per type?
+func (self *PaymentObject) GetSale() ([]*SaleObject) {
+	var sales = []*SaleObject{}
+	for _, transaction := range self.Transactions {
+		for _, related_resource := range transaction.Related_resources {
+			if related_resource.Sale != nil {
+				sales = append(sales, related_resource.Sale)
+			}
+		}
+	}
+	return sales
 }
 
 func (self *Payments) Execute(req *http.Request) error {
@@ -170,8 +180,7 @@ func (self *Payments) Cancel(req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	// TODO: Should I have some sort of status check? Like for canceling a payment that is complete?
-	delete(self.pending, pymt.uuid)
+	pymt.Cancel()
 	return nil
 }
 
@@ -196,13 +205,7 @@ type _times struct {
 	Update_time string `json:"update_time,omitempty"`
 }
 
-type Payment struct {
-	payment
-	payments *Payments
-	uuid       string
-	url_values url.Values // Holds values from response from PayPal
-}
-type payment struct {
+type PaymentObject struct {
 	_times
 	Intent        Intent         `json:"intent,omitempty"`
 	Payer         payer          `json:"payer,omitempty"`
@@ -213,13 +216,18 @@ type payment struct {
 	Links         links          `json:"links,omitempty"`
 
 	*payment_error
+	payments *Payments
+	uuid       string
+	url_values url.Values // Holds values from response from PayPal
 }
 
 type payment_list struct {
-	Payments []payment `json:"payments,omitempty"`
-	Count    int       `json:"count,omitempty"`
+	Payments []PaymentObject `json:"payments,omitempty"`
+	Count    int			 `json:"count,omitempty"`
 }
 
+// This is for simplified Transaction creation
+// TODO: Should I keep this abstraction, or just require the PayPal model directly?
 type Transaction struct {
 	Total           float64
 	Currency        CurrencyType
@@ -229,15 +237,21 @@ type Transaction struct {
 	*item_list
 }
 type transaction struct {
-	Amount            amount            `json:"amount"` // Required object
+	Amount            Amount            `json:"amount"` // Required object
 	Description       string            `json:"description,omitempty"`
 	Item_list         *item_list        `json:"item_list,omitempty"`
 	Related_resources related_resources `json:"related_resources,omitempty`
 }
 
-// TODO: I need to define this somehow
-// array of sale, authorization, capture, or refund, objects
-type related_resources []interface{}
+// array of SaleObject, AuthorizationObject, CaptureObject, or RefundObject
+type related_resources []related_resource
+
+type related_resource struct {
+	Sale			*SaleObject				`json:"sale",omitempty`
+	Authorization	*AuthorizationObject	`json:"authorization",omitempty`
+	Capture			*CaptureObject			`json:"capture",omitempty`
+	Refund			*RefundObject			`json:"refund",omitempty`
+}
 
 type payment_execution struct {
 	Payer_id     string         `json:"payer_id,omitempty"`
@@ -255,9 +269,14 @@ type item struct {
 	Currency CurrencyType `json:"currency,omitempty"`
 	Sku      string       `json:"sku,omitempty"`
 }
-type amount struct {
-	Currency CurrencyType `json:"currency,omitempty"`     // Required
-	Total    float64      `json:"total,omitempty,string"` // Required
+
+
+/*
+	Currency and Total fields are required when making payments
+*/
+type Amount struct {
+	Currency CurrencyType `json:"currency"`
+	Total    float64      `json:"total,string"`
 	Details  *Details     `json:"details,omitempty"`
 }
 
@@ -268,33 +287,15 @@ type Details struct {
 	Fee      float64 `json:"fee,omitempty,string"` // Response only
 }
 
+/*
+	Amount is always required. TODO: verify this
+*/
 type _trans struct {
 	_times
 	Id     string `json:"id,omitempty"`
-	Amount amount `json:"amount,omitempty"`
+	Amount Amount `json:"amount"`
 
-	// TODO `state` can hold different values for different types. How to deal?
-	State          State  `json:"state,omitempty"`
 	Parent_payment string `json:"parent_payment,omitempty"`
-}
-type refund struct {
-	_trans
-	Sale_id string `json:"sale_id,omitempty"`
-}
-type sale struct {
-	_trans
-	Sale_id     string `json:"sale_id,omitempty"`
-	Description string `json:"description,omitempty"`
-}
-type authorization struct {
-	_trans
-	Valid_until string `json:"valid_until,omitempty"`
-	Links       links  `json:"links,omitempty"`
-}
-type capture struct {
-	_trans
-	Is_final_capture bool  `json:"is_final_capture,omitempty"`
-	Links            links `json:"links,omitempty"`
 }
 
 type links []link
