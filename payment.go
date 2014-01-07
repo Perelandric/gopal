@@ -7,6 +7,135 @@ import "path"
 import "strconv"
 import "time"
 
+type Payments struct {
+    pathGroup *PathGroup
+    pending map[string]*PaymentObject
+}
+
+
+// Pagination
+//	Assuming `start_time`, `start_index` and `start_id` are mutually exclusive
+//	...going to treat them that way anyhow until I understand better.
+
+// I'm going to ignore `start_index` for now since I don't see its usefulness
+
+func (self *Payments) GetAll(size int, sort_by sort_by_i, sort_order sort_order_i, time_range ...time.Time) *PaymentBatcher {
+    if size < 0 {
+        size = 0
+    } else if size > 20 {
+        size = 20
+    }
+
+	var qry = fmt.Sprintf("?sort_order=%s&sort_by=%s&count=%d", sort_by, sort_order, size)
+
+	if len(time_range) > 0 {
+		if time_range[0].IsZero() == false {
+			qry = fmt.Sprintf("%s&start_time=%s", qry, time_range[0].Format(time.RFC3339))
+		}
+		if len(time_range) > 1 && time_range[1].After(time_range[0]) {
+			qry = fmt.Sprintf("%s&end_time=%s", qry, time_range[1].Format(time.RFC3339))
+		}
+	}
+
+	return &PaymentBatcher {
+		base_query: qry,
+		next_id: "",
+		done: false,
+		pathGroup: self.pathGroup,
+	}
+}
+
+
+/****************************************
+
+	PaymentBatcher
+
+Manages paginated requests for Payments
+
+*****************************************/
+
+type PaymentBatcher struct {
+	base_query string
+	next_id string
+	done bool
+	pathGroup *PathGroup
+}
+
+func (self *PaymentBatcher) IsDone() bool {
+	return self.done
+}
+
+// TODO: Should `.Next()` take an optional filter function?
+func (self *PaymentBatcher) Next() ([]*PaymentObject, error) {
+	if self.done {
+		return nil, ErrNoResults
+	}
+	var pymt_list = new(payment_list)
+	var qry = self.base_query
+
+	if self.next_id != "" {
+		qry = fmt.Sprintf("%s&start_id=%s", qry, self.next_id)
+	}
+
+	var err = self.pathGroup.connection.make_request("GET",
+													"payments/payment" + qry,
+													nil, "", pymt_list, false)
+	if err != nil {
+		return nil, err
+	}
+
+	if pymt_list.Count == 0 {
+		self.done = true
+		self.next_id = ""
+		return nil, ErrNoResults
+	}
+
+	self.next_id = pymt_list.Next_id
+
+	if self.next_id == "" {
+		self.done = true
+	}
+
+	return pymt_list.Payments, nil
+}
+
+// These provide a way to both get and set the `next_id`.
+// This gives the ability to cache the ID, and then set it in a new Batcher.
+// Useful if a session is not desired or practical
+
+func (self *PaymentBatcher) GetNextId() string {
+	return self.next_id
+}
+func (self *PaymentBatcher) SetNextId(id string) {
+	self.next_id = id
+}
+
+
+
+func (self *Payments) get(req *http.Request) (*PaymentObject, error) {
+    var query = req.URL.Query()
+    var uuid = query.Get("uuid")
+    var pymt, _ = self.pending[uuid]
+
+    if pymt == nil || pymt.uuid != uuid {
+        return nil, fmt.Errorf("Unknown payment")
+    }
+    pymt.url_values = query
+    return pymt, nil
+}
+
+
+func (self *Payments) Get(payment_id string) (*PaymentObject, error) {
+    var pymt = new(PaymentObject)
+    var err = self.pathGroup.connection.make_request("GET",
+													"payments/payment/" + payment_id,
+													nil, "", pymt, false)
+    if err != nil {
+        return nil, err
+    }
+    return pymt, nil
+}
+
 func (self *Payments) Create(method payment_method_i) (*PaymentObject, error) {
 
 	if method == PayPal {
@@ -122,21 +251,6 @@ func (self *PaymentObject) Cancel() {
 	delete(self.payments.pending, self.uuid)
 }
 
-// TODO: I'm returning a list of Sale objects because every payment can have multiple transactions.
-//		I need to find out why a payment can have multiple transactions, and see if I should eliminate that in the API
-//		Also, I need to find out why `related_resources` is an array. Can there be more than one per type?
-func (self *PaymentObject) GetSale() ([]*SaleObject) {
-	var sales = []*SaleObject{}
-	for _, transaction := range self.Transactions {
-		for _, related_resource := range transaction.Related_resources {
-			if related_resource.Sale != nil {
-				sales = append(sales, related_resource.Sale)
-			}
-		}
-	}
-	return sales
-}
-
 func (self *Payments) Execute(req *http.Request) error {
 	var payerid string
 	var pathname string
@@ -198,11 +312,34 @@ func (t *Transaction) AddItem(qty uint, price float64, curr currency_type_i, nam
 }
 
 
+// TODO: I'm returning a list of Sale objects because every payment can have multiple transactions.
+//		I need to find out why a payment can have multiple transactions, and see if I should eliminate that in the API
+//		Also, I need to find out why `related_resources` is an array. Can there be more than one per type?
+func (self *PaymentObject) GetSale() ([]*SaleObject) {
+	var sales = []*SaleObject{}
+	for _, transaction := range self.Transactions {
+		for _, related_resource := range transaction.Related_resources {
+			if related_resource.Sale != nil {
+				sales = append(sales, related_resource.Sale)
+			}
+		}
+	}
+	return sales
+}
+
+
 
 // The _times are assigned by PayPal in responses
 type _times struct {
 	Create_time string `json:"create_time,omitempty"`
 	Update_time string `json:"update_time,omitempty"`
+}
+
+type payment_list struct {
+	Payments []*PaymentObject	`json:"payments"`
+	Count int					`json:"count"`
+	Next_id string				`json:"next_id"`
+	*identity_error
 }
 
 type PaymentObject struct {
@@ -219,11 +356,6 @@ type PaymentObject struct {
 	payments *Payments
 	uuid       string
 	url_values url.Values // Holds values from response from PayPal
-}
-
-type payment_list struct {
-	Payments []PaymentObject `json:"payments,omitempty"`
-	Count    int			 `json:"count,omitempty"`
 }
 
 // This is for simplified Transaction creation

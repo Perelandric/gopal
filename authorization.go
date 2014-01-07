@@ -307,7 +307,9 @@ RESPONSE:  Returns an AUTHORIZATION object with details of the authorization.
 
 **************************************************************/
 
-func (self *AuthorizationObject) Reauthorize(amt *Amount) (*AuthorizationObject, error) {
+// TODO: Since only PayPal authorizations can be re-authorized, should I add a check
+//			for this? Or should I just let the error come back from the server?
+func (self *AuthorizationObject) ReauthorizeAmount(amt *Amount) (*AuthorizationObject, error) {
 	var auth_req = new(AuthorizationObject)
 	if amt == nil {
 		auth_req.Amount = self.Amount
@@ -325,4 +327,7 @@ func (self *AuthorizationObject) Reauthorize(amt *Amount) (*AuthorizationObject,
     return auth_resp, nil
 }
 
+func (self *AuthorizationObject) Reauthorize() (*AuthorizationObject, error) {
+	return self.ReauthorizeAmount(nil)
+}
 
