@@ -1,15 +1,12 @@
 package gopal
 
 import "fmt"
-import "net/url"
 import "net/http"
 import "path"
-import "strconv"
 import "time"
 
 type Payments struct {
     pathGroup *PathGroup
-    pending map[string]*PaymentObject
 }
 
 
@@ -112,19 +109,6 @@ func (self *PaymentBatcher) SetNextId(id string) {
 
 
 
-func (self *Payments) get(req *http.Request) (*PaymentObject, error) {
-    var query = req.URL.Query()
-    var uuid = query.Get("uuid")
-    var pymt, _ = self.pending[uuid]
-
-    if pymt == nil || pymt.uuid != uuid {
-        return nil, fmt.Errorf("Unknown payment")
-    }
-    pymt.url_values = query
-    return pymt, nil
-}
-
-
 func (self *Payments) Get(payment_id string) (*PaymentObject, error) {
     var pymt = new(PaymentObject)
     var err = self.pathGroup.connection.make_request("GET",
@@ -145,43 +129,18 @@ func (self *Payments) Create(method payment_method_i) (*PaymentObject, error) {
 			return nil, err
 		}
 
-		var uuid string
-
-		for { // TODO Clearly this needs to be improved
-			uuid = strconv.FormatInt(time.Now().UnixNano(), 36)
-			var _, ok = self.pending[uuid]
-			if ok {
-				continue
-			}
-			break
-		}
-
-		var return_url, cancel_url = self.pathGroup.return_url, self.pathGroup.cancel_url
-
-		for _, uptr := range [...]*string{&return_url, &cancel_url} {
-			u, _ := url.Parse(*uptr)
-			var q = u.Query()
-			q.Set("uuid", uuid)
-			u.RawQuery = q.Encode()
-			*uptr = u.String()
-		}
-
-		self.pending[uuid] = &PaymentObject{
+		return &PaymentObject{
 			Intent: Sale,
 			Redirect_urls: redirects{
-				Return_url: return_url,
-				Cancel_url: cancel_url,
+				Return_url: self.pathGroup.return_url,
+				Cancel_url: self.pathGroup.cancel_url,
 			},
 			Payer: payer{
 				Payment_method: method.payment_method(), // PayPal
 			},
 			Transactions: make([]*transaction, 0),
-			url_values: nil,
 			payments: self,
-			uuid:       uuid,
-		}
-
-		return self.pending[uuid], nil
+		}, nil
 	}
 	return nil, nil
 }
@@ -224,13 +183,8 @@ func (self *PaymentObject) AddTransaction(trans Transaction) {
 }
 
 func (self *PaymentObject) Authorize() (to string, code int, err error) {
-	defer func() {
-		if err != nil {
-			self.Cancel()
-		}
-	}()
 
-	err = self.payments.pathGroup.connection.make_request("POST", "payments/payment", self, "send_"+self.uuid, self, false)
+	err = self.payments.pathGroup.connection.make_request("POST", "payments/payment", self, "send_", self, false)
 
 	if err == nil {
 		switch self.State {
@@ -246,38 +200,25 @@ func (self *PaymentObject) Authorize() (to string, code int, err error) {
 
 	return to, code, err
 }
-func (self *PaymentObject) Cancel() {
-	// TODO: Should I have some sort of status check? Like for canceling a payment that is complete?
-	delete(self.payments.pending, self.uuid)
-}
 
-func (self *Payments) Execute(req *http.Request) error {
-	var payerid string
-	var pathname string
 
-	var pymt, err = self.get(req)
+func (self *PaymentObject) Execute(req *http.Request) error {
+	var query = req.URL.Query()
 
-	if err != nil {
-		return err
-	}
-
-	var query = pymt.url_values
-
+	// TODO: Is this right? Does URL.Query() ever return nil?
 	if query == nil {
 		return fmt.Errorf("Attempt to execute a payment that has not been approved")
 	}
 
-	payerid = query.Get("PayerID")
+	var payerid = query.Get("PayerID")
 	if payerid == "" {
 		return fmt.Errorf("PayerID is missing")
 	}
 
-	pathname = path.Join("payments/payment", pymt.Id, "execute")
+	var pathname = path.Join("payments/payment", self.Id, "execute")
+	var pymt = new(PaymentObject)
 
-	// TODO Maybe make_request() should check the resulting unmarshaled body for a PayPal error object?
-	// 		Every object I pass to take the body would need to implement an interface to allow this.
-
-	err = self.pathGroup.connection.make_request("POST", pathname, `{"payer_id":"`+payerid+`"}`, "execute_"+pymt.uuid, pymt, false)
+	var err = self.payments.pathGroup.connection.make_request("POST", pathname, `{"payer_id":"`+payerid+`"}`, "execute_", pymt, false)
 	if err != nil {
 		return err
 	}
@@ -285,16 +226,7 @@ func (self *Payments) Execute(req *http.Request) error {
 	if pymt.State != Approved {
 		return fmt.Errorf("Payment not approved")
 	}
-	// TODO I should remove the Payment object from Pending at this point?
-	return nil
-}
 
-func (self *Payments) Cancel(req *http.Request) error {
-	var pymt, err = self.get(req)
-	if err != nil {
-		return err
-	}
-	pymt.Cancel()
 	return nil
 }
 
@@ -354,8 +286,6 @@ type PaymentObject struct {
 
 	*payment_error
 	payments *Payments
-	uuid       string
-	url_values url.Values // Holds values from response from PayPal
 }
 
 // This is for simplified Transaction creation

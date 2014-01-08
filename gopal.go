@@ -8,6 +8,7 @@ import "path"
 import "io"
 import "io/ioutil"
 import "strings"
+import "strconv"
 import "bytes"
 import "encoding/json"
 
@@ -43,7 +44,6 @@ func (self *Connection) PathGroup(valid, cancel string) (*PathGroup, error) {
 
 	var pg = &PathGroup{connection: self, return_url: valid, cancel_url: cancel}
 	pg.Payments.pathGroup = pg
-	pg.Payments.pending = make(map[string]*PaymentObject)
 
 	pg.Sales.pathGroup = pg
 	pg.Refunds.pathGroup = pg
@@ -144,9 +144,9 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 	} else {
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Authorization", pp.tokeninfo.auth_token())
-		if idempotent_id != "" {
-			req.Header.Set("PayPal-Request-Id", idempotent_id)
-		}
+
+		// TODO: The UUID generation needs to be imporoved------v
+		req.Header.Set("PayPal-Request-Id", idempotent_id + strconv.FormatInt(time.Now().UnixNano(), 36))
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Accept-Language", "en_US")
