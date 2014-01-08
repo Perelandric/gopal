@@ -14,23 +14,21 @@ package gopal
 **************************************************************/
 
 type Sales struct {
-   connection *Connection 
+	connection *Connection
 }
-
 
 type SaleObject struct {
-    _trans
-    State       State  `json:"state,omitempty"` // TODO: Limit to allowed values
+	_trans
+	State State `json:"state,omitempty"` // TODO: Limit to allowed values
 
-// TODO: Verify that `sale_id` shouldn't be there and can be removed
-//	Sale_id     string `json:"sale_id,omitempty"`
+	// TODO: Verify that `sale_id` shouldn't be there and can be removed
+	//	Sale_id     string `json:"sale_id,omitempty"`
 
-    Description string `json:"description,omitempty"`
+	Description string `json:"description,omitempty"`
 
 	*identity_error // TODO: Is this right, or is there a special error object like `payments` has?
-	sales *Sales
+	sales           *Sales
 }
-
 
 /*************************************************************
 
@@ -80,10 +78,9 @@ RESPONSE: Returns a SALE object.
 
 **************************************************************/
 
-
 func (self *Sales) Get(sale_id string) (*SaleObject, error) {
 	var sale = new(SaleObject)
-	var err = self.connection.make_request("GET", "payments/sale/" + sale_id, nil, "", sale, false)
+	var err = self.connection.make_request("GET", "payments/sale/"+sale_id, nil, "", sale, false)
 	if err != nil {
 		return nil, err
 	}
@@ -94,8 +91,6 @@ func (self *Sales) Get(sale_id string) (*SaleObject, error) {
 func (self *SaleObject) GetParentPayment() (*PaymentObject, error) {
 	return self.sales.connection.Payments.Get(self.Parent_payment)
 }
-
-
 
 /*************************************************************
 
@@ -152,8 +147,8 @@ RESPONSE: Returns a REFUND object with details about a refund and whether the re
 func (self *SaleObject) do_refund(ref_req interface{}) (*RefundObject, error) {
 	var ref_resp = new(RefundObject)
 	var err = self.sales.connection.make_request("POST",
-															"payments/sale/" + self.Id + "/refund",
-															ref_req, "", ref_resp, false)
+		"payments/sale/"+self.Id+"/refund",
+		ref_req, "", ref_resp, false)
 	if err != nil {
 		return nil, err
 	}
@@ -161,12 +156,9 @@ func (self *SaleObject) do_refund(ref_req interface{}) (*RefundObject, error) {
 }
 
 func (self *SaleObject) Refund(amt Amount) (*RefundObject, error) {
-	return self.do_refund(&RefundObject{_trans:_trans{Amount:amt}})
+	return self.do_refund(&RefundObject{_trans: _trans{Amount: amt}})
 }
 
 func (self *SaleObject) FullRefund() (*RefundObject, error) {
 	return self.do_refund(`{}`)
 }
-
-
-

@@ -32,18 +32,18 @@ func NewConnection(live connection_type_i, id, secret, host string) (*Connection
 }
 
 type Connection struct {
-	live       connection_type_i
-	id, secret string
-	hosturl    *url.URL
-	client     http.Client
-	tokeninfo  tokeninfo
-    Payments Payments
-    Sales Sales
-    Refunds Refunds
-    Authorizations Authorizations
-	Captures Captures
-//  Vault
-//  Identity
+	live           connection_type_i
+	id, secret     string
+	hosturl        *url.URL
+	client         http.Client
+	tokeninfo      tokeninfo
+	Payments       Payments
+	Sales          Sales
+	Refunds        Refunds
+	Authorizations Authorizations
+	Captures       Captures
+	//  Vault
+	//  Identity
 }
 
 func (self *Connection) authenticate() error {
@@ -140,7 +140,7 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 		req.Header.Set("Authorization", pp.tokeninfo.auth_token())
 
 		// TODO: The UUID generation needs to be imporoved------v
-		req.Header.Set("PayPal-Request-Id", idempotent_id + strconv.FormatInt(time.Now().UnixNano(), 36))
+		req.Header.Set("PayPal-Request-Id", idempotent_id+strconv.FormatInt(time.Now().UnixNano(), 36))
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Accept-Language", "en_US")

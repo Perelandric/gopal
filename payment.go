@@ -6,9 +6,8 @@ import "path"
 import "time"
 
 type Payments struct {
-    connection *Connection
+	connection *Connection
 }
-
 
 // Pagination
 //	Assuming `start_time`, `start_index` and `start_id` are mutually exclusive
@@ -17,11 +16,11 @@ type Payments struct {
 // I'm going to ignore `start_index` for now since I don't see its usefulness
 
 func (self *Payments) GetAll(size int, sort_by sort_by_i, sort_order sort_order_i, time_range ...time.Time) *PaymentBatcher {
-    if size < 0 {
-        size = 0
-    } else if size > 20 {
-        size = 20
-    }
+	if size < 0 {
+		size = 0
+	} else if size > 20 {
+		size = 20
+	}
 
 	var qry = fmt.Sprintf("?sort_order=%s&sort_by=%s&count=%d", sort_by, sort_order, size)
 
@@ -34,14 +33,13 @@ func (self *Payments) GetAll(size int, sort_by sort_by_i, sort_order sort_order_
 		}
 	}
 
-	return &PaymentBatcher {
+	return &PaymentBatcher{
 		base_query: qry,
-		next_id: "",
-		done: false,
+		next_id:    "",
+		done:       false,
 		connection: self.connection,
 	}
 }
-
 
 /****************************************
 
@@ -53,8 +51,8 @@ Manages paginated requests for Payments
 
 type PaymentBatcher struct {
 	base_query string
-	next_id string
-	done bool
+	next_id    string
+	done       bool
 	connection *Connection
 }
 
@@ -75,8 +73,8 @@ func (self *PaymentBatcher) Next() ([]*PaymentObject, error) {
 	}
 
 	var err = self.connection.make_request("GET",
-													"payments/payment" + qry,
-													nil, "", pymt_list, false)
+		"payments/payment"+qry,
+		nil, "", pymt_list, false)
 	if err != nil {
 		return nil, err
 	}
@@ -107,17 +105,15 @@ func (self *PaymentBatcher) SetNextId(id string) {
 	self.next_id = id
 }
 
-
-
 func (self *Payments) Get(payment_id string) (*PaymentObject, error) {
-    var pymt = new(PaymentObject)
-    var err = self.connection.make_request("GET",
-											"payments/payment/" + payment_id,
-											nil, "", pymt, false)
-    if err != nil {
-        return nil, err
-    }
-    return pymt, nil
+	var pymt = new(PaymentObject)
+	var err = self.connection.make_request("GET",
+		"payments/payment/"+payment_id,
+		nil, "", pymt, false)
+	if err != nil {
+		return nil, err
+	}
+	return pymt, nil
 }
 
 func (self *Payments) Create(method payment_method_i, return_url, cancel_url string) (*PaymentObject, error) {
@@ -139,7 +135,7 @@ func (self *Payments) Create(method payment_method_i, return_url, cancel_url str
 				Payment_method: method.payment_method(), // PayPal
 			},
 			Transactions: make([]*transaction, 0),
-			payments: self,
+			payments:     self,
 		}, nil
 	}
 	return nil, nil
@@ -201,7 +197,6 @@ func (self *PaymentObject) Authorize() (to string, code int, err error) {
 	return to, code, err
 }
 
-
 func (self *PaymentObject) Execute(req *http.Request) error {
 	var query = req.URL.Query()
 
@@ -243,11 +238,10 @@ func (t *Transaction) AddItem(qty uint, price float64, curr currency_type_i, nam
 	})
 }
 
-
 // TODO: I'm returning a list of Sale objects because every payment can have multiple transactions.
 //		I need to find out why a payment can have multiple transactions, and see if I should eliminate that in the API
 //		Also, I need to find out why `related_resources` is an array. Can there be more than one per type?
-func (self *PaymentObject) GetSale() ([]*SaleObject) {
+func (self *PaymentObject) GetSale() []*SaleObject {
 	var sales = []*SaleObject{}
 	for _, transaction := range self.Transactions {
 		for _, related_resource := range transaction.Related_resources {
@@ -259,8 +253,6 @@ func (self *PaymentObject) GetSale() ([]*SaleObject) {
 	return sales
 }
 
-
-
 // The _times are assigned by PayPal in responses
 type _times struct {
 	Create_time string `json:"create_time,omitempty"`
@@ -268,9 +260,9 @@ type _times struct {
 }
 
 type payment_list struct {
-	Payments []*PaymentObject	`json:"payments"`
-	Count int					`json:"count"`
-	Next_id string				`json:"next_id"`
+	Payments []*PaymentObject `json:"payments"`
+	Count    int              `json:"count"`
+	Next_id  string           `json:"next_id"`
 	*identity_error
 }
 
@@ -309,10 +301,10 @@ type transaction struct {
 type related_resources []related_resource
 
 type related_resource struct {
-	Sale			*SaleObject				`json:"sale",omitempty`
-	Authorization	*AuthorizationObject	`json:"authorization",omitempty`
-	Capture			*CaptureObject			`json:"capture",omitempty`
-	Refund			*RefundObject			`json:"refund",omitempty`
+	Sale          *SaleObject          `json:"sale",omitempty`
+	Authorization *AuthorizationObject `json:"authorization",omitempty`
+	Capture       *CaptureObject       `json:"capture",omitempty`
+	Refund        *RefundObject        `json:"refund",omitempty`
 }
 
 type payment_execution struct {
@@ -331,7 +323,6 @@ type item struct {
 	Currency CurrencyType `json:"currency,omitempty"`
 	Sku      string       `json:"sku,omitempty"`
 }
-
 
 /*
 	Currency and Total fields are required when making payments

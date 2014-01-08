@@ -1,6 +1,5 @@
 package gopal
 
-
 /*************************************************************
 
 	REFUNDS:  https://api.paypal.com/v1/refund
@@ -21,14 +20,13 @@ type Refunds struct {
 }
 
 type RefundObject struct {
-    _trans
-    State   State  `json:"state,omitempty"` // TODO: Limit to allowed values
-    Sale_id string `json:"sale_id,omitempty"`
+	_trans
+	State   State  `json:"state,omitempty"` // TODO: Limit to allowed values
+	Sale_id string `json:"sale_id,omitempty"`
 
-    *identity_error
+	*identity_error
 	refunds *Refunds
 }
-
 
 /*************************************************************
 
@@ -87,17 +85,15 @@ RESPONSE: Returns a REFUND object with details about a refund and whether the re
 **************************************************************/
 
 func (self *Refunds) Get(refund_id string) (*RefundObject, error) {
-    var refund = new(RefundObject)
-    var err = self.connection.make_request("GET", "payments/refund/" + refund_id, nil, "", refund, false)
-    if err != nil {
-        return nil, err
-    }
-    refund.refunds = self
-    return refund, nil
+	var refund = new(RefundObject)
+	var err = self.connection.make_request("GET", "payments/refund/"+refund_id, nil, "", refund, false)
+	if err != nil {
+		return nil, err
+	}
+	refund.refunds = self
+	return refund, nil
 }
 
 func (self *RefundObject) GetParentPayment() (*PaymentObject, error) {
-    return self.refunds.connection.Payments.Get(self.Parent_payment)
+	return self.refunds.connection.Payments.Get(self.Parent_payment)
 }
-
-

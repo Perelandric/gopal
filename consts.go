@@ -1,8 +1,8 @@
 package gopal
 
-
 // Sort order
 type sort_by bool
+
 func (self sort_by) getSortBy() bool {
 	return bool(self)
 }
@@ -13,16 +13,18 @@ func (self sort_by) String() string {
 		return "update_time"
 	}
 }
+
 type sort_by_i interface {
 	getSortBy() bool
 	String() string
 }
+
 const CreateTime = sort_by(true)
 const UpdateTime = sort_by(false)
 
-
 // Ascending or descending order
 type sort_order bool
+
 func (self sort_order) getSortOrder() bool {
 	return bool(self)
 }
@@ -33,32 +35,33 @@ func (self sort_order) String() string {
 		return "ASC"
 	}
 }
+
 type sort_order_i interface {
 	getSortOrder() bool
 	String() string
 }
+
 const DESC = sort_order(true)
 const ASC = sort_order(false)
 
-
 // Types of PayPal connection (Sandbox or Live)
 type c_type bool
+
 func (self c_type) getType() bool {
 	return bool(self)
 }
+
 type connection_type_i interface {
 	getType() bool
 }
+
 const Sandbox = c_type(false)
 const Live = c_type(true)
 
-
-
 type Intent string
+
 const Sale = Intent("sale")
 const Authorize = Intent("authorize")
-
-
 
 type AddressType string
 
@@ -93,8 +96,6 @@ const Visa = CreditCardType("visa")
 const MasterCard = CreditCardType("mastercard")
 const Discover = CreditCardType("discover")
 const Amex = CreditCardType("amex")
-
-
 
 type State string
 

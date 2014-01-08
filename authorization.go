@@ -15,15 +15,14 @@ type Authorizations struct {
 }
 
 type AuthorizationObject struct {
-    _trans
-    State       State  `json:"state,omitempty"` // TODO: Limit to allowed values
-    Valid_until string `json:"valid_until,omitempty"`
-    Links       links  `json:"links,omitempty"`
+	_trans
+	State       State  `json:"state,omitempty"` // TODO: Limit to allowed values
+	Valid_until string `json:"valid_until,omitempty"`
+	Links       links  `json:"links,omitempty"`
 
 	*identity_error
 	authorizations *Authorizations
 }
-
 
 /*************************************************************
 
@@ -83,21 +82,20 @@ RESPONSE: Returns a AUTHORIZATION object.
 **************************************************************/
 
 func (self *Authorizations) Get(auth_id string) (*AuthorizationObject, error) {
-    var auth = new(AuthorizationObject)
-    var err = self.connection.make_request("GET",
-													"payments/authorization/" + auth_id,
-													nil, "", auth, false)
-    if err != nil {
-        return nil, err
-    }
-    auth.authorizations = self
-    return auth, nil
+	var auth = new(AuthorizationObject)
+	var err = self.connection.make_request("GET",
+		"payments/authorization/"+auth_id,
+		nil, "", auth, false)
+	if err != nil {
+		return nil, err
+	}
+	auth.authorizations = self
+	return auth, nil
 }
 
 func (self *AuthorizationObject) GetParentPayment() (*PaymentObject, error) {
-    return self.authorizations.connection.Payments.Get(self.Parent_payment)
+	return self.authorizations.connection.Payments.Get(self.Parent_payment)
 }
-
 
 /*************************************************************
 
@@ -164,7 +162,7 @@ RESPONSE:  Returns a CAPTURE object along with the STATE of the capture.
 **************************************************************/
 
 func (self *AuthorizationObject) Capture(amt *Amount, is_final bool) (*CaptureObject, error) {
-    var capt_req = &CaptureObject{
+	var capt_req = &CaptureObject{
 		_trans: _trans{
 			Amount: *amt,
 		},
@@ -172,15 +170,14 @@ func (self *AuthorizationObject) Capture(amt *Amount, is_final bool) (*CaptureOb
 	}
 	var capt_resp = new(CaptureObject)
 
-    var err = self.authorizations.connection.make_request("POST",
-															"payments/authorization/" + self.Id + "/capture",
-															capt_req, "", capt_resp, false)
-    if err != nil {
-        return nil, err
-    }
-    return capt_resp, nil
+	var err = self.authorizations.connection.make_request("POST",
+		"payments/authorization/"+self.Id+"/capture",
+		capt_req, "", capt_resp, false)
+	if err != nil {
+		return nil, err
+	}
+	return capt_resp, nil
 }
-
 
 /*************************************************************
 
@@ -232,15 +229,14 @@ RESPONSE:  Returns an AUTHORIZATION object.
 func (self *AuthorizationObject) Void() (*AuthorizationObject, error) {
 	var void_resp = new(AuthorizationObject)
 
-    var err = self.authorizations.connection.make_request("POST",
-															"payments/authorization/" + self.Id + "/void",
-															nil, "", void_resp, false)
-    if err != nil {
-        return nil, err
-    }
-    return void_resp, nil
+	var err = self.authorizations.connection.make_request("POST",
+		"payments/authorization/"+self.Id+"/void",
+		nil, "", void_resp, false)
+	if err != nil {
+		return nil, err
+	}
+	return void_resp, nil
 }
-
 
 /*************************************************************
 
@@ -318,16 +314,15 @@ func (self *AuthorizationObject) ReauthorizeAmount(amt *Amount) (*AuthorizationO
 	}
 	var auth_resp = new(AuthorizationObject)
 
-    var err = self.authorizations.connection.make_request("POST",
-															"payments/authorization/" + self.Id + "/reauthorize",
-															auth_req, "", auth_resp, false)
-    if err != nil {
-        return nil, err
-    }
-    return auth_resp, nil
+	var err = self.authorizations.connection.make_request("POST",
+		"payments/authorization/"+self.Id+"/reauthorize",
+		auth_req, "", auth_resp, false)
+	if err != nil {
+		return nil, err
+	}
+	return auth_resp, nil
 }
 
 func (self *AuthorizationObject) Reauthorize() (*AuthorizationObject, error) {
 	return self.ReauthorizeAmount(nil)
 }
-
