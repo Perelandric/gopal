@@ -17,7 +17,7 @@ package gopal
 **************************************************************/
 
 type Refunds struct {
-	pathGroup *PathGroup
+	connection *Connection
 }
 
 type RefundObject struct {
@@ -88,7 +88,7 @@ RESPONSE: Returns a REFUND object with details about a refund and whether the re
 
 func (self *Refunds) Get(refund_id string) (*RefundObject, error) {
     var refund = new(RefundObject)
-    var err = self.pathGroup.connection.make_request("GET", "payments/refund/" + refund_id, nil, "", refund, false)
+    var err = self.connection.make_request("GET", "payments/refund/" + refund_id, nil, "", refund, false)
     if err != nil {
         return nil, err
     }
@@ -97,7 +97,7 @@ func (self *Refunds) Get(refund_id string) (*RefundObject, error) {
 }
 
 func (self *RefundObject) GetParentPayment() (*PaymentObject, error) {
-    return self.refunds.pathGroup.Payments.Get(self.Parent_payment)
+    return self.refunds.connection.Payments.Get(self.Parent_payment)
 }
 
 

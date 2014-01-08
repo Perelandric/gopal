@@ -14,7 +14,7 @@ package gopal
 **************************************************************/
 
 type Sales struct {
-    pathGroup *PathGroup
+   connection *Connection 
 }
 
 
@@ -83,7 +83,7 @@ RESPONSE: Returns a SALE object.
 
 func (self *Sales) Get(sale_id string) (*SaleObject, error) {
 	var sale = new(SaleObject)
-	var err = self.pathGroup.connection.make_request("GET", "payments/sale/" + sale_id, nil, "", sale, false)
+	var err = self.connection.make_request("GET", "payments/sale/" + sale_id, nil, "", sale, false)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (self *Sales) Get(sale_id string) (*SaleObject, error) {
 }
 
 func (self *SaleObject) GetParentPayment() (*PaymentObject, error) {
-	return self.sales.pathGroup.Payments.Get(self.Parent_payment)
+	return self.sales.connection.Payments.Get(self.Parent_payment)
 }
 
 
@@ -151,7 +151,7 @@ RESPONSE: Returns a REFUND object with details about a refund and whether the re
 
 func (self *SaleObject) do_refund(ref_req interface{}) (*RefundObject, error) {
 	var ref_resp = new(RefundObject)
-	var err = self.sales.pathGroup.connection.make_request("POST",
+	var err = self.sales.connection.make_request("POST",
 															"payments/sale/" + self.Id + "/refund",
 															ref_req, "", ref_resp, false)
 	if err != nil {

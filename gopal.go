@@ -18,6 +18,12 @@ func NewConnection(live connection_type_i, id, secret, host string) (*Connection
 		return nil, err
 	}
 	var conn = &Connection{live: live, id: id, secret: secret, hosturl: hosturl, client: http.Client{}}
+	conn.Payments.connection = conn
+	conn.Sales.connection = conn
+	conn.Refunds.connection = conn
+	conn.Authorizations.connection = conn
+	conn.Captures.connection = conn
+
 	err = conn.authenticate()
 	if err != nil {
 		return nil, err
@@ -31,25 +37,13 @@ type Connection struct {
 	hosturl    *url.URL
 	client     http.Client
 	tokeninfo  tokeninfo
-}
-
-func (self *Connection) PathGroup(valid, cancel string) (*PathGroup, error) {
-	for _, p := range [...]*string{&valid, &cancel} {
-		var u, err = url.Parse(*p)
-		if err != nil {
-			return nil, err
-		}
-		*p = self.hosturl.ResolveReference(u).String()
-	}
-
-	var pg = &PathGroup{connection: self, return_url: valid, cancel_url: cancel}
-	pg.Payments.pathGroup = pg
-
-	pg.Sales.pathGroup = pg
-	pg.Refunds.pathGroup = pg
-	pg.Authorizations.pathGroup = pg
-
-	return pg, nil
+    Payments Payments
+    Sales Sales
+    Refunds Refunds
+    Authorizations Authorizations
+	Captures Captures
+//  Vault
+//  Identity
 }
 
 func (self *Connection) authenticate() error {

@@ -6,7 +6,7 @@ import "path"
 import "time"
 
 type Payments struct {
-    pathGroup *PathGroup
+    connection *Connection
 }
 
 
@@ -38,7 +38,7 @@ func (self *Payments) GetAll(size int, sort_by sort_by_i, sort_order sort_order_
 		base_query: qry,
 		next_id: "",
 		done: false,
-		pathGroup: self.pathGroup,
+		connection: self.connection,
 	}
 }
 
@@ -55,7 +55,7 @@ type PaymentBatcher struct {
 	base_query string
 	next_id string
 	done bool
-	pathGroup *PathGroup
+	connection *Connection
 }
 
 func (self *PaymentBatcher) IsDone() bool {
@@ -74,7 +74,7 @@ func (self *PaymentBatcher) Next() ([]*PaymentObject, error) {
 		qry = fmt.Sprintf("%s&start_id=%s", qry, self.next_id)
 	}
 
-	var err = self.pathGroup.connection.make_request("GET",
+	var err = self.connection.make_request("GET",
 													"payments/payment" + qry,
 													nil, "", pymt_list, false)
 	if err != nil {
@@ -111,20 +111,20 @@ func (self *PaymentBatcher) SetNextId(id string) {
 
 func (self *Payments) Get(payment_id string) (*PaymentObject, error) {
     var pymt = new(PaymentObject)
-    var err = self.pathGroup.connection.make_request("GET",
-													"payments/payment/" + payment_id,
-													nil, "", pymt, false)
+    var err = self.connection.make_request("GET",
+											"payments/payment/" + payment_id,
+											nil, "", pymt, false)
     if err != nil {
         return nil, err
     }
     return pymt, nil
 }
 
-func (self *Payments) Create(method payment_method_i) (*PaymentObject, error) {
+func (self *Payments) Create(method payment_method_i, return_url, cancel_url string) (*PaymentObject, error) {
 
 	if method == PayPal {
 		// Make sure we're still authenticated. Will refresh if not.
-		var err = self.pathGroup.connection.authenticate()
+		var err = self.connection.authenticate()
 		if err != nil {
 			return nil, err
 		}
@@ -132,8 +132,8 @@ func (self *Payments) Create(method payment_method_i) (*PaymentObject, error) {
 		return &PaymentObject{
 			Intent: Sale,
 			Redirect_urls: redirects{
-				Return_url: self.pathGroup.return_url,
-				Cancel_url: self.pathGroup.cancel_url,
+				Return_url: return_url,
+				Cancel_url: cancel_url,
 			},
 			Payer: payer{
 				Payment_method: method.payment_method(), // PayPal
@@ -184,7 +184,7 @@ func (self *PaymentObject) AddTransaction(trans Transaction) {
 
 func (self *PaymentObject) Authorize() (to string, code int, err error) {
 
-	err = self.payments.pathGroup.connection.make_request("POST", "payments/payment", self, "send_", self, false)
+	err = self.payments.connection.make_request("POST", "payments/payment", self, "send_", self, false)
 
 	if err == nil {
 		switch self.State {
@@ -218,7 +218,7 @@ func (self *PaymentObject) Execute(req *http.Request) error {
 	var pathname = path.Join("payments/payment", self.Id, "execute")
 	var pymt = new(PaymentObject)
 
-	var err = self.payments.pathGroup.connection.make_request("POST", pathname, `{"payer_id":"`+payerid+`"}`, "execute_", pymt, false)
+	var err = self.payments.connection.make_request("POST", pathname, `{"payer_id":"`+payerid+`"}`, "execute_", pymt, false)
 	if err != nil {
 		return err
 	}

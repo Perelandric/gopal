@@ -11,7 +11,7 @@ package gopal
 **************************************************************/
 
 type Authorizations struct {
-	pathGroup *PathGroup
+	connection *Connection
 }
 
 type AuthorizationObject struct {
@@ -84,7 +84,7 @@ RESPONSE: Returns a AUTHORIZATION object.
 
 func (self *Authorizations) Get(auth_id string) (*AuthorizationObject, error) {
     var auth = new(AuthorizationObject)
-    var err = self.pathGroup.connection.make_request("GET",
+    var err = self.connection.make_request("GET",
 													"payments/authorization/" + auth_id,
 													nil, "", auth, false)
     if err != nil {
@@ -95,7 +95,7 @@ func (self *Authorizations) Get(auth_id string) (*AuthorizationObject, error) {
 }
 
 func (self *AuthorizationObject) GetParentPayment() (*PaymentObject, error) {
-    return self.authorizations.pathGroup.Payments.Get(self.Parent_payment)
+    return self.authorizations.connection.Payments.Get(self.Parent_payment)
 }
 
 
@@ -172,9 +172,9 @@ func (self *AuthorizationObject) Capture(amt *Amount, is_final bool) (*CaptureOb
 	}
 	var capt_resp = new(CaptureObject)
 
-    var err = self.authorizations.pathGroup.connection.make_request("POST",
-																	"payments/authorization/" + self.Id + "/capture",
-																	capt_req, "", capt_resp, false)
+    var err = self.authorizations.connection.make_request("POST",
+															"payments/authorization/" + self.Id + "/capture",
+															capt_req, "", capt_resp, false)
     if err != nil {
         return nil, err
     }
@@ -232,9 +232,9 @@ RESPONSE:  Returns an AUTHORIZATION object.
 func (self *AuthorizationObject) Void() (*AuthorizationObject, error) {
 	var void_resp = new(AuthorizationObject)
 
-    var err = self.authorizations.pathGroup.connection.make_request("POST",
-																	"payments/authorization/" + self.Id + "/void",
-																	nil, "", void_resp, false)
+    var err = self.authorizations.connection.make_request("POST",
+															"payments/authorization/" + self.Id + "/void",
+															nil, "", void_resp, false)
     if err != nil {
         return nil, err
     }
@@ -318,9 +318,9 @@ func (self *AuthorizationObject) ReauthorizeAmount(amt *Amount) (*AuthorizationO
 	}
 	var auth_resp = new(AuthorizationObject)
 
-    var err = self.authorizations.pathGroup.connection.make_request("POST",
-																	"payments/authorization/" + self.Id + "/reauthorize",
-																	auth_req, "", auth_resp, false)
+    var err = self.authorizations.connection.make_request("POST",
+															"payments/authorization/" + self.Id + "/reauthorize",
+															auth_req, "", auth_resp, false)
     if err != nil {
         return nil, err
     }

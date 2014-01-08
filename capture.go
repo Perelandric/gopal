@@ -11,7 +11,7 @@ package gopal
 
 
 type Captures struct {
-    pathGroup *PathGroup
+    connection *Connection
 }
 
 type CaptureObject struct {
@@ -78,7 +78,7 @@ RESPONSE: Returns a CAPTURE object with details about the capture.
 
 func (self *Captures) Get(capt_id string) (*CaptureObject, error) {
     var capt = new(CaptureObject)
-    var err = self.pathGroup.connection.make_request("GET",
+    var err = self.connection.make_request("GET",
                                                     "payments/capture/" + capt_id,
                                                     nil, "", capt, false)
     if err != nil {
@@ -89,7 +89,7 @@ func (self *Captures) Get(capt_id string) (*CaptureObject, error) {
 }
 
 func (self *CaptureObject) GetParentPayment() (*PaymentObject, error) {
-    return self.captures.pathGroup.Payments.Get(self.Parent_payment)
+    return self.captures.connection.Payments.Get(self.Parent_payment)
 }
 
 
@@ -150,7 +150,7 @@ RESPONSE: Returns a REFUND object with details about a refund and whether the re
 
 func (self *CaptureObject) do_refund(ref_req interface{}) (*RefundObject, error) {
     var ref_resp = new(RefundObject)
-    var err = self.captures.pathGroup.connection.make_request("POST",
+    var err = self.captures.connection.make_request("POST",
                                                             "payments/capture/" + self.Id + "/refund",
                                                             ref_req, "", ref_resp, false)
     if err != nil {
