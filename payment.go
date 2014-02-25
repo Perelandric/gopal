@@ -283,11 +283,11 @@ type PaymentObject struct {
 // This is for simplified Transaction creation
 // TODO: Should I keep this abstraction, or just require the PayPal model directly?
 type Transaction struct {
-	Total           float64
-	Currency        CurrencyType
+	Total           float64				// maps to Amount.Total
+	Currency        CurrencyType		// maps to Amount.Currency
 	Description     string
-	Details         *Details
-	ShippingAddress *ShippingAddress
+	Details         *Details			// maps to Amount.Details
+	ShippingAddress *ShippingAddress	// maps to item_list.Shipping_address
 	*item_list
 }
 type transaction struct {
