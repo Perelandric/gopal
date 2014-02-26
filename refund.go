@@ -24,6 +24,8 @@ type RefundObject struct {
 	State   State  `json:"state,omitempty"` // TODO: Limit to allowed values
 	Sale_id string `json:"sale_id,omitempty"`
 
+	RawData		[]byte `json:"-"`
+
 	*identity_error
 	refunds *Refunds
 }

@@ -26,6 +26,8 @@ type SaleObject struct {
 
 	Description string `json:"description,omitempty"`
 
+	RawData		[]byte `json:"-"`
+
 	*identity_error // TODO: Is this right, or is there a special error object like `payments` has?
 	sales           *Sales
 }

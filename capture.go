@@ -19,6 +19,8 @@ type CaptureObject struct {
 	Is_final_capture bool  `json:"is_final_capture,omitempty"`
 	Links            links `json:"links,omitempty"`
 
+	RawData		[]byte `json:"-"`
+
 	*identity_error
 	captures *Captures
 }

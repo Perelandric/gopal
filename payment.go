@@ -178,7 +178,8 @@ func (self *PaymentObject) AddTransaction(trans Transaction) {
 	self.Transactions = append(self.Transactions, &t)
 }
 
-func (self *PaymentObject) Authorize() (to string, code int, err error) {
+// TODO: The tkn parameter is ignored, but should send a query string parameter `token=tkn`
+func (self *PaymentObject) Authorize(tkn string) (to string, code int, err error) {
 
 	err = self.payments.connection.make_request("POST", "payments/payment", self, "send_", self, false)
 
@@ -275,6 +276,8 @@ type PaymentObject struct {
 	Id            string         `json:"id,omitempty"`
 	State         State          `json:"state,omitempty"`
 	Links         links          `json:"links,omitempty"`
+
+	RawData		  []byte		 `json:"-"`
 
 	*payment_error
 	payments *Payments

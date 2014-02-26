@@ -11,6 +11,7 @@ import "strings"
 import "strconv"
 import "bytes"
 import "encoding/json"
+import "reflect"
 
 func NewConnection(live connection_type_i, id, secret, host string) (*Connection, error) {
 	var hosturl, err = url.Parse(host)
@@ -127,6 +128,8 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 		result = nil
 	}
 
+// TODO: Paypal docs mention a `nonce`. Research that.
+
 	req, err = http.NewRequest(method, url, body_reader)
 	if err != nil {
 		return err
@@ -152,6 +155,17 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 	defer resp.Body.Close()
 
 	result, err = ioutil.ReadAll(resp.Body)
+
+	var v = reflect.ValueOf(jsn)
+
+	if v.Kind() == reflect.Struct {
+		v = v.FieldByName("RawData")
+		if v.IsValid() {
+			v.SetBytes(result)
+		}
+	}
+
+
 	if err != nil {
 		return err
 	}

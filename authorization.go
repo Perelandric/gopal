@@ -20,6 +20,8 @@ type AuthorizationObject struct {
 	Valid_until string `json:"valid_until,omitempty"`
 	Links       links  `json:"links,omitempty"`
 
+	RawData		[]byte `json:"-"`
+
 	*identity_error
 	authorizations *Authorizations
 }
