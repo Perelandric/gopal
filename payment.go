@@ -189,7 +189,7 @@ func (self *Payments) Execute(pymt PaymentFinalizer, req *http.Request) error {
 		}
 		fmt.Println(string(s))
 */
-		return fmt.Errorf("Payment not approved\n")
+		return fmt.Errorf("Payment with ID %q for payer %q was not approved\n", pymtid, payerid)
 	}
 
 	return nil
