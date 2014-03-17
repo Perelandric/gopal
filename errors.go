@@ -3,6 +3,7 @@ package gopal
 import "fmt"
 
 type errorable interface {
+	IsError() bool
 	to_error() error
 }
 
@@ -19,11 +20,14 @@ type identity_error struct {
 	RawData		[]byte `json:"-"`
 }
 
+func (self *identity_error) IsError() bool {
+	return self != nil
+}
 func (ie *identity_error) to_error() error {
-	if ie == nil {
-		return nil
+	if ie.IsError() {
+		return fmt.Errorf("PayPal error response:%q, Description:%q", ie.Error, ie.Error_description)
 	}
-	return fmt.Errorf("PayPal error response:%q, Description:%q", ie.Error, ie.Error_description)
+	return nil
 }
 
 type http_status_error struct {
@@ -34,11 +38,14 @@ type http_status_error struct {
 	RawData		[]byte `json:"-"`
 }
 
+func (self *http_status_error) IsError() bool {
+	return self != nil
+}
 func (hse *http_status_error) to_error() error {
-	if hse == nil {
-		return nil
+	if hse.IsError() {
+		return fmt.Errorf("Http status error: %q, Message: %q, Info link: %q", hse.Name, hse.Message, hse.Information_link)
 	}
-	return fmt.Errorf("Http status error: %q, Message: %q, Info link: %q", hse.Name, hse.Message, hse.Information_link)
+	return nil
 }
 
 type payment_error struct {
@@ -49,16 +56,18 @@ type payment_error struct {
 	RawData		[]byte `json:"-"`
 }
 
-func (pe *payment_error) to_error() error {
-	if pe == nil {
-		return nil
-	}
-	return fmt.Errorf("Payment error response: %q, Message: %q", pe.Name, pe.Message)
+func (self *payment_error) IsError() bool {
+	return self != nil
 }
+func (pe *payment_error) to_error() error {
+	if pe.IsError() {
+		return fmt.Errorf("Payment error response: %q, Message: %q", pe.Name, pe.Message)
+	}
+	return nil
+}
+
 
 type error_details struct {
 	Field string `json:"field,omitempty"`
 	Issue string `json:"issue,omitempty"`
-
-	RawData		[]byte `json:"-"`
 }

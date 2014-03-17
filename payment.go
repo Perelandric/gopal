@@ -1,5 +1,6 @@
 package gopal
 
+import "encoding/json"
 import "fmt"
 import "net/http"
 import "path"
@@ -126,6 +127,9 @@ func (self *Payments) Create(method payment_method_i, return_url, cancel_url str
 		}
 
 		return &PaymentObject{
+			PaymentExecutor: PaymentExecutor {
+				payments:     self,
+			},
 			Intent: Sale,
 			Redirect_urls: redirects{
 				Return_url: return_url,
@@ -135,10 +139,87 @@ func (self *Payments) Create(method payment_method_i, return_url, cancel_url str
 				Payment_method: method.payment_method(), // PayPal
 			},
 			Transactions: make([]*transaction, 0),
-			payments:     self,
 		}, nil
 	}
 	return nil, nil
+}
+func (self *Payments) ParseRawData(rawdata []byte) *PaymentObject {
+	var po PaymentObject
+	var err = json.Unmarshal(rawdata, &po)
+	if err != nil {
+		return nil
+	}
+	return &po
+}
+
+func (self *Payments) Execute(pymt PaymentFinalizer, req *http.Request) error {
+	var query = req.URL.Query()
+
+	// TODO: Is this right? Does URL.Query() ever return nil?
+	if query == nil {
+		return fmt.Errorf("Attempt to execute a payment that has not been approved")
+	}
+
+	var payerid = query.Get("PayerID")
+	if payerid == "" {
+		return fmt.Errorf("PayerID is missing\n")
+	}
+
+	if pymt == nil {
+		return fmt.Errorf("Payment Object is missing\n")
+	}
+
+	var pymtid = pymt.GetId()
+	if pymtid == "" {
+		return fmt.Errorf("Payment ID is missing\n")
+	}
+
+	var pathname = path.Join("payments/payment", pymtid, "execute")
+
+	var err = self.connection.make_request("POST", pathname, `{"payer_id":"`+payerid+`"}`, "execute_", pymt, false)
+	if err != nil {
+		return err
+	}
+
+	if pymt.GetState() != Approved {
+/*
+		var s, err = json.Marshal(pymt)
+		if err != nil {
+			return fmt.Errorf("JSON marshal error\n")
+		}
+		fmt.Println(string(s))
+*/
+		return fmt.Errorf("Payment not approved\n")
+	}
+
+	return nil
+}
+
+// TODO: Should this hold the `execute` path so that it doesn't need to be constructed in `Execute()`?
+type PaymentExecutor struct {
+	Id			 string			`json:"id,omitempty"`
+	State		 State			`json:"state,omitempty"`
+
+	RawData		  []byte		`json:"-"`
+	*payment_error
+	payments *Payments
+}
+func (self *PaymentExecutor) GetState() State {
+	return self.State
+}
+func (self *PaymentExecutor) GetId() string {
+	return self.Id
+}
+func (self *PaymentExecutor) Execute(r *http.Request) error {
+	return self.payments.Execute(self, r)
+}
+
+type PaymentFinalizer interface {
+	GetState() State
+	GetId() string
+	Execute(*http.Request) error
+
+	errorable
 }
 
 /***************************
@@ -147,6 +228,19 @@ func (self *Payments) Create(method payment_method_i, return_url, cancel_url str
 
 ***************************/
 
+func (self *PaymentObject) GetState() State {
+	return self.State
+}
+func (self *PaymentObject) GetId() string {
+	return self.Id
+}
+func (self *PaymentObject) MakeExecutor() *PaymentExecutor {
+	return &PaymentExecutor{
+		Id: self.Id,
+		State: self.State,
+		payments: self.payments,
+	}
+}
 func (self *PaymentObject) AddTransaction(trans Transaction) {
 	var t = transaction{
 		Amount: Amount{
@@ -199,31 +293,7 @@ func (self *PaymentObject) Authorize(tkn string) (to string, code int, err error
 }
 
 func (self *PaymentObject) Execute(req *http.Request) error {
-	var query = req.URL.Query()
-
-	// TODO: Is this right? Does URL.Query() ever return nil?
-	if query == nil {
-		return fmt.Errorf("Attempt to execute a payment that has not been approved")
-	}
-
-	var payerid = query.Get("PayerID")
-	if payerid == "" {
-		return fmt.Errorf("PayerID is missing")
-	}
-
-	var pathname = path.Join("payments/payment", self.Id, "execute")
-	var pymt = new(PaymentObject)
-
-	var err = self.payments.connection.make_request("POST", pathname, `{"payer_id":"`+payerid+`"}`, "execute_", pymt, false)
-	if err != nil {
-		return err
-	}
-
-	if pymt.State != Approved {
-		return fmt.Errorf("Payment not approved")
-	}
-
-	return nil
+	return self.payments.Execute(self, req)
 }
 
 func (t *Transaction) AddItem(qty uint, price float64, curr currency_type_i, name, sku string) {
@@ -269,18 +339,12 @@ type payment_list struct {
 
 type PaymentObject struct {
 	_times
+	PaymentExecutor
 	Intent        Intent         `json:"intent,omitempty"`
 	Payer         payer          `json:"payer,omitempty"`
 	Transactions  []*transaction `json:"transactions,omitempty"`
 	Redirect_urls redirects      `json:"redirect_urls,omitempty"`
-	Id            string         `json:"id,omitempty"`
-	State         State          `json:"state,omitempty"`
 	Links         links          `json:"links,omitempty"`
-
-	RawData		  []byte		 `json:"-"`
-
-	*payment_error
-	payments *Payments
 }
 
 // This is for simplified Transaction creation
@@ -297,17 +361,17 @@ type transaction struct {
 	Amount            Amount            `json:"amount"` // Required object
 	Description       string            `json:"description,omitempty"`
 	Item_list         *item_list        `json:"item_list,omitempty"`
-	Related_resources related_resources `json:"related_resources,omitempty`
+	Related_resources related_resources `json:"related_resources,omitempty"`
 }
 
 // array of SaleObject, AuthorizationObject, CaptureObject, or RefundObject
 type related_resources []related_resource
 
 type related_resource struct {
-	Sale          *SaleObject          `json:"sale",omitempty`
-	Authorization *AuthorizationObject `json:"authorization",omitempty`
-	Capture       *CaptureObject       `json:"capture",omitempty`
-	Refund        *RefundObject        `json:"refund",omitempty`
+	Sale          *SaleObject          `json:"sale,omitempty"`
+	Authorization *AuthorizationObject `json:"authorization,omitempty"`
+	Capture       *CaptureObject       `json:"capture,omitempty"`
+	Refund        *RefundObject        `json:"refund,omitempty"`
 }
 
 type payment_execution struct {

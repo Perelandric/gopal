@@ -1,17 +1,16 @@
 package gopal
 
-import "net/http"
-import "net/url"
-import "time"
-import "fmt"
-import "path"
-import "io"
-import "io/ioutil"
-import "strings"
-import "strconv"
 import "bytes"
 import "encoding/json"
+import "io"
+import "io/ioutil"
+import "net/http"
+import "net/url"
+import "path"
 import "reflect"
+import "strings"
+import "strconv"
+import "time"
 
 func NewConnection(live connection_type_i, id, secret, host string) (*Connection, error) {
 	var hosturl, err = url.Parse(host)
@@ -90,6 +89,8 @@ type tokeninfo struct {
 	// Derived fields
 	expiration time.Time
 
+	RawData		 []byte `json:"-"`
+
 	// Handles the case where an error is received instead
 	*identity_error
 }
@@ -111,6 +112,15 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 		url += ".sandbox"
 	}
 	url = url + ".paypal.com/" + path.Join("v1", subdir)
+
+/*
+// Show request body
+	var s, e = json.Marshal(body)
+	if e != nil {
+		fmt.Println("marshal error", e)
+	}
+	fmt.Printf("REQUEST BODY:\n%s\n\n%s\n\n", url, s)
+*/
 
 	switch val := body.(type) {
 	case string:
@@ -142,7 +152,7 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Authorization", pp.tokeninfo.auth_token())
 
-		// TODO: The UUID generation needs to be imporoved------v
+		// TODO: The UUID generation needs to be improved------v
 		req.Header.Set("PayPal-Request-Id", idempotent_id+strconv.FormatInt(time.Now().UnixNano(), 36))
 	}
 	req.Header.Set("Accept", "application/json")
@@ -156,7 +166,24 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 
 	result, err = ioutil.ReadAll(resp.Body)
 
+	if err != nil {
+		return err
+	}
+
+/*
+	fmt.Println("RESPONSE:",string(result))
+*/
+
+	// If there was no Body, we can return
+	if len(bytes.TrimSpace(result)) == 0 {
+		return nil
+	}
+
 	var v = reflect.ValueOf(jsn)
+
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
 
 	if v.Kind() == reflect.Struct {
 		v = v.FieldByName("RawData")
@@ -165,12 +192,6 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 		}
 	}
 
-
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(string(result))
 	err = json.Unmarshal(result, jsn)
 	//var x,y = json.Marshal(jsn)
 	//fmt.Printf("=++++++++++++++++++\n%s\n%v\n",x,y)
