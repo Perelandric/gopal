@@ -162,7 +162,10 @@ func (self *Payments) Execute(pymt PaymentFinalizer, req *http.Request) error {
 
 	var payerid = query.Get("PayerID")
 	if payerid == "" {
-		return fmt.Errorf("PayerID is missing\n")
+		payerid = pymt.GetPayerID()
+		if payerid == "" {
+			return fmt.Errorf("PayerID is missing\n")
+		}
 	}
 
 	if pymt == nil {
@@ -199,6 +202,7 @@ func (self *Payments) Execute(pymt PaymentFinalizer, req *http.Request) error {
 type PaymentExecutor struct {
 	Id			 string			`json:"id,omitempty"`
 	State		 State			`json:"state,omitempty"`
+	PayerID		string			`json:"-"`
 
 	RawData		  []byte		`json:"-"`
 	*payment_error
@@ -210,6 +214,9 @@ func (self *PaymentExecutor) GetState() State {
 func (self *PaymentExecutor) GetId() string {
 	return self.Id
 }
+func (self *PaymentExecutor) GetPayerID() string {
+	return self.PayerID
+}
 func (self *PaymentExecutor) Execute(r *http.Request) error {
 	return self.payments.Execute(self, r)
 }
@@ -217,6 +224,7 @@ func (self *PaymentExecutor) Execute(r *http.Request) error {
 type PaymentFinalizer interface {
 	GetState() State
 	GetId() string
+	GetPayerID() string
 	Execute(*http.Request) error
 
 	errorable
@@ -233,6 +241,12 @@ func (self *PaymentObject) GetState() State {
 }
 func (self *PaymentObject) GetId() string {
 	return self.Id
+}
+func (self *PaymentObject) GetPayerID() string {
+	if self != nil && self.Payer.Payer_info != nil {
+		return self.Payer.Payer_info.Payer_id
+	}
+	return ""
 }
 func (self *PaymentObject) MakeExecutor() *PaymentExecutor {
 	return &PaymentExecutor{
