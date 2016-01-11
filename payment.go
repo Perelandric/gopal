@@ -6,17 +6,17 @@ import "net/http"
 import "path"
 import "time"
 
-type Payments struct {
-	connection *Connection
-}
-
 // Pagination
 //	Assuming `start_time`, `start_index` and `start_id` are mutually exclusive
 //	...going to treat them that way anyhow until I understand better.
 
 // I'm going to ignore `start_index` for now since I don't see its usefulness
 
-func (self *Payments) GetAll(size int, sort_by sort_by_i, sort_order sort_order_i, time_range ...time.Time) *PaymentBatcher {
+func GetAllPayments(
+	size int,
+	sort_by sort_by_i, sort_order sort_order_i, time_range ...time.Time,
+) *PaymentBatcher {
+
 	if size < 0 {
 		size = 0
 	} else if size > 20 {
@@ -54,7 +54,7 @@ type PaymentBatcher struct {
 	base_query string
 	next_id    string
 	done       bool
-	connection *Connection
+	connection *connection
 }
 
 func (self *PaymentBatcher) IsDone() bool {
@@ -62,7 +62,7 @@ func (self *PaymentBatcher) IsDone() bool {
 }
 
 // TODO: Should `.Next()` take an optional filter function?
-func (self *PaymentBatcher) Next() ([]*PaymentObject, error) {
+func (self *PaymentBatcher) Next() ([]*Payment, error) {
 	if self.done {
 		return nil, ErrNoResults
 	}
@@ -73,7 +73,7 @@ func (self *PaymentBatcher) Next() ([]*PaymentObject, error) {
 		qry = fmt.Sprintf("%s&start_id=%s", qry, self.next_id)
 	}
 
-	var err = self.connection.make_request("GET",
+	var err = self.connection.send("GET",
 		"payments/payment"+qry,
 		nil, "", pymt_list, false)
 	if err != nil {
@@ -106,9 +106,9 @@ func (self *PaymentBatcher) SetNextId(id string) {
 	self.next_id = id
 }
 
-func (self *Payments) Get(payment_id string) (*PaymentObject, error) {
-	var pymt = new(PaymentObject)
-	var err = self.connection.make_request("GET",
+func GetPayment(conn *connection, payment_id string) (*Payment, error) {
+	var pymt = new(Payment)
+	var err = self.connection.send("GET",
 		"payments/payment/"+payment_id,
 		nil, "", pymt, false)
 	if err != nil {
@@ -117,7 +117,7 @@ func (self *Payments) Get(payment_id string) (*PaymentObject, error) {
 	return pymt, nil
 }
 
-func (self *Payments) Create(method payment_method_i, return_url, cancel_url string) (*PaymentObject, error) {
+func CreatePayment(method payment_method_i, return_url, cancel_url string) (*Payment, error) {
 
 	if method == PayPal {
 		// Make sure we're still authenticated. Will refresh if not.
@@ -126,9 +126,9 @@ func (self *Payments) Create(method payment_method_i, return_url, cancel_url str
 			return nil, err
 		}
 
-		return &PaymentObject{
-			PaymentExecutor: PaymentExecutor {
-				payments:     self,
+		return &Payment{
+			PaymentExecutor: PaymentExecutor{
+				payments: self,
 			},
 			Intent: Sale,
 			Redirect_urls: redirects{
@@ -143,8 +143,8 @@ func (self *Payments) Create(method payment_method_i, return_url, cancel_url str
 	}
 	return nil, nil
 }
-func (self *Payments) ParseRawData(rawdata []byte) *PaymentObject {
-	var po PaymentObject
+func ParseRawData(rawdata []byte) *Payment {
+	var po Payment
 	var err = json.Unmarshal(rawdata, &po)
 	if err != nil {
 		return nil
@@ -152,7 +152,7 @@ func (self *Payments) ParseRawData(rawdata []byte) *PaymentObject {
 	return &po
 }
 
-func (self *Payments) Execute(pymt PaymentFinalizer, req *http.Request) error {
+func ExecutePayment(req *http.Request) error {
 	var query = req.URL.Query()
 
 	// TODO: Is this right? Does URL.Query() ever return nil?
@@ -162,37 +162,28 @@ func (self *Payments) Execute(pymt PaymentFinalizer, req *http.Request) error {
 
 	var payerid = query.Get("PayerID")
 	if payerid == "" {
-		payerid = pymt.GetPayerID()
-		if payerid == "" {
-			return fmt.Errorf("PayerID is missing\n")
-		}
+		return fmt.Errorf("PayerID is missing\n")
 	}
 
-	if pymt == nil {
-		return fmt.Errorf("Payment Object is missing\n")
-	}
-
-	var pymtid = pymt.GetId()
+	var pymtid = query.Get("paymentId")
 	if pymtid == "" {
-		return fmt.Errorf("Payment ID is missing\n")
+		return fmt.Errorf("paymentId is missing\n")
 	}
 
-	var pathname = path.Join("payments/payment", pymtid, "execute")
+	var pymt Payment
 
-	var err = self.connection.make_request("POST", pathname, `{"payer_id":"`+payerid+`"}`, "execute_", pymt, false)
-	if err != nil {
+	if err := self.send(&request{
+		method:   "POST",
+		path:     path.Join("payments/payment", pymtid, "execute"),
+		body:     `{"payer_id":"` + payerid + `"}`,
+		response: &pymt,
+	}); err != nil {
 		return err
 	}
 
-	if pymt.GetState() != Approved {
-/*
-		var s, err = json.Marshal(pymt)
-		if err != nil {
-			return fmt.Errorf("JSON marshal error\n")
-		}
-		fmt.Println(string(s))
-*/
-		return fmt.Errorf("Payment with ID %q for payer %q was not approved\n", pymtid, payerid)
+	if pymt.State != Approved {
+		return fmt.Errorf(
+			"Payment with ID %q for payer %q was not approved\n", pymtid, payerid)
 	}
 
 	return nil
@@ -200,14 +191,15 @@ func (self *Payments) Execute(pymt PaymentFinalizer, req *http.Request) error {
 
 // TODO: Should this hold the `execute` path so that it doesn't need to be constructed in `Execute()`?
 type PaymentExecutor struct {
-	Id			 string			`json:"id,omitempty"`
-	State		 State			`json:"state,omitempty"`
-	PayerID		string			`json:"-"`
+	Id      string `json:"id,omitempty"`
+	State   State  `json:"state,omitempty"`
+	PayerID string `json:"-"`
 
-	RawData		  []byte		`json:"-"`
+	RawData []byte `json:"-"`
 	*payment_error
-	payments *Payments
+	payments *Payment
 }
+
 func (self *PaymentExecutor) GetState() State {
 	return self.State
 }
@@ -236,26 +228,26 @@ type PaymentFinalizer interface {
 
 ***************************/
 
-func (self *PaymentObject) GetState() State {
+func (self *Payment) GetState() State {
 	return self.State
 }
-func (self *PaymentObject) GetId() string {
+func (self *Payment) GetId() string {
 	return self.Id
 }
-func (self *PaymentObject) GetPayerID() string {
+func (self *Payment) GetPayerID() string {
 	if self != nil && self.Payer.Payer_info != nil {
 		return self.Payer.Payer_info.Payer_id
 	}
 	return ""
 }
-func (self *PaymentObject) MakeExecutor() *PaymentExecutor {
+func (self *Payment) MakeExecutor() *PaymentExecutor {
 	return &PaymentExecutor{
-		Id: self.Id,
-		State: self.State,
+		Id:       self.Id,
+		State:    self.State,
 		payments: self.payments,
 	}
 }
-func (self *PaymentObject) AddTransaction(trans Transaction) {
+func (self *Payment) AddTransaction(trans Transaction) {
 	var t = transaction{
 		Amount: Amount{
 			Currency: trans.Currency.currency_type(),
@@ -287,9 +279,9 @@ func (self *PaymentObject) AddTransaction(trans Transaction) {
 }
 
 // TODO: The tkn parameter is ignored, but should send a query string parameter `token=tkn`
-func (self *PaymentObject) Authorize(tkn string) (to string, code int, err error) {
+func (self *Payment) Authorize(tkn string) (to string, code int, err error) {
 
-	err = self.payments.connection.make_request("POST", "payments/payment", self, "send_", self, false)
+	err = self.payments.connection.send("POST", "payments/payment", self, "send_", self, false)
 
 	if err == nil {
 		switch self.State {
@@ -306,7 +298,7 @@ func (self *PaymentObject) Authorize(tkn string) (to string, code int, err error
 	return to, code, err
 }
 
-func (self *PaymentObject) Execute(req *http.Request) error {
+func (self *Payment) Execute(req *http.Request) error {
 	return self.payments.Execute(self, req)
 }
 
@@ -326,7 +318,7 @@ func (t *Transaction) AddItem(qty uint, price float64, curr currency_type_i, nam
 // TODO: I'm returning a list of Sale objects because every payment can have multiple transactions.
 //		I need to find out why a payment can have multiple transactions, and see if I should eliminate that in the API
 //		Also, I need to find out why `related_resources` is an array. Can there be more than one per type?
-func (self *PaymentObject) GetSale() []*SaleObject {
+func (self *Payment) GetSale() []*SaleObject {
 	var sales = []*SaleObject{}
 	for _, transaction := range self.Transactions {
 		for _, related_resource := range transaction.Related_resources {
@@ -345,13 +337,13 @@ type _times struct {
 }
 
 type payment_list struct {
-	Payments []*PaymentObject `json:"payments"`
-	Count    int              `json:"count"`
-	Next_id  string           `json:"next_id"`
+	Payments []*Payment `json:"payments"`
+	Count    int        `json:"count"`
+	Next_id  string     `json:"next_id"`
 	*identity_error
 }
 
-type PaymentObject struct {
+type Payment struct {
 	_times
 	PaymentExecutor
 	Intent        Intent         `json:"intent,omitempty"`
@@ -364,11 +356,11 @@ type PaymentObject struct {
 // This is for simplified Transaction creation
 // TODO: Should I keep this abstraction, or just require the PayPal model directly?
 type Transaction struct {
-	Total           float64				// maps to Amount.Total
-	Currency        CurrencyType		// maps to Amount.Currency
+	Total           float64      // maps to Amount.Total
+	Currency        CurrencyType // maps to Amount.Currency
 	Description     string
-	Details         *Details			// maps to Amount.Details
-	ShippingAddress *ShippingAddress	// maps to item_list.Shipping_address
+	Details         *Details         // maps to Amount.Details
+	ShippingAddress *ShippingAddress // maps to item_list.Shipping_address
 	*item_list
 }
 type transaction struct {
@@ -384,7 +376,7 @@ type related_resources []related_resource
 type related_resource struct {
 	Sale          *SaleObject          `json:"sale,omitempty"`
 	Authorization *AuthorizationObject `json:"authorization,omitempty"`
-	Capture       *CaptureObject       `json:"capture,omitempty"`
+	Capture       *Capture             `json:"capture,omitempty"`
 	Refund        *RefundObject        `json:"refund,omitempty"`
 }
 

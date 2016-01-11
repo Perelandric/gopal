@@ -1,52 +1,48 @@
 package gopal
 
+// http://play.golang.org/p/zUgqXPsjjg // Idea for generated enums
+
 import "bytes"
 import "encoding/json"
 import "io"
 import "io/ioutil"
 import "net/http"
-import "net/url"
+
 import "path"
 import "reflect"
 import "strings"
 import "strconv"
 import "time"
 
-func NewConnection(live connection_type_i, id, secret, host string) (*Connection, error) {
-	var hosturl, err = url.Parse(host)
-	if err != nil {
-		return nil, err
-	}
-	var conn = &Connection{live: live, id: id, secret: secret, hosturl: hosturl, client: http.Client{}}
-	conn.Payments.connection = conn
-	conn.Sales.connection = conn
-	conn.Refunds.connection = conn
-	conn.Authorizations.connection = conn
-	conn.Captures.connection = conn
-
-	err = conn.authenticate()
-	if err != nil {
-		return nil, err
-	}
-	return conn, nil
+type request struct {
+	method    string
+	path      string
+	body      interface{}
+	response  errorable
+	isAuthReq bool
 }
 
-type Connection struct {
-	live           connection_type_i
-	id, secret     string
-	hosturl        *url.URL
-	client         http.Client
-	tokeninfo      tokeninfo
-	Payments       Payments
-	Sales          Sales
-	Refunds        Refunds
-	Authorizations Authorizations
-	Captures       Captures
-	//  Vault
-	//  Identity
+type connection struct {
+	live       bool
+	id, secret string
+	tokeninfo  tokeninfo
+	client     http.Client
 }
 
-func (self *Connection) authenticate() error {
+func NewConnection(live bool, id, secret string) (conn *connection, err error) {
+	conn = &connection{
+		live:   live,
+		id:     id,
+		secret: secret,
+	}
+
+	if err = conn.authenticate(); err != nil {
+		return nil, err
+	}
+	return
+}
+
+func (self *connection) authenticate() error {
 	// If an error is returned, zero the tokeninfo
 	var err error
 	var duration time.Duration
@@ -63,8 +59,13 @@ func (self *Connection) authenticate() error {
 	}()
 
 	// (re)authenticate
-	err = self.make_request("POST", "/oauth2/token", "grant_type=client_credentials", "", &self.tokeninfo, true)
-	if err != nil {
+	if err = self.send(&request{
+		method:    "POST",
+		path:      "/oauth2/token",
+		body:      "grant_type=client_credentials",
+		response:  &self.tokeninfo,
+		isAuthReq: true,
+	}); err != nil {
 		return err
 	}
 
@@ -89,7 +90,7 @@ type tokeninfo struct {
 	// Derived fields
 	expiration time.Time
 
-	RawData		 []byte `json:"-"`
+	RawData []byte `json:"-"`
 
 	// Handles the case where an error is received instead
 	*identity_error
@@ -99,28 +100,20 @@ func (ti *tokeninfo) auth_token() string {
 	return ti.Token_type + " " + ti.Access_token
 }
 
-func (pp *Connection) make_request(method, subdir string, body interface{}, idempotent_id string, jsn errorable, auth_req bool) error {
+func (pp *connection) send(reqData *request) error {
 	var err error
 	var result []byte
 	var req *http.Request
 	var resp *http.Response
 	var body_reader io.Reader
-	var url = "https://api"
+	var url string
 
 	// use sandbox url if requested
-	if pp.live == Sandbox {
-		url += ".sandbox"
+	if pp.live {
+		url = path.Join("https://api.paypal.com/v1", reqData.path)
+	} else {
+		url = path.Join("https://api.sandbox.paypal.com/v1", reqData.path)
 	}
-	url = url + ".paypal.com/" + path.Join("v1", subdir)
-
-/*
-// Show request body
-	var s, e = json.Marshal(body)
-	if e != nil {
-		fmt.Println("marshal error", e)
-	}
-	fmt.Printf("REQUEST BODY:\n%s\n\n%s\n\n", url, s)
-*/
 
 	switch val := body.(type) {
 	case string:
@@ -138,7 +131,7 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 		result = nil
 	}
 
-// TODO: Paypal docs mention a `nonce`. Research that.
+	// TODO: Paypal docs mention a `nonce`. Research that.
 
 	req, err = http.NewRequest(method, url, body_reader)
 	if err != nil {
@@ -152,6 +145,7 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Authorization", pp.tokeninfo.auth_token())
 
+		// TODO: How to include idempotent id
 		// TODO: The UUID generation needs to be improved------v
 		req.Header.Set("PayPal-Request-Id", idempotent_id+strconv.FormatInt(time.Now().UnixNano(), 36))
 	}
@@ -170,9 +164,9 @@ func (pp *Connection) make_request(method, subdir string, body interface{}, idem
 		return err
 	}
 
-/*
-	fmt.Println("RESPONSE:",string(result))
-*/
+	/*
+		fmt.Println("RESPONSE:",string(result))
+	*/
 
 	// If there was no Body, we can return
 	if len(bytes.TrimSpace(result)) == 0 {

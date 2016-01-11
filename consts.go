@@ -44,20 +44,6 @@ type sort_order_i interface {
 const DESC = sort_order(true)
 const ASC = sort_order(false)
 
-// Types of PayPal connection (Sandbox or Live)
-type c_type bool
-
-func (self c_type) getType() bool {
-	return bool(self)
-}
-
-type connection_type_i interface {
-	getType() bool
-}
-
-const Sandbox = c_type(false)
-const Live = c_type(true)
-
 type Intent string
 
 const Sale = Intent("sale")

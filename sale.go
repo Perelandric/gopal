@@ -14,7 +14,7 @@ package gopal
 **************************************************************/
 
 type Sales struct {
-	connection *Connection
+	*connection
 }
 
 type SaleObject struct {
@@ -26,7 +26,7 @@ type SaleObject struct {
 
 	Description string `json:"description,omitempty"`
 
-	RawData		[]byte `json:"-"`
+	RawData []byte `json:"-"`
 
 	*identity_error // TODO: Is this right, or is there a special error object like `payments` has?
 	sales           *Sales
@@ -82,7 +82,7 @@ RESPONSE: Returns a SALE object.
 
 func (self *Sales) Get(sale_id string) (*SaleObject, error) {
 	var sale = new(SaleObject)
-	var err = self.connection.make_request("GET", "payments/sale/"+sale_id, nil, "", sale, false)
+	var err = self.connection.send("GET", "payments/sale/"+sale_id, nil, "", sale, false)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (self *Sales) Get(sale_id string) (*SaleObject, error) {
 	return sale, nil
 }
 
-func (self *SaleObject) GetParentPayment() (*PaymentObject, error) {
+func (self *SaleObject) GetParentPayment() (*Payment, error) {
 	return self.sales.connection.Payments.Get(self.Parent_payment)
 }
 
@@ -148,7 +148,7 @@ RESPONSE: Returns a REFUND object with details about a refund and whether the re
 
 func (self *SaleObject) do_refund(ref_req interface{}) (*RefundObject, error) {
 	var ref_resp = new(RefundObject)
-	var err = self.sales.connection.make_request("POST",
+	var err = self.sales.connection.send("POST",
 		"payments/sale/"+self.Id+"/refund",
 		ref_req, "", ref_resp, false)
 	if err != nil {

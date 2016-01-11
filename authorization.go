@@ -1,5 +1,7 @@
 package gopal
 
+import "path"
+
 /*************************************************************
 
 	AUTHORIZATIONS:  https://api.paypal.com/v1/payments/payment/authorization
@@ -11,7 +13,7 @@ package gopal
 **************************************************************/
 
 type Authorizations struct {
-	connection *Connection
+	*connection
 }
 
 type AuthorizationObject struct {
@@ -20,7 +22,7 @@ type AuthorizationObject struct {
 	Valid_until string `json:"valid_until,omitempty"`
 	Links       links  `json:"links,omitempty"`
 
-	RawData		[]byte `json:"-"`
+	RawData []byte `json:"-"`
 
 	*identity_error
 	authorizations *Authorizations
@@ -85,17 +87,20 @@ RESPONSE: Returns a AUTHORIZATION object.
 
 func (self *Authorizations) Get(auth_id string) (*AuthorizationObject, error) {
 	var auth = new(AuthorizationObject)
-	var err = self.connection.make_request("GET",
-		"payments/authorization/"+auth_id,
-		nil, "", auth, false)
-	if err != nil {
+	if err := self.send(&request{
+		method:   "GET",
+		path:     path.Join("payments/authorization", auth_id),
+		body:     nil,
+		response: auth,
+	}); err != nil {
 		return nil, err
 	}
+
 	auth.authorizations = self
 	return auth, nil
 }
 
-func (self *AuthorizationObject) GetParentPayment() (*PaymentObject, error) {
+func (self *AuthorizationObject) GetParentPayment() (*Payment, error) {
 	return self.authorizations.connection.Payments.Get(self.Parent_payment)
 }
 
@@ -172,10 +177,12 @@ func (self *AuthorizationObject) Capture(amt *Amount, is_final bool) (*CaptureOb
 	}
 	var capt_resp = new(CaptureObject)
 
-	var err = self.authorizations.connection.make_request("POST",
-		"payments/authorization/"+self.Id+"/capture",
-		capt_req, "", capt_resp, false)
-	if err != nil {
+	if err := self.authorizations.send(&request{
+		method:   "POST",
+		path:     path.Join("payments/authorization", self.Id, "capture"),
+		body:     capt_req,
+		response: capt_resp,
+	}); err != nil {
 		return nil, err
 	}
 	return capt_resp, nil
@@ -231,10 +238,12 @@ RESPONSE:  Returns an AUTHORIZATION object.
 func (self *AuthorizationObject) Void() (*AuthorizationObject, error) {
 	var void_resp = new(AuthorizationObject)
 
-	var err = self.authorizations.connection.make_request("POST",
-		"payments/authorization/"+self.Id+"/void",
-		nil, "", void_resp, false)
-	if err != nil {
+	if err := self.authorizations.send(&request{
+		method:   "POST",
+		path:     path.Join("payments/authorization", self.Id, "void"),
+		body:     nil,
+		response: void_resp,
+	}); err != nil {
 		return nil, err
 	}
 	return void_resp, nil
@@ -316,10 +325,12 @@ func (self *AuthorizationObject) ReauthorizeAmount(amt *Amount) (*AuthorizationO
 	}
 	var auth_resp = new(AuthorizationObject)
 
-	var err = self.authorizations.connection.make_request("POST",
-		"payments/authorization/"+self.Id+"/reauthorize",
-		auth_req, "", auth_resp, false)
-	if err != nil {
+	if err := self.authorizations.send(&request{
+		method:   "POST",
+		path:     path.Join("payments/authorization", self.Id, "reauthorize"),
+		body:     auth_req,
+		response: auth_resp,
+	}); err != nil {
 		return nil, err
 	}
 	return auth_resp, nil

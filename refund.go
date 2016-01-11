@@ -16,7 +16,7 @@ package gopal
 **************************************************************/
 
 type Refunds struct {
-	connection *Connection
+	*connection
 }
 
 type RefundObject struct {
@@ -24,7 +24,7 @@ type RefundObject struct {
 	State   State  `json:"state,omitempty"` // TODO: Limit to allowed values
 	Sale_id string `json:"sale_id,omitempty"`
 
-	RawData		[]byte `json:"-"`
+	RawData []byte `json:"-"`
 
 	*identity_error
 	refunds *Refunds
@@ -88,7 +88,7 @@ RESPONSE: Returns a REFUND object with details about a refund and whether the re
 
 func (self *Refunds) Get(refund_id string) (*RefundObject, error) {
 	var refund = new(RefundObject)
-	var err = self.connection.make_request("GET", "payments/refund/"+refund_id, nil, "", refund, false)
+	var err = self.connection.send("GET", "payments/refund/"+refund_id, nil, "", refund, false)
 	if err != nil {
 		return nil, err
 	}
@@ -96,6 +96,6 @@ func (self *Refunds) Get(refund_id string) (*RefundObject, error) {
 	return refund, nil
 }
 
-func (self *RefundObject) GetParentPayment() (*PaymentObject, error) {
+func (self *RefundObject) GetParentPayment() (*Payment, error) {
 	return self.refunds.connection.Payments.Get(self.Parent_payment)
 }
