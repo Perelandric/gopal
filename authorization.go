@@ -12,20 +12,51 @@ import "path"
 
 **************************************************************/
 
-type Authorizations struct {
-	*connection
+// State items are: pending, authorized, captured, partially_captured, expired,
+// 									voided
+type Authorization struct {
+	_trans
+
+	// ID of the billing agreement used as reference to execute this transaction.
+	BillingAgreementId string `json:"billing_agreement_id"`
+
+	// Specifies the payment mode of the transaction.
+	PaymentMode paymentMode `json:"payment_mode"`
+
+	// Reason code, AUTHORIZATION, for a transaction state of `pending`. Value
+	// assigned by PayPal.
+	ReasonCode reasonCode `json:"reason_code"`
+
+	// Authorization expiration time and date as defined in RFC 3339 Section 5.6.
+	// Value assigned by PayPal.
+	ValidUntil dateTime `json:"valid_until"`
+
+	// Expected clearing time for eCheck transactions. Only supported when the
+	// payment_method is set to paypal. Value assigned by PayPal.
+	ClearingTime string `json:"clearing_time"`
+
+	// The level of seller protection in force for the transaction. Only supported
+	// when the payment_method is set to paypal.
+	ProtectionElig protectionElig `json:"protection_eligibility"`
+
+	// The kind of seller protection in force for the transaction. This property
+	// is returned only when the protection_eligibility property is set to
+	// ELIGIBLE or PARTIALLY_ELIGIBLE. Only supported when the `payment_method` is
+	// set to `paypal`.
+	ProtectionEligType protectionEligType `json:"protection_eligibility_type"`
+
+	// Fraud Management Filter (FMF) details applied for the payment that could
+	// result in accept, deny, or pending action. Returned in a payment response
+	// only if the merchant has enabled FMF in the profile settings and one of the
+	// fraud filters was triggered based on those settings. See "Fraud Management
+	// Filters Summary" for more information.
+	FmfDetails fmfDetails `json:"fmf_details"`
 }
 
-type AuthorizationObject struct {
-	_trans
-	State       State  `json:"state,omitempty"` // TODO: Limit to allowed values
-	Valid_until string `json:"valid_until,omitempty"`
-	Links       links  `json:"links,omitempty"`
+// Implement the transactionable interface
 
-	RawData []byte `json:"-"`
-
-	*identity_error
-	authorizations *Authorizations
+func (self *Authorization) getPath() string {
+	return path.Join("payments/authorization", self.Id)
 }
 
 /*************************************************************
@@ -35,60 +66,16 @@ type AuthorizationObject struct {
 
 Use this call to get details about authorizations.
 
-
-REQUEST: Pass the authorization ID. (No object to send)
-
-curl -v -X GET https://api.sandbox.paypal.com/v1/payments/authorization/2DC87612EK520411B \
--H "Content-Type:application/json" \
--H "Authorization:Bearer ENxom5Fof1KqAffEsXtxwEDa6E1HTEK__KVdIsaCYF8C"
-
-
-RESPONSE: Returns a AUTHORIZATION object.
-
-{
-  "id": "2DC87612EK520411B",
-  "create_time": "2013-06-25T21:39:15Z",
-  "update_time": "2013-06-25T21:39:17Z",
-  "state": "authorized",
-  "amount": {
-    "total": "7.47",
-    "currency": "USD",
-    "details": {
-      "subtotal": "7.47"
-    }
-  },
-  "parent_payment": "PAY-36246664YD343335CKHFA4AY",
-  "valid_until": "2013-07-24T21:39:15Z",
-  "links": [
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/authorization/2DC87612EK520411B",
-      "rel": "self",
-      "method": "GET"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/authorization/2DC87612EK520411B/capture",
-      "rel": "capture",
-      "method": "POST"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/authorization/2DC87612EK520411B/void",
-      "rel": "void",
-      "method": "POST"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/payment/PAY-36246664YD343335CKHFA4AY",
-      "rel": "parent_payment",
-      "method": "GET"
-    }
-  ]
-}
-
 **************************************************************/
 
-func (self *Authorizations) Get(auth_id string) (*AuthorizationObject, error) {
-	var auth = new(AuthorizationObject)
+func (self *connection) FetchAuthorization(
+	auth_id string) (*Authorization, error) {
+
+	var auth = &Authorization{}
+	auth.connection = self
+
 	if err := self.send(&request{
-		method:   "GET",
+		method:   get,
 		path:     path.Join("payments/authorization", auth_id),
 		body:     nil,
 		response: auth,
@@ -96,12 +83,7 @@ func (self *Authorizations) Get(auth_id string) (*AuthorizationObject, error) {
 		return nil, err
 	}
 
-	auth.authorizations = self
 	return auth, nil
-}
-
-func (self *AuthorizationObject) GetParentPayment() (*Payment, error) {
-	return self.authorizations.connection.Payments.Get(self.Parent_payment)
 }
 
 /*************************************************************
@@ -112,73 +94,19 @@ func (self *AuthorizationObject) GetParentPayment() (*Payment, error) {
 Use this resource to capture and process a previously created authorization.
 To use this resource, the original payment call must have the intent set to authorize.
 
-
-REQUEST: Provide an authorization_id along with an amount object.
-		For a partial capture, you can provide a lower amount.
-		Additionally, you can explicitly indicate a final capture (prevent future captures)
-		by setting the is_final_capture value to true.
-
-curl -v https://api.sandbox.paypal.com/v1/payments/authorization/5RA45624N3531924N/capture \
--H "Content-Type:application/json" \
--H "Authorization:Bearer EMxItHE7Zl4cMdkvMg-f7c63GQgYZU8FjyPWKQlpsqQP" \
--d '{
-  "amount":{
-    "currency":"USD",
-    "total":"4.54"
-  },
-  "is_final_capture":true
-}'
-
-RESPONSE:  Returns a CAPTURE object along with the STATE of the capture.
-
-{
-  "id": "6BA17599X0950293U",
-  "create_time": "2013-05-06T22:32:24Z",
-  "update_time": "2013-05-06T22:32:25Z",
-  "amount": {
-    "total": "4.54",
-    "currency": "USD"
-  },
-  "is_final_capture": true,
-  "state": "completed",
-  "parent_payment": "PAY-44664305570317015KGEC5DI",
-  "links": [
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/capture/6BA17599X0950293U",
-      "rel": "self",
-      "method": "GET"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/capture/6BA17599X0950293U/refund",
-      "rel": "refund",
-      "method": "POST"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/authorization/5RA45624N3531924N",
-      "rel": "authorization",
-      "method": "GET"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/payment/PAY-44664305570317015KGEC5DI",
-      "rel": "parent_payment",
-      "method": "GET"
-    }
-  ]
-}
-
 **************************************************************/
 
-func (self *AuthorizationObject) Capture(amt *Amount, is_final bool) (*CaptureObject, error) {
-	var capt_req = &CaptureObject{
+func (self *Authorization) Capture(amt *amount, is_final bool) (*Capture, error) {
+	var capt_req = &Capture{
 		_trans: _trans{
 			Amount: *amt,
 		},
-		Is_final_capture: is_final,
+		IsFinalCapture: is_final,
 	}
-	var capt_resp = new(CaptureObject)
+	var capt_resp = new(Capture)
 
-	if err := self.authorizations.send(&request{
-		method:   "POST",
+	if err := self.send(&request{
+		method:   post,
 		path:     path.Join("payments/authorization", self.Id, "capture"),
 		body:     capt_req,
 		response: capt_resp,
@@ -196,50 +124,13 @@ func (self *AuthorizationObject) Capture(amt *Amount, is_final bool) (*CaptureOb
 Use this call to void a previously authorized payment. Note a fully captured authorization
 cannot be voided.
 
-
-REQUEST: Pass the authorization ID in the resource URI.
-
-curl -v -X POST https://api.sandbox.paypal.com/v1/payments/authorization/6CR34526N64144512/void \
--H "Content-Type:application/json" \
--H "Authorization:Bearer ENxom5Fof1KqAffEsXtxwEDa6E1HTEK__KVdIsaCYF8C"
-
-
-RESPONSE:  Returns an AUTHORIZATION object.
-
-{
-  "id": "6CR34526N64144512",
-  "create_time": "2013-05-06T21:56:50Z",
-  "update_time": "2013-05-06T21:57:51Z",
-  "state": "voided",
-  "amount": {
-    "total": "110.54",
-    "currency": "USD",
-    "details": {
-      "subtotal": "110.54"
-    }
-  },
-  "parent_payment": "PAY-0PL82432AD7432233KGECOIQ",
-  "links": [
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/authorization/6CR34526N64144512",
-      "rel": "self",
-      "method": "GET"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/payment/PAY-0PL82432AD7432233KGECOIQ",
-      "rel": "parent_payment",
-      "method": "GET"
-    }
-  ]
-}
-
 **************************************************************/
 
-func (self *AuthorizationObject) Void() (*AuthorizationObject, error) {
-	var void_resp = new(AuthorizationObject)
+func (self *Authorization) Void() (*Authorization, error) {
+	var void_resp = new(Authorization)
 
-	if err := self.authorizations.send(&request{
-		method:   "POST",
+	if err := self.send(&request{
+		method:   post,
 		path:     path.Join("payments/authorization", self.Id, "void"),
 		body:     nil,
 		response: void_resp,
@@ -265,68 +156,21 @@ authorized amount, not to exceed an increase of $75 USD.
 
   Note: You can only reauthorize PayPal account payments.
 
-
-
-REQUEST: Pass the authorization id in the resource URI along with a new AUTHORIZATION object if you need to authorize a different amount.
-
-curl -v https://api.sandbox.paypal.com/v1/payments/authorization/7YK97137TM7104916/reauthorize \
--H "Content-Type:application/json"  \
--H "Authorization: Bearer EBKoE2M-mctKH3OnORRVzUlxiromWnU5Mgz2PUZntQmt"  \
--d '{
-  "amount":{
-    "total":"7.00",
-    "currency":"USD"
-  }
-}
-
-
-RESPONSE:  Returns an AUTHORIZATION object with details of the authorization.
-
-{
-  "id": "8AA831015G517922L",
-  "create_time": "2013-06-25T21:39:15Z",
-  "update_time": "2013-06-25T21:39:17Z",
-  "state": "authorized",
-  "amount": {
-    "total": "7.00",
-    "currency": "USD"
-  },
-  "parent_payment": "PAY-7LD317540C810384EKHFAGYA",
-  "valid_until": "2013-07-24T21:39:15Z",
-  "links": [
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/authorization/8AA831015G517922L",
-      "rel": "self",
-      "method": "GET"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/payment/PAY-7LD317540C810384EKHFAGYA",
-      "rel": "parent_payment",
-      "method": "GET"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/authorization/8AA831015G517922L/capture",
-      "rel": "capture",
-      "method": "POST"
-    }
-  ]
-}
-
 **************************************************************/
 
 // TODO: Since only PayPal authorizations can be re-authorized, should I add a check
 //			for this? Or should I just let the error come back from the server?
-func (self *AuthorizationObject) ReauthorizeAmount(amt *Amount) (*AuthorizationObject, error) {
-	var auth_req = new(AuthorizationObject)
+func (self *Authorization) ReauthorizeAmount(amt *amount) (*Authorization, error) {
+	var auth_req = new(Authorization)
 	if amt == nil {
 		auth_req.Amount = self.Amount
 	} else {
 		auth_req.Amount = *amt
 	}
-	var auth_resp = new(AuthorizationObject)
+	var auth_resp = new(Authorization)
 
-	if err := self.authorizations.send(&request{
-		method:   "POST",
+	if err := self.send(&request{
+		method:   post,
 		path:     path.Join("payments/authorization", self.Id, "reauthorize"),
 		body:     auth_req,
 		response: auth_resp,
@@ -336,6 +180,6 @@ func (self *AuthorizationObject) ReauthorizeAmount(amt *Amount) (*AuthorizationO
 	return auth_resp, nil
 }
 
-func (self *AuthorizationObject) Reauthorize() (*AuthorizationObject, error) {
+func (self *Authorization) Reauthorize() (*Authorization, error) {
 	return self.ReauthorizeAmount(nil)
 }

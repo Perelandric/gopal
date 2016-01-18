@@ -1,5 +1,7 @@
 package gopal
 
+import "path"
+
 /*************************************************************
 
 	SALE TRANSACTIONS:  https://api.paypal.com/v1/payments/sale
@@ -13,23 +15,76 @@ package gopal
 
 **************************************************************/
 
-type Sales struct {
-	*connection
-}
-
-type SaleObject struct {
+// State values are: pending; completed; refunded; partially_refunded
+type Sale struct {
 	_trans
-	State State `json:"state,omitempty"` // TODO: Limit to allowed values
 
 	// TODO: Verify that `sale_id` shouldn't be there and can be removed
 	//	Sale_id     string `json:"sale_id,omitempty"`
 
 	Description string `json:"description,omitempty"`
 
-	RawData []byte `json:"-"`
+	// Specifies payment mode of the transaction. Only supported when the
+	// `payment_method` is set to `paypal`. Assigned by PayPal.
+	PaymentMode paymentMode `json:"payment_mode"`
 
-	*identity_error // TODO: Is this right, or is there a special error object like `payments` has?
-	sales           *Sales
+	// Reason the transaction is in pending state. Only supported when the
+	// `payment_method` is set to `paypal`
+	PendingReason pendingReason `json:"pending_reason"`
+
+	// Expected clearing time for eCheck transactions. Only supported when the
+	// payment_method is set to paypal. Assigned by PayPal.
+	ClearingTime string `json:"clearing_time"`
+
+	// Transaction fee charged by PayPal for this transaction.
+	TransactionFee currency `json:"transaction_fee"`
+
+	// Net amount the merchant receives for this transaction in their receivable
+	// currency. Returned only in cross-currency use cases where a merchant bills
+	// a buyer in a non-primary currency for that buyer.
+	ReceivableAmount currency `json:"receivable_amount"`
+
+	// Exchange rate applied for this transaction. Returned only in cross-currency
+	// use cases where a merchant bills a buyer in a non-primary currency for that
+	// buyer.
+	ExchangeRate string `json:"exchange_rate"`
+
+	// Fraud Management Filter (FMF) details applied for the payment that could
+	// result in accept, deny, or pending action. Returned in a payment response
+	// only if the merchant has enabled FMF in the profile settings and one of the
+	// fraud filters was triggered based on those settings. See "Fraud Management
+	// Filters Summary" for more information.
+	FmfDetails fmfDetails `json:"fmf_details"`
+
+	// Receipt ID is a 16-digit payment identification number returned for guest
+	// users to identify the payment.
+	ReceiptId string `json:"receipt_id"`
+
+	// Reason code for the transaction state being Pending or Reversed. Only
+	// supported when the `payment_method` is set to `paypal`.
+	ReasonCode reasonCode `json:"reason_code"`
+
+	// The level of seller protection in force for the transaction. Only supported
+	// when the `payment_method` is set to `paypal`.
+	ProtectionEligibility protectionElig `json:"protection_eligibility"`
+
+	// The kind of seller protection in force for the transaction. This property
+	// is returned only when the protection_eligibility property is set to
+	// `ELIGIBLE` or `PARTIALLY_ELIGIBLE`. Only supported when the `payment_method`
+	// is set to paypal. One or both of the allowed values can be returned.
+	ProtectionEligibilityType protectionEligType `json:"protection_eligibility_type"`
+}
+
+// Implement the transactionable interface
+
+func (self *Sale) getPath() string {
+	return path.Join("payments/sale", self.Id)
+}
+
+// Implement `refundable` interface
+
+func (self *Sale) getRefundPath() string {
+	return path.Join("payments/sale", self.Id, "refund")
 }
 
 /*************************************************************
@@ -39,59 +94,22 @@ type SaleObject struct {
 
 Use this call to get details about a sale transaction.
 
-
-REQUEST: (No object to send)
-
-curl -v -X GET https://api.sandbox.paypal.com/v1/payments/sale/36C38912MN9658832 \
--H "Content-Type:application/json" \
--H "Authorization:Bearer EIpHzmJ8BGVEBw5KxBQZfibqL-3xfc3ECveRDjHX0_Ur"
-
-
-RESPONSE: Returns a SALE object.
-
-{
-  "id": "36C38912MN9658832",
-  "create_time": "2013-02-19T22:01:53Z",
-  "update_time": "2013-02-19T22:01:55Z",
-  "state": "completed",
-  "amount": {
-    "total": "7.47",
-    "currency": "USD"
-  },
-  "parent_payment": "PAY-5YK922393D847794YKER7MUI",
-  "links": [
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/sale/36C38912MN9658832",
-      "rel": "self",
-      "method": "GET"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/sale/36C38912MN9658832/refund",
-      "rel": "refund",
-      "method": "POST"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/payment/PAY-5YK922393D847794YKER7MUI",
-      "rel": "parent_payment",
-      "method": "GET"
-    }
-  ]
-}
-
 **************************************************************/
 
-func (self *Sales) Get(sale_id string) (*SaleObject, error) {
-	var sale = new(SaleObject)
-	var err = self.connection.send("GET", "payments/sale/"+sale_id, nil, "", sale, false)
-	if err != nil {
+func (self *connection) FetchSale(sale_id string) (*Sale, error) {
+	var sale = &Sale{}
+	sale.connection = self
+
+	if err := self.send(&request{
+		method:   get,
+		path:     path.Join("payments/sale", sale_id),
+		body:     nil,
+		response: sale,
+	}); err != nil {
 		return nil, err
 	}
-	sale.sales = self
-	return sale, nil
-}
 
-func (self *SaleObject) GetParentPayment() (*Payment, error) {
-	return self.sales.connection.Payments.Get(self.Parent_payment)
+	return sale, nil
 }
 
 /*************************************************************
@@ -103,64 +121,12 @@ Use this call to refund a completed payment.
 Provide the sale_id in the URI and an empty JSON payload for a full refund.
 For partial refunds, you can include an amount.
 
-
-REQUEST: Sends an AMOUNT object
-
-curl -v https://api.sandbox.paypal.com/v1/payments/sale/32G235960X3106808/refund \
--H "Content-Type:application/json"  \
--H "Authorization: Bearer EBKoE2M-mctKH3OnORRVzUlxiromWnU5Mgz2PUZntQmt"  \
--d '{"amount":{"total":"2.34","currency":"USD"}}'
-
-
-RESPONSE: Returns a REFUND object with details about a refund and whether the refund was successful.
-
-{
-  "id": "4CF18861HF410323U",
-  "create_time": "2013-01-31T04:13:34Z",
-  "update_time": "2013-01-31T04:13:36Z",
-  "state": "completed",
-  "amount": {
-    "total": "2.34",
-    "currency": "USD"
-  },
-  "sale_id": "2MU78835H4515710F",
-  "parent_payment": "PAY-46E69296BH2194803KEE662Y",
-  "links": [
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/refund/4CF18861HF410323U",
-      "rel": "self",
-      "method": "GET"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/payment/PAY-46E69296BH2194803KEE662Y",
-      "rel": "parent_payment",
-      "method": "GET"
-    },
-    {
-      "href": "https://api.sandbox.paypal.com/v1/payments/sale/2MU78835H4515710F",
-      "rel": "sale",
-      "method": "GET"
-    }
-  ]
-}
-
 **************************************************************/
 
-func (self *SaleObject) do_refund(ref_req interface{}) (*RefundObject, error) {
-	var ref_resp = new(RefundObject)
-	var err = self.sales.connection.send("POST",
-		"payments/sale/"+self.Id+"/refund",
-		ref_req, "", ref_resp, false)
-	if err != nil {
-		return nil, err
-	}
-	return ref_resp, nil
+func (self *Sale) Refund(amt float64) (*Refund, error) {
+	return self.doRefund(self, amt)
 }
 
-func (self *SaleObject) Refund(amt Amount) (*RefundObject, error) {
-	return self.do_refund(&RefundObject{_trans: _trans{Amount: amt}})
-}
-
-func (self *SaleObject) FullRefund() (*RefundObject, error) {
-	return self.do_refund(`{}`)
+func (self *Sale) FullRefund() (*Refund, error) {
+	return self.doRefund(self, self.totalAsFloat())
 }

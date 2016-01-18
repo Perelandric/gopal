@@ -9,13 +9,13 @@ import "io/ioutil"
 import "net/http"
 
 import "path"
-import "reflect"
+
 import "strings"
 import "strconv"
 import "time"
 
 type request struct {
-	method    string
+	method    method
 	path      string
 	body      interface{}
 	response  errorable
@@ -60,7 +60,7 @@ func (self *connection) authenticate() error {
 
 	// (re)authenticate
 	if err = self.send(&request{
-		method:    "POST",
+		method:    post,
 		path:      "/oauth2/token",
 		body:      "grant_type=client_credentials",
 		response:  &self.tokeninfo,
@@ -115,7 +115,7 @@ func (pp *connection) send(reqData *request) error {
 		url = path.Join("https://api.sandbox.paypal.com/v1", reqData.path)
 	}
 
-	switch val := body.(type) {
+	switch val := reqData.body.(type) {
 	case string:
 		body_reader = strings.NewReader(val)
 	case []byte:
@@ -133,12 +133,12 @@ func (pp *connection) send(reqData *request) error {
 
 	// TODO: Paypal docs mention a `nonce`. Research that.
 
-	req, err = http.NewRequest(method, url, body_reader)
+	req, err = http.NewRequest(string(reqData.method), url, body_reader)
 	if err != nil {
 		return err
 	}
 
-	if auth_req {
+	if reqData.isAuthReq {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		req.SetBasicAuth(pp.id, pp.secret)
 	} else {
@@ -147,7 +147,8 @@ func (pp *connection) send(reqData *request) error {
 
 		// TODO: How to include idempotent id
 		// TODO: The UUID generation needs to be improved------v
-		req.Header.Set("PayPal-Request-Id", idempotent_id+strconv.FormatInt(time.Now().UnixNano(), 36))
+		req.Header.Set(
+			"PayPal-Request-Id", strconv.FormatInt(time.Now().UnixNano(), 36))
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Accept-Language", "en_US")
@@ -169,35 +170,13 @@ func (pp *connection) send(reqData *request) error {
 	*/
 
 	// If there was no Body, we can return
-	if len(bytes.TrimSpace(result)) == 0 {
+	if len(bytes.TrimSpace(result)) == 0 || reqData.response == nil {
 		return nil
 	}
 
-	var v = reflect.ValueOf(jsn)
-
-	if v.Kind() == reflect.Ptr {
-		v = v.Elem()
-	}
-
-	if v.Kind() == reflect.Struct {
-		v = v.FieldByName("RawData")
-		if v.IsValid() {
-			v.SetBytes(result)
-		}
-	}
-
-	err = json.Unmarshal(result, jsn)
-	//var x,y = json.Marshal(jsn)
-	//fmt.Printf("=++++++++++++++++++\n%s\n%v\n",x,y)
-	if err != nil {
+	if err = json.Unmarshal(result, reqData.response); err != nil {
 		return err
 	}
 
-	err = jsn.to_error()
-	if err != nil {
-		// Specific management for PayPal response errors
-		return err
-	}
-
-	return nil
+	return reqData.response.to_error()
 }
