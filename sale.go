@@ -26,11 +26,11 @@ type Sale struct {
 
 	// Specifies payment mode of the transaction. Only supported when the
 	// `payment_method` is set to `paypal`. Assigned by PayPal.
-	PaymentMode paymentMode `json:"payment_mode"`
+	PaymentMode paymentModeEnum `json:"payment_mode"`
 
 	// Reason the transaction is in pending state. Only supported when the
 	// `payment_method` is set to `paypal`
-	PendingReason pendingReason `json:"pending_reason"`
+	PendingReason pendingReasonEnum `json:"pending_reason"`
 
 	// Expected clearing time for eCheck transactions. Only supported when the
 	// payment_method is set to paypal. Assigned by PayPal.
@@ -62,29 +62,29 @@ type Sale struct {
 
 	// Reason code for the transaction state being Pending or Reversed. Only
 	// supported when the `payment_method` is set to `paypal`.
-	ReasonCode reasonCode `json:"reason_code"`
+	ReasonCode reasonCodeEnum `json:"reason_code"`
 
 	// The level of seller protection in force for the transaction. Only supported
 	// when the `payment_method` is set to `paypal`.
-	ProtectionEligibility protectionElig `json:"protection_eligibility"`
+	ProtectionEligibility protectionEligEnum `json:"protection_eligibility"`
 
 	// The kind of seller protection in force for the transaction. This property
 	// is returned only when the protection_eligibility property is set to
 	// `ELIGIBLE` or `PARTIALLY_ELIGIBLE`. Only supported when the `payment_method`
 	// is set to paypal. One or both of the allowed values can be returned.
-	ProtectionEligibilityType protectionEligType `json:"protection_eligibility_type"`
+	ProtectionEligibilityType protectionEligTypeEnum `json:"protection_eligibility_type"`
 }
 
-// Implement the transactionable interface
+// Implement the Resource interface
 
 func (self *Sale) getPath() string {
-	return path.Join("payments/sale", self.Id)
+	return path.Join(_salePath, self.Id)
 }
 
 // Implement `refundable` interface
 
 func (self *Sale) getRefundPath() string {
-	return path.Join("payments/sale", self.Id, "refund")
+	return path.Join(_salePath, self.Id, _refund)
 }
 
 /*************************************************************
@@ -101,8 +101,8 @@ func (self *connection) FetchSale(sale_id string) (*Sale, error) {
 	sale.connection = self
 
 	if err := self.send(&request{
-		method:   get,
-		path:     path.Join("payments/sale", sale_id),
+		method:   method.get,
+		path:     path.Join(_salePath, sale_id),
 		body:     nil,
 		response: sale,
 	}); err != nil {

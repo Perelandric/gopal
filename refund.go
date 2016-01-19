@@ -32,10 +32,10 @@ type Refund struct {
 	CaptureId string `json:"capture_id,omitempty"`
 }
 
-// Implement the transactionable interface
+// Implement the Resource interface
 
 func (self *Refund) getPath() string {
-	return path.Join("payments/refund", self.Id)
+	return path.Join(_refundPath, self.Id)
 }
 
 // General purpose function for performing a refund.
@@ -53,7 +53,7 @@ func (self *connection) doRefund(obj refundable, amt float64) (*Refund, error) {
 	}
 
 	if err := self.send(&request{
-		method:   post,
+		method:   method.post,
 		path:     obj.getRefundPath(),
 		body:     ref,
 		response: ref,
@@ -83,8 +83,8 @@ func (self *connection) FetchRefund(refund_id string) (*Refund, error) {
 	refund.connection = self
 
 	if err := self.send(&request{
-		method:   get,
-		path:     path.Join("payments/refund", refund_id),
+		method:   method.get,
+		path:     path.Join(_refundPath, refund_id),
 		body:     nil,
 		response: refund,
 	}); err != nil {

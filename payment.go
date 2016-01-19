@@ -4,19 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
+	"path"
+	"time"
 )
-
-import "net/http"
-import "path"
-import "time"
 
 func (self *connection) FetchPayment(payment_id string) (*Payment, error) {
 	var pymt = &Payment{
 		connection: self,
 	}
 	if err := self.send(&request{
-		method:   get,
-		path:     path.Join("payments/payment", payment_id),
+		method:   method.get,
+		path:     path.Join(_paymentsPath, payment_id),
 		body:     nil,
 		response: pymt,
 	}); err != nil {
@@ -26,9 +25,11 @@ func (self *connection) FetchPayment(payment_id string) (*Payment, error) {
 }
 
 func CreatePayment(
-	conn *connection, method PaymentMethod, urls RedirectUrls) (*Payment, error) {
+	conn *connection,
+	method PaymentMethodEnum,
+	urls RedirectUrls) (*Payment, error) {
 
-	if method == PayPal {
+	if method == PaymentMethod.PayPal {
 		// Make sure we're still authenticated. Will refresh if not.
 		if err := conn.authenticate(); err != nil {
 			return nil, err
@@ -36,18 +37,13 @@ func CreatePayment(
 
 		return &Payment{
 			payment_request: payment_request{
-				Intent: sale,
+				Intent: intent.sale,
 				Payer: payer{
 					PaymentMethod: method,
 				},
 				Transactions: make([]*transaction, 0),
 				RedirectUrls: urls,
 			},
-			_times:              _times{},
-			Id:                  "",
-			State:               "",
-			ExperienceProfileId: "",
-			Links:               nil,
 		}, nil
 	}
 	return nil, nil
@@ -74,15 +70,15 @@ func (self *Payment) Execute(req *http.Request) error {
 	var pymt Payment
 
 	if err := self.send(&request{
-		method:   post,
-		path:     path.Join("payments/payment", pymtid, "execute"),
+		method:   method.post,
+		path:     path.Join(_paymentsPath, pymtid, _execute),
 		body:     &paymentExecution{PayerID: payerid},
 		response: &pymt,
 	}); err != nil {
 		return err
 	}
 
-	if pymt.State != Approved {
+	if pymt.State != state.Approved {
 		return fmt.Errorf(
 			"Payment with ID %q for payer %q was not approved\n", pymtid, payerid)
 	}
@@ -103,17 +99,17 @@ func (self *Payment) AddTransaction(t transaction) {
 // TODO: The tkn parameter is ignored, but should send a query string parameter `token=tkn`
 func (self *Payment) Authorize(tkn string) (to string, code int, err error) {
 	err = self.send(&request{
-		method:   post,
-		path:     "payments/payment",
+		method:   method.post,
+		path:     _paymentsPath,
 		body:     self,
 		response: self,
 	})
 
 	if err == nil {
 		switch self.State {
-		case Created:
+		case state.Created:
 			// Set url to redirect to PayPal site to begin approval process
-			to, _ = self.Links.get("approval_url")
+			to, _ = self.Links.get(relType.approvalUrl)
 			code = 303
 		default:
 			// otherwise cancel the payment and return an error
@@ -147,7 +143,7 @@ func (self *Payment) GetSale() []*Sale {
 
 func (self *connection) GetAllPayments(
 	size int,
-	sort_by sort_by_i, sort_order sort_order_i, time_range ...time.Time,
+	sort_by sortByEnum, sort_order sortOrderEnum, time_range ...time.Time,
 ) *PaymentBatcher {
 
 	if size < 0 {
@@ -197,7 +193,7 @@ type payment_request struct {
 	// Payment intent. Must be set to sale for immediate payment, authorize to
 	// authorize a payment for capture later, or order to create an order.
 	// Allowed values: sale, authorize, order.
-	Intent Intent `json:"intent,omitempty"`
+	Intent intentEnum `json:"intent,omitempty"`
 
 	Payer payer `json:"payer,omitempty"`
 
@@ -227,7 +223,7 @@ type Payment struct {
 
 	// Payment state. Must be one of the following: created; approved; failed;
 	// pending; canceled; expired, or in_progress. Value assigned by PayPal.
-	State state `json:"state,omitempty"`
+	State stateEnum `json:"state,omitempty"`
 
 	// Identifier for the payment experience.
 	ExperienceProfileId string `json:"experience_profile_id"`
@@ -255,7 +251,7 @@ type paymentExecution struct {
 // `subtotal` to calculate the `Total`.
 type amount struct {
 	// 3 letter currency code. PayPal does not support all currencies. REQUIRED.
-	Currency currency_type `json:"currency"`
+	Currency CurrencyTypeEnum `json:"currency"`
 
 	// Total amount charged from the payer to the payee. In case of a refund, this
 	// is the refunded amount to the original payer from the payee. 10 characters
@@ -311,7 +307,7 @@ type item struct {
 	Price float64 `json:"price,string"`
 
 	// REQUIRED. 3-letter currency code.
-	Currency currency_type `json:"currency"`
+	Currency CurrencyTypeEnum `json:"currency"`
 
 	// Stock keeping unit corresponding (SKU) to item. 50 chars max.
 	Sku string `json:"sku,omitempty"`
@@ -362,7 +358,7 @@ type transaction struct {
 }
 
 func NewTransaction(
-	c currency_type, desc string, shp *ShippingAddress) *transaction {
+	c CurrencyTypeEnum, desc string, shp *ShippingAddress) *transaction {
 
 	if len(desc) > descMax { // Log and truncate if description is too long
 		log.Printf("Description exceeds %d characters: %q\n", descMax, desc)
@@ -389,7 +385,7 @@ func NewTransaction(
 }
 
 func (t *transaction) AddItem(
-	qty int, price float64, curr currency_type, name, sku string) {
+	qty int, price float64, curr CurrencyTypeEnum, name, sku string) {
 
 	if qty < 1 {
 		qty = 1
@@ -407,7 +403,7 @@ func (t *transaction) AddItem(
 	})
 }
 
-type RelatedResources []transactionable
+type RelatedResources []Resource
 
 //func (self *RelatedResources) MarshalJSON() ([]byte, error) {
 //	return []byte("[]"), nil
@@ -426,19 +422,19 @@ func (self *RelatedResources) UnmarshalJSON(b []byte) error {
 
 	for _, m := range a {
 		for name, rawMesg := range m {
-			var t transactionable // for unmarshaling the current item
+			var t Resource // for unmarshaling the current item
 
 			switch name {
-			case "sale":
+			case SaleType:
 				t = new(Sale)
-			case "authorization":
+			case AuthorizationType:
 				t = new(Authorization)
-			case "capture":
+			case CaptureType:
 				t = new(Capture)
-			case "refund":
+			case RefundType:
 				t = new(Refund)
 			default:
-				log.Printf("Unexpected transactionable type: %s\n", name)
+				log.Printf("Unexpected Resource type: %s\n", name)
 				continue
 			}
 			if err = json.Unmarshal(rawMesg, t); err != nil {
@@ -492,8 +488,8 @@ func (self *PaymentBatcher) Next() ([]*Payment, error) {
 	}
 
 	if err := self.send(&request{
-		method:   get,
-		path:     path.Join("payments/payment", qry),
+		method:   method.get,
+		path:     path.Join(_paymentsPath, qry),
 		body:     nil,
 		response: pymt_list,
 	}); err != nil {

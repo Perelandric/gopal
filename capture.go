@@ -23,16 +23,16 @@ type Capture struct {
 	IsFinalCapture bool `json:"is_final_capture,omitempty"`
 }
 
-// Implement the transactionable interface
+// Implement the Resource interface
 
 func (self *Capture) getPath() string {
-	return path.Join("payments/capture", self.Id)
+	return path.Join(_capturePath, self.Id)
 }
 
 // Implement `refundable` interface
 
 func (self *Capture) getRefundPath() string {
-	return path.Join("payments/capture", self.Id, "refund")
+	return path.Join(_capturePath, self.Id, _refund)
 }
 
 /*************************************************************
@@ -49,8 +49,8 @@ func (self *connection) FetchCapture(capt_id string) (*Capture, error) {
 	capt.connection = self
 
 	if err := self.send(&request{
-		method:   get,
-		path:     path.Join("payments/capture", capt_id),
+		method:   method.get,
+		path:     path.Join(_capturePath, capt_id),
 		body:     nil,
 		response: capt,
 	}); err != nil {

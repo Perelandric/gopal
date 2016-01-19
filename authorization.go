@@ -21,11 +21,11 @@ type Authorization struct {
 	BillingAgreementId string `json:"billing_agreement_id"`
 
 	// Specifies the payment mode of the transaction.
-	PaymentMode paymentMode `json:"payment_mode"`
+	PaymentMode paymentModeEnum `json:"payment_mode"`
 
 	// Reason code, AUTHORIZATION, for a transaction state of `pending`. Value
 	// assigned by PayPal.
-	ReasonCode reasonCode `json:"reason_code"`
+	ReasonCode reasonCodeEnum `json:"reason_code"`
 
 	// Authorization expiration time and date as defined in RFC 3339 Section 5.6.
 	// Value assigned by PayPal.
@@ -37,13 +37,13 @@ type Authorization struct {
 
 	// The level of seller protection in force for the transaction. Only supported
 	// when the payment_method is set to paypal.
-	ProtectionElig protectionElig `json:"protection_eligibility"`
+	ProtectionElig protectionEligEnum `json:"protection_eligibility"`
 
 	// The kind of seller protection in force for the transaction. This property
 	// is returned only when the protection_eligibility property is set to
 	// ELIGIBLE or PARTIALLY_ELIGIBLE. Only supported when the `payment_method` is
 	// set to `paypal`.
-	ProtectionEligType protectionEligType `json:"protection_eligibility_type"`
+	ProtectionEligType protectionEligTypeEnum `json:"protection_eligibility_type"`
 
 	// Fraud Management Filter (FMF) details applied for the payment that could
 	// result in accept, deny, or pending action. Returned in a payment response
@@ -53,10 +53,10 @@ type Authorization struct {
 	FmfDetails fmfDetails `json:"fmf_details"`
 }
 
-// Implement the transactionable interface
+// Implement the Resource interface
 
 func (self *Authorization) getPath() string {
-	return path.Join("payments/authorization", self.Id)
+	return path.Join(_authorizationPath, self.Id)
 }
 
 /*************************************************************
@@ -75,8 +75,8 @@ func (self *connection) FetchAuthorization(
 	auth.connection = self
 
 	if err := self.send(&request{
-		method:   get,
-		path:     path.Join("payments/authorization", auth_id),
+		method:   method.get,
+		path:     path.Join(_authorizationPath, auth_id),
 		body:     nil,
 		response: auth,
 	}); err != nil {
@@ -106,8 +106,8 @@ func (self *Authorization) Capture(amt *amount, is_final bool) (*Capture, error)
 	var capt_resp = new(Capture)
 
 	if err := self.send(&request{
-		method:   post,
-		path:     path.Join("payments/authorization", self.Id, "capture"),
+		method:   method.post,
+		path:     path.Join(_authorizationPath, self.Id, _capture),
 		body:     capt_req,
 		response: capt_resp,
 	}); err != nil {
@@ -130,8 +130,8 @@ func (self *Authorization) Void() (*Authorization, error) {
 	var void_resp = new(Authorization)
 
 	if err := self.send(&request{
-		method:   post,
-		path:     path.Join("payments/authorization", self.Id, "void"),
+		method:   method.post,
+		path:     path.Join(_authorizationPath, self.Id, _void),
 		body:     nil,
 		response: void_resp,
 	}); err != nil {
@@ -170,8 +170,8 @@ func (self *Authorization) ReauthorizeAmount(amt *amount) (*Authorization, error
 	var auth_resp = new(Authorization)
 
 	if err := self.send(&request{
-		method:   post,
-		path:     path.Join("payments/authorization", self.Id, "reauthorize"),
+		method:   method.post,
+		path:     path.Join(_authorizationPath, self.Id, _reauthorize),
 		body:     auth_req,
 		response: auth_resp,
 	}); err != nil {

@@ -15,7 +15,7 @@ import "strconv"
 import "time"
 
 type request struct {
-	method    method
+	method    methodEnum
 	path      string
 	body      interface{}
 	response  errorable
@@ -60,7 +60,7 @@ func (self *connection) authenticate() error {
 
 	// (re)authenticate
 	if err = self.send(&request{
-		method:    post,
+		method:    method.post,
 		path:      "/oauth2/token",
 		body:      "grant_type=client_credentials",
 		response:  &self.tokeninfo,
@@ -133,7 +133,7 @@ func (pp *connection) send(reqData *request) error {
 
 	// TODO: Paypal docs mention a `nonce`. Research that.
 
-	req, err = http.NewRequest(string(reqData.method), url, body_reader)
+	req, err = http.NewRequest(reqData.method.String(), url, body_reader)
 	if err != nil {
 		return err
 	}

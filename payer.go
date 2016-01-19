@@ -4,7 +4,7 @@ package gopal
 // credit card.
 type payer struct {
 	// Payment method used. Must be either credit_card or paypal. Required.
-	PaymentMethod PaymentMethod `json:"payment_method,omitempty"`
+	PaymentMethod PaymentMethodEnum `json:"payment_method,omitempty"`
 
 	// A list of funding instruments for the current payment
 	FundingInstruments []*funding_instrument `json:"funding_instruments,omitempty"`
@@ -14,7 +14,7 @@ type payer struct {
 
 	// Status of the payer’s PayPal account. Only supported when the
 	// payment_method is set to paypal. Allowed values: VERIFIED or UNVERIFIED.
-	Status payerStatus `json:"status,omitempty"`
+	Status payerStatusEnum `json:"status,omitempty"`
 }
 
 // This object is pre-filled by PayPal when the payment_method is paypal.
@@ -26,32 +26,32 @@ type payer_info struct {
 	Salutation string `json:"salutation,omitempty"`
 
 	// First name of the payer. Value assigned by PayPal.
-	First_name string `json:"first_name,omitempty"`
+	FirstName string `json:"first_name,omitempty"`
 
 	// Middle name of the payer. Value assigned by PayPal.
 	MiddleName string `json:"middle_name,omitempty"`
 
 	// Last name of the payer. Value assigned by PayPal.
-	Last_name string `json:"last_name,omitempty"`
+	LastName string `json:"last_name,omitempty"`
 
 	// Suffix of the payer.
 	Suffix string `json:"suffix,omitempty"`
 
 	// PayPal assigned Payer ID. Value assigned by PayPal.
-	Payer_id string `json:"payer_id,omitempty"`
+	PayerId string `json:"payer_id,omitempty"`
 
 	// Phone number representing the payer. 20 characters max.
 	Phone string `json:"phone,omitempty"`
 
 	// Two-letter registered country code of the payer to identify the buyer country.
-	CountryCode country_code `json:"country_code,omitempty"`
+	CountryCode CountryCodeEnum `json:"country_code,omitempty"`
 
 	// Shipping address of payer PayPal account. Value assigned by PayPal.
-	Shipping_address *ShippingAddress `json:"shipping_address,omitempty"`
+	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 
 	// Payer’s tax ID type. Allowed values: BR_CPF or BR_CNPJ. Only supported when
 	// the payment_method is set to paypal.
-	TaxIdType TaxIdType `json:"tax_id_type,omitempty"`
+	TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"`
 
 	// Payer’s tax ID. Only supported when the payment_method is set to paypal.
 	TaxId string `json:"tax_id,omitempty"`
@@ -70,7 +70,7 @@ type Address struct {
 	City string `json:"city,omitempty"`
 
 	// 2-letter country code. 2 characters max. Required.
-	CountryCode country_code `json:"country_code,omitempty"`
+	CountryCode CountryCodeEnum `json:"country_code,omitempty"`
 
 	// Zip code or equivalent is usually required for countries that have them.
 	// 20 characters max. Required in certain countries.
@@ -85,10 +85,10 @@ type Address struct {
 
 	// Address normalization status, returned only for payers from Brazil. Allowed
 	// values: UNKNOWN, UNNORMALIZED_USER_PREFERRED, NORMALIZED, UNNORMALIZED
-	NormalizationStatus normalizationStatus `json:"normalization_status,omitempty"`
+	NormalizationStatus normStatusEnum `json:"normalization_status,omitempty"`
 
 	// Address status. Allowed values: CONFIRMED, UNCONFIRMED
-	Status addressStatus `json:"status,omitempty"`
+	Status addressStatusEnum `json:"status,omitempty"`
 }
 
 type ShippingAddress struct {
@@ -99,7 +99,7 @@ type ShippingAddress struct {
 
 	// Address type. Must be one of the following: `residential`, `business`, or
 	// `mailbox`.
-	Type addressType `json:"type,omitempty"`
+	Type AddressTypeEnum `json:"type,omitempty"`
 }
 
 type identity_address struct {
@@ -141,21 +141,21 @@ type funding_instrument struct {
 	CreditCardToken *credit_card_token `json:"credit_card_token,omitempty"`
 }
 type _cc_details struct {
-	Payer_id     string         `json:"payer_id,omitempty"`
-	Type         CreditCardType `json:"type,omitempty"`
-	Expire_month string         `json:"expire_month,omitempty"`
-	Expire_year  string         `json:"expire_year,omitempty"`
+	Payer_id     string             `json:"payer_id,omitempty"`
+	Type         CreditCardTypeEnum `json:"type,omitempty"`
+	Expire_month string             `json:"expire_month,omitempty"`
+	Expire_year  string             `json:"expire_year,omitempty"`
 }
 type credit_card struct {
 	Id     string `json:"id,omitempty"`
 	Number string `json:"number,omitempty"`
 	_cc_details
-	Cvv2            string   `json:"cvv2,omitempty"`
-	First_name      string   `json:"first_name,omitempty"`
-	Last_name       string   `json:"last_name,omitempty"`
-	Billing_address *Address `json:"billing_address,omitempty"`
-	State           state    `json:"state,omitempty"`
-	Valid_until     string   `json:"valid_until,omitempty"`
+	Cvv2            string    `json:"cvv2,omitempty"`
+	First_name      string    `json:"first_name,omitempty"`
+	Last_name       string    `json:"last_name,omitempty"`
+	Billing_address *Address  `json:"billing_address,omitempty"`
+	State           stateEnum `json:"state,omitempty"`
+	Valid_until     string    `json:"valid_until,omitempty"`
 }
 type credit_card_token struct {
 	Credit_card_id string `json:"credit_card_id,omitempty"`
