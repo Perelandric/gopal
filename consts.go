@@ -23,18 +23,15 @@ const (
 )
 
 /*
-@enum
---name=sortBy --marshaler=string --unmarshaler=string
+@enum sortBy --json=string
 CreateTime --string=create_time
 UpdateTime --string=update_time
 
-@enum
---name=sortOrder
+@enum sortOrder --json=string
 DESC
 ASC
 
-@enum
---name=relType
+@enum relType --json=string
 self
 parentPayment --string=parent_payment
 execute
@@ -62,62 +59,52 @@ start
 nextPage --string=next_page
 previousPage --string=previous_page
 
-@enum
---name=method
+@enum method --json=string
 get --string=GET
 post --string=POST
 redirect --string=REDIRECT
 delete --string=DELETE
 patch --string=PATCH
 
-@enum
---name=payerStatus
+@enum payerStatus --json=string
 verified --string=VERIFIED
 unverified --string=UNVERIFIED
 
-@enum
---name=intent
+@enum intent --json=string
 sale
 authorize
 order
 
-@enum
---name=normStatus
+@enum normStatus --json=string
 unknown --string=UNKNOWN
 unnormalizedUserPreferred --string=UNNORMALIZED_USER_PREFERRED
 normalized --string=NORMALIZED
 unnormalized --string=UNNORMALIZED
 
-@enum
---name=addressStatus
+@enum addressStatus --json=string
 confirmed --string=CONFIRMED
 unconfirmed --string=UNCONFIRMED
 
-@enum
---name=AddressType
+@enum AddressType --json=string
 Residential --string=residential
 Business --string=business
 Mailbox --string=mailbox
 
-@enum
---name=PaymentMethod
+@enum PaymentMethod --json=string
 CreditCard --string=credit_card
 PayPal --string=paypal
 
-@enum
---name=TaxIdType
+@enum TaxIdType --json=string
 BrCpf --string=BR_CPF
 BrCnpj --string=BR_CNPJ
 
-@enum
---name=CreditCardType
+@enum CreditCardType --json=string
 Visa --string=visa
 MasterCard --string=mastercard
 Discover --string=discover
 Amex --string=amex
 
-@enum
---name=state
+@enum state --json=string
 Created --string=created
 Approved --string=approved
 Canceled --string=canceled
@@ -134,8 +121,7 @@ Captured --string=captured
 PartiallyCaptured --string=partially_captured
 Voided --string=voided
 
-@enum
---name=reasonCode
+@enum reasonCode --json=string
 chargeback --string=CHARGEBACK
 guarantee --string=GUARANTEE
 buyerComplaint --string=BUYER_COMPLAINT
@@ -149,26 +135,22 @@ regulatoryReview --string=REGULATORY_REVIEW
 unilateral --string=UNILATERAL
 verificationRequired --string=VERIFICATION_REQUIRED
 
-@enum
---name=protectionElig
+@enum protectionElig --json=string
 eligible --string=ELIGIBLE --description="Merchant is protected by PayPal's Seller Protection Policy for Unauthorized. Payments and Item Not Received."
 partiallyEligible --string=PARTIALLY_ELIGIBLE --description="Merchant is protected by PayPal's Seller Protection Policy for Item Not Received or Unauthorized Payments. Refer to protection_eligibility_type for specifics."
 ineligibile --string=INELIGIBLE --description="Merchant is not protected under the Seller Protection Policy."
 
-@enum
---name=protectionEligType
+@enum protectionEligType --json=string
 itemNotReceivedEligible --string=ITEM_NOT_RECEIVED_ELIGIBLE --description="Sellers are protected against claims for items not received."
 unauthorizedPaymentEligible --string=UNAUTHORIZED_PAYMENT_ELIGIBLE --description="Sellers are protected against claims for unauthorized payments."
 
-@enum
---name=paymentMode
+@enum paymentMode --json=string
 instantTransfer --string=INSTANT_TRANSFER
 manualBankTransfer --string=MANUAL_BANK_TRANSFER
 delayedTransfer --string=DELAYED_TRANSFER
 echeck --string=ECHECK
 
-@enum
---name=pendingReason
+@enum pendingReason --json=string
 payerShippingUnconfirmed --string=PAYER-SHIPPING-UNCONFIRMED
 multiCurrency --string=MULTI-CURRENCY
 riskReview --string=RISK-REVIEW
@@ -177,8 +159,7 @@ verificationRequired --string=VERIFICATION-REQUIRED
 orderPending --string=ORDER
 otherPending --string=OTHER
 
-@enum
---name=CurrencyType
+@enum CurrencyType --json=string
 AUD --string=AUD --description="Australian dollar"
 BRL --string=BRL --description="Brazilian real**"
 CAD --string=CAD --description="Canadian dollar"
@@ -204,8 +185,7 @@ THB --string=THB --description="Thai baht"
 TRY --string=TRY --description="Turkish lira**"
 USD --string=USD --description="United States dollar"
 
-@enum
---name=CountryCode
+@enum CountryCode --json=string
 AL --description="ALBANIA"
 DZ --description="ALGERIA"
 AD --description="ANDORRA"
