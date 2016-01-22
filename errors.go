@@ -16,8 +16,6 @@ type identity_error struct {
 	Error             string `json:"error,omitempty"`
 	Error_description string `json:"error_description,omitempty"`
 	Error_uri         string `json:"error_uri,omitempty"`
-
-	RawData		[]byte `json:"-"`
 }
 
 func (self *identity_error) IsError() bool {
@@ -34,8 +32,6 @@ type http_status_error struct {
 	Name             string `json:"name,omitempty"`
 	Message          string `json:"message,omitempty"`
 	Information_link string `json:"information_link,omitempty"`
-
-	RawData		[]byte `json:"-"`
 }
 
 func (self *http_status_error) IsError() bool {
@@ -52,8 +48,6 @@ type payment_error struct {
 	http_status_error
 	Debug_id string        `json:"debug_id,omitempty"`
 	Details  error_details `json:"details,omitempty"`
-
-	RawData		[]byte `json:"-"`
 }
 
 func (self *payment_error) IsError() bool {
@@ -65,7 +59,6 @@ func (pe *payment_error) to_error() error {
 	}
 	return nil
 }
-
 
 type error_details struct {
 	Field string `json:"field,omitempty"`

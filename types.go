@@ -3,7 +3,9 @@ package gopal
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
+	"time"
 )
 
 func make10CharAmount(amt float64) (string, error) {
@@ -35,6 +37,61 @@ type Resource interface {
 type refundable interface {
 	Resource
 	getRefundPath() string
+}
+
+type request struct {
+	method    methodEnum
+	path      string
+	body      interface{}
+	response  errorable
+	isAuthReq bool
+}
+
+type connection struct {
+	server     ServerEnum
+	id, secret string
+	tokeninfo  tokeninfo
+	client     http.Client
+}
+
+// Authorization response
+type tokeninfo struct {
+	// The access token issued by the authorization server.
+	AccessToken string `json:"access_token,omitempty"`
+
+	// The refresh token, which can be used to obtain new access tokens using the
+	// same authorization grant as described in OAuth2.0 RFC6749 - Section 6.
+	RefreshToken string `json:"refresh_token,omitempty"`
+
+	// The type of the token issued as described in OAuth2.0 RFC6749 - Section 7.1
+	// Value is case insensitive.
+	TokenType string `json:"token_type,omitempty"`
+
+	// The lifetime of the access token in seconds. After the access token
+	// expires, use the refresh_token to refresh the access token.
+	ExpiresIn uint `json:"expires_in,omitempty"`
+
+	// Not sure what this is for. Appears once in a response example, but no
+	// explanation is given anywhere.
+	AppId string `json:"app_id,omitempty"`
+
+	// THERE SEEM TO BE DIFFERENT DOCS IN DIFFERENT PLACES FOR THIS!!!
+	//
+	// Required if different from the scope requested by the client. For a list of
+	// possible values, see the attributes table.
+	// https://developer.paypal.com/docs/integration/direct/identity/attributes/
+	//
+	// Scopes expressed in the form of resource URL endpoints. The value of the
+	// scope parameter is expressed as a list of space-delimited, case-sensitive
+	// strings.
+	// Value assigned by PayPal.
+	Scope string `json:"scope,omitempty"`
+
+	////////////// Derived fields
+	expiration time.Time
+
+	// Handles the case where an error is received instead
+	*identity_error
 }
 
 // The _times are assigned by PayPal in responses

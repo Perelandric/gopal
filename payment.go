@@ -9,44 +9,64 @@ import (
 	"time"
 )
 
-func (self *connection) FetchPayment(payment_id string) (*Payment, error) {
-	var pymt = &Payment{
-		connection: self,
-	}
-	if err := self.send(&request{
-		method:   method.get,
-		path:     path.Join(_paymentsPath, payment_id),
-		body:     nil,
-		response: pymt,
-	}); err != nil {
-		return nil, err
-	}
-	return pymt, nil
-}
-
-func CreatePayment(
-	conn *connection,
+func (self *connection) CreatePayment(
 	method PaymentMethodEnum,
-	urls RedirectUrls) (*Payment, error) {
+	urls Redirects) (*payment_request, error) {
 
 	if method == PaymentMethod.PayPal {
 		// Make sure we're still authenticated. Will refresh if not.
-		if err := conn.authenticate(); err != nil {
+
+		// TODO: Should I really authenticate here? Seems like I should wait for the
+		// actual request to be made.
+		if err := self.authenticate(); err != nil {
 			return nil, err
 		}
 
-		return &Payment{
-			payment_request: payment_request{
-				Intent: intent.sale,
-				Payer: payer{
-					PaymentMethod: method,
-				},
-				Transactions: make([]*transaction, 0),
-				RedirectUrls: urls,
+		return &payment_request{
+			connection: self,
+			Intent:     intent.sale,
+			Payer: payer{
+				PaymentMethod: method,
 			},
+			Transactions: make([]*transaction, 0),
+			RedirectUrls: urls,
 		}, nil
 	}
 	return nil, nil
+}
+
+/***************************
+
+	Payment object methods
+
+***************************/
+
+func (self *Payment) AddTransaction(t transaction) {
+	self.Transactions = append(self.Transactions, &t)
+}
+
+// TODO: The tkn parameter is ignored, but should send a query string parameter `token=tkn`
+func (self *Payment) Authorize(tkn string) (to string, code int, err error) {
+	err = self.send(&request{
+		method:   method.post,
+		path:     _paymentsPath,
+		body:     self,
+		response: self,
+	})
+
+	if err == nil {
+		switch self.State {
+		case state.Created:
+			// Set url to redirect to PayPal site to begin approval process
+			to, _ = self.Links.get(relType.approvalUrl)
+			code = 303
+		default:
+			// otherwise cancel the payment and return an error
+			err = UnexpectedResponse
+		}
+	}
+
+	return to, code, err
 }
 
 func (self *Payment) Execute(req *http.Request) error {
@@ -86,40 +106,6 @@ func (self *Payment) Execute(req *http.Request) error {
 	return nil
 }
 
-/***************************
-
-	Payment object methods
-
-***************************/
-
-func (self *Payment) AddTransaction(t transaction) {
-	self.Transactions = append(self.Transactions, &t)
-}
-
-// TODO: The tkn parameter is ignored, but should send a query string parameter `token=tkn`
-func (self *Payment) Authorize(tkn string) (to string, code int, err error) {
-	err = self.send(&request{
-		method:   method.post,
-		path:     _paymentsPath,
-		body:     self,
-		response: self,
-	})
-
-	if err == nil {
-		switch self.State {
-		case state.Created:
-			// Set url to redirect to PayPal site to begin approval process
-			to, _ = self.Links.get(relType.approvalUrl)
-			code = 303
-		default:
-			// otherwise cancel the payment and return an error
-			err = UnexpectedResponse
-		}
-	}
-
-	return to, code, err
-}
-
 // TODO: I'm returning a list of Sale objects because every payment can have multiple transactions.
 //		I need to find out why a payment can have multiple transactions, and see if I should eliminate that in the API
 //		Also, I need to find out why `related_resources` is an array. Can there be more than one per type?
@@ -133,6 +119,24 @@ func (self *Payment) GetSale() []*Sale {
 		}
 	}
 	return sales
+}
+
+func (self *connection) FetchPayment(payment_id string) (*Payment, error) {
+	var pymt = &Payment{
+		payment_request: payment_request{
+			connection: self,
+		},
+	}
+
+	if err := self.send(&request{
+		method:   method.get,
+		path:     path.Join(_paymentsPath, payment_id),
+		body:     nil,
+		response: pymt,
+	}); err != nil {
+		return nil, err
+	}
+	return pymt, nil
 }
 
 // Pagination
@@ -189,7 +193,20 @@ type payment_list struct {
 	*identity_error
 }
 
+/**********************
+
+Payment Object
+
+**********************/
+
+type Redirects struct {
+	Return string `json:"return_url,omitempty"`
+	Cancel string `json:"cancel_url,omitempty"`
+}
+
 type payment_request struct {
+	*connection
+
 	// Payment intent. Must be set to sale for immediate payment, authorize to
 	// authorize a payment for capture later, or order to create an order.
 	// Allowed values: sale, authorize, order.
@@ -202,16 +219,10 @@ type payment_request struct {
 
 	// Set of redirect URLs you provide only for PayPal-based payments. Returned
 	// only when the payment is in created state. REQUIRED for PayPal payments.
-	RedirectUrls RedirectUrls `json:"redirect_urls,omitempty"`
-}
-
-type RedirectUrls struct {
-	ReturnUrl string `json:"return_url,omitempty"`
-	CancelUrl string `json:"cancel_url,omitempty"`
+	RedirectUrls Redirects `json:"redirect_urls,omitempty"`
 }
 
 type Payment struct {
-	*connection
 	payment_request
 
 	// Payment creation time as defined in RFC 3339 Section 5.6. and the
@@ -234,6 +245,7 @@ type Payment struct {
 	*payment_error
 }
 
+// Used to execute the approved payment.
 type paymentExecution struct {
 	// The ID of the Payer, passed in the return_url by PayPal.
 	PayerID string `json:"payer_id,omitempty"`
@@ -241,6 +253,58 @@ type paymentExecution struct {
 	// Transactional details if updating a payment. Note that this instance of
 	// the transactions object accepts only the amount object.
 	Transactions []*update_transaction `json:"transactions,omitempty"`
+}
+
+/**********************
+
+	Transaction objects
+
+**********************/
+
+func NewTransaction(
+	c CurrencyTypeEnum, desc string, shp *ShippingAddress) *transaction {
+
+	if len(desc) > descMax { // Log and truncate if description is too long
+		log.Printf("Description exceeds %d characters: %q\n", descMax, desc)
+		desc = desc[0:descMax]
+	}
+
+	var t = &transaction{
+		update_transaction: update_transaction{
+			Amount: amount{
+				Currency: c,
+				Total:    "0",
+			},
+		},
+		Description: desc,
+	}
+
+	if shp != nil {
+		t.ItemList = &itemList{
+			ShippingAddress: shp,
+		}
+	}
+
+	return t
+}
+
+func (t *transaction) AddItem(
+	qty int, price float64, curr CurrencyTypeEnum, name, sku string) {
+
+	if qty < 1 {
+		qty = 1
+	}
+
+	if t.ItemList == nil {
+		t.ItemList = new(itemList)
+	}
+	t.ItemList.Items = append(t.ItemList.Items, &item{
+		Quantity: qty,
+		Name:     name,
+		Price:    price,
+		Currency: curr,
+		Sku:      sku,
+	})
 }
 
 // Amount Object
@@ -355,52 +419,6 @@ type transaction struct {
 
 	// Payment options requested for this purchase unit.
 	PaymentOptions paymentOptions `json:"payment_options,omitempty"`
-}
-
-func NewTransaction(
-	c CurrencyTypeEnum, desc string, shp *ShippingAddress) *transaction {
-
-	if len(desc) > descMax { // Log and truncate if description is too long
-		log.Printf("Description exceeds %d characters: %q\n", descMax, desc)
-		desc = desc[0:descMax]
-	}
-
-	var t = &transaction{
-		update_transaction: update_transaction{
-			Amount: amount{
-				Currency: c,
-				Total:    "0",
-			},
-		},
-		Description: desc,
-	}
-
-	if shp != nil {
-		t.ItemList = &itemList{
-			ShippingAddress: shp,
-		}
-	}
-
-	return t
-}
-
-func (t *transaction) AddItem(
-	qty int, price float64, curr CurrencyTypeEnum, name, sku string) {
-
-	if qty < 1 {
-		qty = 1
-	}
-
-	if t.ItemList == nil {
-		t.ItemList = new(itemList)
-	}
-	t.ItemList.Items = append(t.ItemList.Items, &item{
-		Quantity: qty,
-		Name:     name,
-		Price:    price,
-		Currency: curr,
-		Sku:      sku,
-	})
 }
 
 type RelatedResources []Resource

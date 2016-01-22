@@ -22,7 +22,20 @@ const (
 	_void              = "void"
 )
 
+// Re-export public variants
+var (
+	Live    = Server.Live
+	Sandbox = Server.Sandbox
+
+	PayPal     = PaymentMethod.PayPal
+	CreditCard = PaymentMethod.CreditCard
+)
+
 /*
+@enum Server
+Live
+Sandbox
+
 @enum sortBy --json=string
 CreateTime --string=create_time
 UpdateTime --string=update_time

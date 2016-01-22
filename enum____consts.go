@@ -14,11 +14,98 @@ import (
 
 /*****************************
 
+ServerEnum
+
+******************************/
+
+type ServerEnum struct{ value_2kc3hv4eoe9b uint8 }
+
+var Server = struct {
+	Live    ServerEnum
+	Sandbox ServerEnum
+
+	// Used to iterate in range loops
+	Values [2]ServerEnum
+}{
+	Live:    ServerEnum{value_2kc3hv4eoe9b: 1},
+	Sandbox: ServerEnum{value_2kc3hv4eoe9b: 2},
+}
+
+func init() {
+	Server.Values = [2]ServerEnum{
+		Server.Live, Server.Sandbox,
+	}
+}
+
+// Value returns the numeric value of the variant as a uint8.
+func (Se ServerEnum) Value() uint8 {
+	return Se.value_2kc3hv4eoe9b
+}
+
+// IntValue is the same as 'Value()', except that the value is cast to an 'int'.
+func (Se ServerEnum) IntValue() int {
+	return int(Se.value_2kc3hv4eoe9b)
+}
+
+// Name returns the name of the variant as a string.
+func (Se ServerEnum) Name() string {
+	switch Se.value_2kc3hv4eoe9b {
+	case 1:
+		return "Live"
+	case 2:
+		return "Sandbox"
+	}
+
+	return ""
+}
+
+// String returns the given string value of the variant. If none has been set,
+// its return value is as though 'Name()' had been called.
+
+func (Se ServerEnum) String() string {
+	switch Se.value_2kc3hv4eoe9b {
+	case 1:
+		return "Live"
+	case 2:
+		return "Sandbox"
+	}
+
+	return ""
+}
+
+// Description returns the description of the variant. If none has been set, its
+// return value is as though 'String()' had been called.
+func (Se ServerEnum) Description() string {
+	switch Se.value_2kc3hv4eoe9b {
+	case 1:
+		return "Live"
+	case 2:
+		return "Sandbox"
+	}
+	return ""
+}
+
+// JSON marshaling methods
+func (Se ServerEnum) MarshalJSON() ([]byte, error) {
+	return []byte(strconv.Itoa(Se.IntValue())), nil
+}
+
+func (Se *ServerEnum) UnmarshalJSON(b []byte) error {
+	var n, err = strconv.ParseUint(string(b), 10, 64)
+	if err != nil {
+		return err
+	}
+	Se.value_2kc3hv4eoe9b = uint8(n)
+	return nil
+}
+
+/*****************************
+
 sortByEnum
 
 ******************************/
 
-type sortByEnum struct{ value_65yvbytmzagm uint8 }
+type sortByEnum struct{ value_gb64t97mrcwo uint8 }
 
 var sortBy = struct {
 	CreateTime sortByEnum
@@ -27,8 +114,8 @@ var sortBy = struct {
 	// Used to iterate in range loops
 	Values [2]sortByEnum
 }{
-	CreateTime: sortByEnum{value_65yvbytmzagm: 1},
-	UpdateTime: sortByEnum{value_65yvbytmzagm: 2},
+	CreateTime: sortByEnum{value_gb64t97mrcwo: 1},
+	UpdateTime: sortByEnum{value_gb64t97mrcwo: 2},
 }
 
 func init() {
@@ -39,17 +126,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (se sortByEnum) Value() uint8 {
-	return se.value_65yvbytmzagm
+	return se.value_gb64t97mrcwo
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (se sortByEnum) IntValue() int {
-	return int(se.value_65yvbytmzagm)
+	return int(se.value_gb64t97mrcwo)
 }
 
 // Name returns the name of the variant as a string.
 func (se sortByEnum) Name() string {
-	switch se.value_65yvbytmzagm {
+	switch se.value_gb64t97mrcwo {
 	case 1:
 		return "CreateTime"
 	case 2:
@@ -63,7 +150,7 @@ func (se sortByEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (se sortByEnum) String() string {
-	switch se.value_65yvbytmzagm {
+	switch se.value_gb64t97mrcwo {
 	case 1:
 		return "create_time"
 	case 2:
@@ -76,7 +163,7 @@ func (se sortByEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (se sortByEnum) Description() string {
-	switch se.value_65yvbytmzagm {
+	switch se.value_gb64t97mrcwo {
 	case 1:
 		return "create_time"
 	case 2:
@@ -102,10 +189,10 @@ func (se *sortByEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "create_time":
-		se.value_65yvbytmzagm = 1
+		se.value_gb64t97mrcwo = 1
 		return nil
 	case "update_time":
-		se.value_65yvbytmzagm = 2
+		se.value_gb64t97mrcwo = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling sortByEnum\n", s)
@@ -120,7 +207,7 @@ sortOrderEnum
 
 ******************************/
 
-type sortOrderEnum struct{ value_1pjd8xuve6855 uint8 }
+type sortOrderEnum struct{ value_r8qqjevexhek uint8 }
 
 var sortOrder = struct {
 	DESC sortOrderEnum
@@ -129,8 +216,8 @@ var sortOrder = struct {
 	// Used to iterate in range loops
 	Values [2]sortOrderEnum
 }{
-	DESC: sortOrderEnum{value_1pjd8xuve6855: 1},
-	ASC:  sortOrderEnum{value_1pjd8xuve6855: 2},
+	DESC: sortOrderEnum{value_r8qqjevexhek: 1},
+	ASC:  sortOrderEnum{value_r8qqjevexhek: 2},
 }
 
 func init() {
@@ -141,17 +228,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (se sortOrderEnum) Value() uint8 {
-	return se.value_1pjd8xuve6855
+	return se.value_r8qqjevexhek
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (se sortOrderEnum) IntValue() int {
-	return int(se.value_1pjd8xuve6855)
+	return int(se.value_r8qqjevexhek)
 }
 
 // Name returns the name of the variant as a string.
 func (se sortOrderEnum) Name() string {
-	switch se.value_1pjd8xuve6855 {
+	switch se.value_r8qqjevexhek {
 	case 1:
 		return "DESC"
 	case 2:
@@ -165,7 +252,7 @@ func (se sortOrderEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (se sortOrderEnum) String() string {
-	switch se.value_1pjd8xuve6855 {
+	switch se.value_r8qqjevexhek {
 	case 1:
 		return "DESC"
 	case 2:
@@ -178,7 +265,7 @@ func (se sortOrderEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (se sortOrderEnum) Description() string {
-	switch se.value_1pjd8xuve6855 {
+	switch se.value_r8qqjevexhek {
 	case 1:
 		return "DESC"
 	case 2:
@@ -204,10 +291,10 @@ func (se *sortOrderEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "DESC":
-		se.value_1pjd8xuve6855 = 1
+		se.value_r8qqjevexhek = 1
 		return nil
 	case "ASC":
-		se.value_1pjd8xuve6855 = 2
+		se.value_r8qqjevexhek = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling sortOrderEnum\n", s)
@@ -222,7 +309,7 @@ relTypeEnum
 
 ******************************/
 
-type relTypeEnum struct{ value_1u0znq86mfsl2 uint8 }
+type relTypeEnum struct{ value_1dl73ty2f1jn8 uint8 }
 
 var relType = struct {
 	self          relTypeEnum
@@ -255,32 +342,32 @@ var relType = struct {
 	// Used to iterate in range loops
 	Values [26]relTypeEnum
 }{
-	self:          relTypeEnum{value_1u0znq86mfsl2: 1},
-	parentPayment: relTypeEnum{value_1u0znq86mfsl2: 2},
-	execute:       relTypeEnum{value_1u0znq86mfsl2: 3},
-	refund:        relTypeEnum{value_1u0znq86mfsl2: 4},
-	approvalUrl:   relTypeEnum{value_1u0znq86mfsl2: 5},
-	suspend:       relTypeEnum{value_1u0znq86mfsl2: 6},
-	reActivate:    relTypeEnum{value_1u0znq86mfsl2: 7},
-	cancel:        relTypeEnum{value_1u0znq86mfsl2: 8},
-	void:          relTypeEnum{value_1u0znq86mfsl2: 9},
-	authorization: relTypeEnum{value_1u0znq86mfsl2: 10},
-	capture:       relTypeEnum{value_1u0znq86mfsl2: 11},
-	reauthorize:   relTypeEnum{value_1u0znq86mfsl2: 12},
-	order:         relTypeEnum{value_1u0znq86mfsl2: 13},
-	item:          relTypeEnum{value_1u0znq86mfsl2: 14},
-	batch:         relTypeEnum{value_1u0znq86mfsl2: 15},
-	delete:        relTypeEnum{value_1u0znq86mfsl2: 16},
-	patch:         relTypeEnum{value_1u0znq86mfsl2: 17},
-	first:         relTypeEnum{value_1u0znq86mfsl2: 18},
-	last:          relTypeEnum{value_1u0znq86mfsl2: 19},
-	update:        relTypeEnum{value_1u0znq86mfsl2: 20},
-	resend:        relTypeEnum{value_1u0znq86mfsl2: 21},
-	next:          relTypeEnum{value_1u0znq86mfsl2: 22},
-	previous:      relTypeEnum{value_1u0znq86mfsl2: 23},
-	start:         relTypeEnum{value_1u0znq86mfsl2: 24},
-	nextPage:      relTypeEnum{value_1u0znq86mfsl2: 25},
-	previousPage:  relTypeEnum{value_1u0znq86mfsl2: 26},
+	self:          relTypeEnum{value_1dl73ty2f1jn8: 1},
+	parentPayment: relTypeEnum{value_1dl73ty2f1jn8: 2},
+	execute:       relTypeEnum{value_1dl73ty2f1jn8: 3},
+	refund:        relTypeEnum{value_1dl73ty2f1jn8: 4},
+	approvalUrl:   relTypeEnum{value_1dl73ty2f1jn8: 5},
+	suspend:       relTypeEnum{value_1dl73ty2f1jn8: 6},
+	reActivate:    relTypeEnum{value_1dl73ty2f1jn8: 7},
+	cancel:        relTypeEnum{value_1dl73ty2f1jn8: 8},
+	void:          relTypeEnum{value_1dl73ty2f1jn8: 9},
+	authorization: relTypeEnum{value_1dl73ty2f1jn8: 10},
+	capture:       relTypeEnum{value_1dl73ty2f1jn8: 11},
+	reauthorize:   relTypeEnum{value_1dl73ty2f1jn8: 12},
+	order:         relTypeEnum{value_1dl73ty2f1jn8: 13},
+	item:          relTypeEnum{value_1dl73ty2f1jn8: 14},
+	batch:         relTypeEnum{value_1dl73ty2f1jn8: 15},
+	delete:        relTypeEnum{value_1dl73ty2f1jn8: 16},
+	patch:         relTypeEnum{value_1dl73ty2f1jn8: 17},
+	first:         relTypeEnum{value_1dl73ty2f1jn8: 18},
+	last:          relTypeEnum{value_1dl73ty2f1jn8: 19},
+	update:        relTypeEnum{value_1dl73ty2f1jn8: 20},
+	resend:        relTypeEnum{value_1dl73ty2f1jn8: 21},
+	next:          relTypeEnum{value_1dl73ty2f1jn8: 22},
+	previous:      relTypeEnum{value_1dl73ty2f1jn8: 23},
+	start:         relTypeEnum{value_1dl73ty2f1jn8: 24},
+	nextPage:      relTypeEnum{value_1dl73ty2f1jn8: 25},
+	previousPage:  relTypeEnum{value_1dl73ty2f1jn8: 26},
 }
 
 func init() {
@@ -291,17 +378,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (re relTypeEnum) Value() uint8 {
-	return re.value_1u0znq86mfsl2
+	return re.value_1dl73ty2f1jn8
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (re relTypeEnum) IntValue() int {
-	return int(re.value_1u0znq86mfsl2)
+	return int(re.value_1dl73ty2f1jn8)
 }
 
 // Name returns the name of the variant as a string.
 func (re relTypeEnum) Name() string {
-	switch re.value_1u0znq86mfsl2 {
+	switch re.value_1dl73ty2f1jn8 {
 	case 1:
 		return "self"
 	case 2:
@@ -363,7 +450,7 @@ func (re relTypeEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (re relTypeEnum) String() string {
-	switch re.value_1u0znq86mfsl2 {
+	switch re.value_1dl73ty2f1jn8 {
 	case 1:
 		return "self"
 	case 2:
@@ -424,7 +511,7 @@ func (re relTypeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (re relTypeEnum) Description() string {
-	switch re.value_1u0znq86mfsl2 {
+	switch re.value_1dl73ty2f1jn8 {
 	case 1:
 		return "self"
 	case 2:
@@ -498,82 +585,82 @@ func (re *relTypeEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "self":
-		re.value_1u0znq86mfsl2 = 1
+		re.value_1dl73ty2f1jn8 = 1
 		return nil
 	case "parent_payment":
-		re.value_1u0znq86mfsl2 = 2
+		re.value_1dl73ty2f1jn8 = 2
 		return nil
 	case "execute":
-		re.value_1u0znq86mfsl2 = 3
+		re.value_1dl73ty2f1jn8 = 3
 		return nil
 	case "refund":
-		re.value_1u0znq86mfsl2 = 4
+		re.value_1dl73ty2f1jn8 = 4
 		return nil
 	case "approval_url":
-		re.value_1u0znq86mfsl2 = 5
+		re.value_1dl73ty2f1jn8 = 5
 		return nil
 	case "suspend":
-		re.value_1u0znq86mfsl2 = 6
+		re.value_1dl73ty2f1jn8 = 6
 		return nil
 	case "re_activate":
-		re.value_1u0znq86mfsl2 = 7
+		re.value_1dl73ty2f1jn8 = 7
 		return nil
 	case "cancel":
-		re.value_1u0znq86mfsl2 = 8
+		re.value_1dl73ty2f1jn8 = 8
 		return nil
 	case "void":
-		re.value_1u0znq86mfsl2 = 9
+		re.value_1dl73ty2f1jn8 = 9
 		return nil
 	case "authorization":
-		re.value_1u0znq86mfsl2 = 10
+		re.value_1dl73ty2f1jn8 = 10
 		return nil
 	case "capture":
-		re.value_1u0znq86mfsl2 = 11
+		re.value_1dl73ty2f1jn8 = 11
 		return nil
 	case "reauthorize":
-		re.value_1u0znq86mfsl2 = 12
+		re.value_1dl73ty2f1jn8 = 12
 		return nil
 	case "order":
-		re.value_1u0znq86mfsl2 = 13
+		re.value_1dl73ty2f1jn8 = 13
 		return nil
 	case "item":
-		re.value_1u0znq86mfsl2 = 14
+		re.value_1dl73ty2f1jn8 = 14
 		return nil
 	case "batch":
-		re.value_1u0znq86mfsl2 = 15
+		re.value_1dl73ty2f1jn8 = 15
 		return nil
 	case "delete":
-		re.value_1u0znq86mfsl2 = 16
+		re.value_1dl73ty2f1jn8 = 16
 		return nil
 	case "patch":
-		re.value_1u0znq86mfsl2 = 17
+		re.value_1dl73ty2f1jn8 = 17
 		return nil
 	case "first":
-		re.value_1u0znq86mfsl2 = 18
+		re.value_1dl73ty2f1jn8 = 18
 		return nil
 	case "last":
-		re.value_1u0znq86mfsl2 = 19
+		re.value_1dl73ty2f1jn8 = 19
 		return nil
 	case "update":
-		re.value_1u0znq86mfsl2 = 20
+		re.value_1dl73ty2f1jn8 = 20
 		return nil
 	case "resend":
-		re.value_1u0znq86mfsl2 = 21
+		re.value_1dl73ty2f1jn8 = 21
 		return nil
 	case "next":
-		re.value_1u0znq86mfsl2 = 22
+		re.value_1dl73ty2f1jn8 = 22
 		return nil
 	case "previous":
-		re.value_1u0znq86mfsl2 = 23
+		re.value_1dl73ty2f1jn8 = 23
 		return nil
 	case "start":
-		re.value_1u0znq86mfsl2 = 24
+		re.value_1dl73ty2f1jn8 = 24
 		return nil
 	case "next_page":
-		re.value_1u0znq86mfsl2 = 25
+		re.value_1dl73ty2f1jn8 = 25
 		return nil
 	case "previous_page":
-		re.value_1u0znq86mfsl2 = 26
+		re.value_1dl73ty2f1jn8 = 26
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling relTypeEnum\n", s)
@@ -588,7 +675,7 @@ methodEnum
 
 ******************************/
 
-type methodEnum struct{ value_10hi4h99vz5zg uint8 }
+type methodEnum struct{ value_c6rjgirpun60 uint8 }
 
 var method = struct {
 	get      methodEnum
@@ -600,11 +687,11 @@ var method = struct {
 	// Used to iterate in range loops
 	Values [5]methodEnum
 }{
-	get:      methodEnum{value_10hi4h99vz5zg: 1},
-	post:     methodEnum{value_10hi4h99vz5zg: 2},
-	redirect: methodEnum{value_10hi4h99vz5zg: 3},
-	delete:   methodEnum{value_10hi4h99vz5zg: 4},
-	patch:    methodEnum{value_10hi4h99vz5zg: 5},
+	get:      methodEnum{value_c6rjgirpun60: 1},
+	post:     methodEnum{value_c6rjgirpun60: 2},
+	redirect: methodEnum{value_c6rjgirpun60: 3},
+	delete:   methodEnum{value_c6rjgirpun60: 4},
+	patch:    methodEnum{value_c6rjgirpun60: 5},
 }
 
 func init() {
@@ -615,17 +702,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (me methodEnum) Value() uint8 {
-	return me.value_10hi4h99vz5zg
+	return me.value_c6rjgirpun60
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (me methodEnum) IntValue() int {
-	return int(me.value_10hi4h99vz5zg)
+	return int(me.value_c6rjgirpun60)
 }
 
 // Name returns the name of the variant as a string.
 func (me methodEnum) Name() string {
-	switch me.value_10hi4h99vz5zg {
+	switch me.value_c6rjgirpun60 {
 	case 1:
 		return "get"
 	case 2:
@@ -645,7 +732,7 @@ func (me methodEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (me methodEnum) String() string {
-	switch me.value_10hi4h99vz5zg {
+	switch me.value_c6rjgirpun60 {
 	case 1:
 		return "GET"
 	case 2:
@@ -664,7 +751,7 @@ func (me methodEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (me methodEnum) Description() string {
-	switch me.value_10hi4h99vz5zg {
+	switch me.value_c6rjgirpun60 {
 	case 1:
 		return "GET"
 	case 2:
@@ -696,19 +783,19 @@ func (me *methodEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "GET":
-		me.value_10hi4h99vz5zg = 1
+		me.value_c6rjgirpun60 = 1
 		return nil
 	case "POST":
-		me.value_10hi4h99vz5zg = 2
+		me.value_c6rjgirpun60 = 2
 		return nil
 	case "REDIRECT":
-		me.value_10hi4h99vz5zg = 3
+		me.value_c6rjgirpun60 = 3
 		return nil
 	case "DELETE":
-		me.value_10hi4h99vz5zg = 4
+		me.value_c6rjgirpun60 = 4
 		return nil
 	case "PATCH":
-		me.value_10hi4h99vz5zg = 5
+		me.value_c6rjgirpun60 = 5
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling methodEnum\n", s)
@@ -723,7 +810,7 @@ payerStatusEnum
 
 ******************************/
 
-type payerStatusEnum struct{ value_1vilvxg2afjkq uint8 }
+type payerStatusEnum struct{ value_1qgs0q0c04kgf uint8 }
 
 var payerStatus = struct {
 	verified   payerStatusEnum
@@ -732,8 +819,8 @@ var payerStatus = struct {
 	// Used to iterate in range loops
 	Values [2]payerStatusEnum
 }{
-	verified:   payerStatusEnum{value_1vilvxg2afjkq: 1},
-	unverified: payerStatusEnum{value_1vilvxg2afjkq: 2},
+	verified:   payerStatusEnum{value_1qgs0q0c04kgf: 1},
+	unverified: payerStatusEnum{value_1qgs0q0c04kgf: 2},
 }
 
 func init() {
@@ -744,17 +831,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (pe payerStatusEnum) Value() uint8 {
-	return pe.value_1vilvxg2afjkq
+	return pe.value_1qgs0q0c04kgf
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (pe payerStatusEnum) IntValue() int {
-	return int(pe.value_1vilvxg2afjkq)
+	return int(pe.value_1qgs0q0c04kgf)
 }
 
 // Name returns the name of the variant as a string.
 func (pe payerStatusEnum) Name() string {
-	switch pe.value_1vilvxg2afjkq {
+	switch pe.value_1qgs0q0c04kgf {
 	case 1:
 		return "verified"
 	case 2:
@@ -768,7 +855,7 @@ func (pe payerStatusEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (pe payerStatusEnum) String() string {
-	switch pe.value_1vilvxg2afjkq {
+	switch pe.value_1qgs0q0c04kgf {
 	case 1:
 		return "VERIFIED"
 	case 2:
@@ -781,7 +868,7 @@ func (pe payerStatusEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (pe payerStatusEnum) Description() string {
-	switch pe.value_1vilvxg2afjkq {
+	switch pe.value_1qgs0q0c04kgf {
 	case 1:
 		return "VERIFIED"
 	case 2:
@@ -807,10 +894,10 @@ func (pe *payerStatusEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "VERIFIED":
-		pe.value_1vilvxg2afjkq = 1
+		pe.value_1qgs0q0c04kgf = 1
 		return nil
 	case "UNVERIFIED":
-		pe.value_1vilvxg2afjkq = 2
+		pe.value_1qgs0q0c04kgf = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling payerStatusEnum\n", s)
@@ -825,7 +912,7 @@ intentEnum
 
 ******************************/
 
-type intentEnum struct{ value_p4hcxj8f38ve uint8 }
+type intentEnum struct{ value_1slerrngugdav uint8 }
 
 var intent = struct {
 	sale      intentEnum
@@ -835,9 +922,9 @@ var intent = struct {
 	// Used to iterate in range loops
 	Values [3]intentEnum
 }{
-	sale:      intentEnum{value_p4hcxj8f38ve: 1},
-	authorize: intentEnum{value_p4hcxj8f38ve: 2},
-	order:     intentEnum{value_p4hcxj8f38ve: 3},
+	sale:      intentEnum{value_1slerrngugdav: 1},
+	authorize: intentEnum{value_1slerrngugdav: 2},
+	order:     intentEnum{value_1slerrngugdav: 3},
 }
 
 func init() {
@@ -848,17 +935,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (ie intentEnum) Value() uint8 {
-	return ie.value_p4hcxj8f38ve
+	return ie.value_1slerrngugdav
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (ie intentEnum) IntValue() int {
-	return int(ie.value_p4hcxj8f38ve)
+	return int(ie.value_1slerrngugdav)
 }
 
 // Name returns the name of the variant as a string.
 func (ie intentEnum) Name() string {
-	switch ie.value_p4hcxj8f38ve {
+	switch ie.value_1slerrngugdav {
 	case 1:
 		return "sale"
 	case 2:
@@ -874,7 +961,7 @@ func (ie intentEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (ie intentEnum) String() string {
-	switch ie.value_p4hcxj8f38ve {
+	switch ie.value_1slerrngugdav {
 	case 1:
 		return "sale"
 	case 2:
@@ -889,7 +976,7 @@ func (ie intentEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (ie intentEnum) Description() string {
-	switch ie.value_p4hcxj8f38ve {
+	switch ie.value_1slerrngugdav {
 	case 1:
 		return "sale"
 	case 2:
@@ -917,13 +1004,13 @@ func (ie *intentEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "sale":
-		ie.value_p4hcxj8f38ve = 1
+		ie.value_1slerrngugdav = 1
 		return nil
 	case "authorize":
-		ie.value_p4hcxj8f38ve = 2
+		ie.value_1slerrngugdav = 2
 		return nil
 	case "order":
-		ie.value_p4hcxj8f38ve = 3
+		ie.value_1slerrngugdav = 3
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling intentEnum\n", s)
@@ -938,7 +1025,7 @@ normStatusEnum
 
 ******************************/
 
-type normStatusEnum struct{ value_dh3fr55mg9oj uint8 }
+type normStatusEnum struct{ value_t9zcaj0nx582 uint8 }
 
 var normStatus = struct {
 	unknown                   normStatusEnum
@@ -949,10 +1036,10 @@ var normStatus = struct {
 	// Used to iterate in range loops
 	Values [4]normStatusEnum
 }{
-	unknown:                   normStatusEnum{value_dh3fr55mg9oj: 1},
-	unnormalizedUserPreferred: normStatusEnum{value_dh3fr55mg9oj: 2},
-	normalized:                normStatusEnum{value_dh3fr55mg9oj: 3},
-	unnormalized:              normStatusEnum{value_dh3fr55mg9oj: 4},
+	unknown:                   normStatusEnum{value_t9zcaj0nx582: 1},
+	unnormalizedUserPreferred: normStatusEnum{value_t9zcaj0nx582: 2},
+	normalized:                normStatusEnum{value_t9zcaj0nx582: 3},
+	unnormalized:              normStatusEnum{value_t9zcaj0nx582: 4},
 }
 
 func init() {
@@ -963,17 +1050,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (ne normStatusEnum) Value() uint8 {
-	return ne.value_dh3fr55mg9oj
+	return ne.value_t9zcaj0nx582
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (ne normStatusEnum) IntValue() int {
-	return int(ne.value_dh3fr55mg9oj)
+	return int(ne.value_t9zcaj0nx582)
 }
 
 // Name returns the name of the variant as a string.
 func (ne normStatusEnum) Name() string {
-	switch ne.value_dh3fr55mg9oj {
+	switch ne.value_t9zcaj0nx582 {
 	case 1:
 		return "unknown"
 	case 2:
@@ -991,7 +1078,7 @@ func (ne normStatusEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (ne normStatusEnum) String() string {
-	switch ne.value_dh3fr55mg9oj {
+	switch ne.value_t9zcaj0nx582 {
 	case 1:
 		return "UNKNOWN"
 	case 2:
@@ -1008,7 +1095,7 @@ func (ne normStatusEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (ne normStatusEnum) Description() string {
-	switch ne.value_dh3fr55mg9oj {
+	switch ne.value_t9zcaj0nx582 {
 	case 1:
 		return "UNKNOWN"
 	case 2:
@@ -1038,16 +1125,16 @@ func (ne *normStatusEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "UNKNOWN":
-		ne.value_dh3fr55mg9oj = 1
+		ne.value_t9zcaj0nx582 = 1
 		return nil
 	case "UNNORMALIZED_USER_PREFERRED":
-		ne.value_dh3fr55mg9oj = 2
+		ne.value_t9zcaj0nx582 = 2
 		return nil
 	case "NORMALIZED":
-		ne.value_dh3fr55mg9oj = 3
+		ne.value_t9zcaj0nx582 = 3
 		return nil
 	case "UNNORMALIZED":
-		ne.value_dh3fr55mg9oj = 4
+		ne.value_t9zcaj0nx582 = 4
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling normStatusEnum\n", s)
@@ -1062,7 +1149,7 @@ addressStatusEnum
 
 ******************************/
 
-type addressStatusEnum struct{ value_kul8a2iq7kvy uint8 }
+type addressStatusEnum struct{ value_18py9m85ip6k9 uint8 }
 
 var addressStatus = struct {
 	confirmed   addressStatusEnum
@@ -1071,8 +1158,8 @@ var addressStatus = struct {
 	// Used to iterate in range loops
 	Values [2]addressStatusEnum
 }{
-	confirmed:   addressStatusEnum{value_kul8a2iq7kvy: 1},
-	unconfirmed: addressStatusEnum{value_kul8a2iq7kvy: 2},
+	confirmed:   addressStatusEnum{value_18py9m85ip6k9: 1},
+	unconfirmed: addressStatusEnum{value_18py9m85ip6k9: 2},
 }
 
 func init() {
@@ -1083,17 +1170,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (ae addressStatusEnum) Value() uint8 {
-	return ae.value_kul8a2iq7kvy
+	return ae.value_18py9m85ip6k9
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (ae addressStatusEnum) IntValue() int {
-	return int(ae.value_kul8a2iq7kvy)
+	return int(ae.value_18py9m85ip6k9)
 }
 
 // Name returns the name of the variant as a string.
 func (ae addressStatusEnum) Name() string {
-	switch ae.value_kul8a2iq7kvy {
+	switch ae.value_18py9m85ip6k9 {
 	case 1:
 		return "confirmed"
 	case 2:
@@ -1107,7 +1194,7 @@ func (ae addressStatusEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (ae addressStatusEnum) String() string {
-	switch ae.value_kul8a2iq7kvy {
+	switch ae.value_18py9m85ip6k9 {
 	case 1:
 		return "CONFIRMED"
 	case 2:
@@ -1120,7 +1207,7 @@ func (ae addressStatusEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (ae addressStatusEnum) Description() string {
-	switch ae.value_kul8a2iq7kvy {
+	switch ae.value_18py9m85ip6k9 {
 	case 1:
 		return "CONFIRMED"
 	case 2:
@@ -1146,10 +1233,10 @@ func (ae *addressStatusEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "CONFIRMED":
-		ae.value_kul8a2iq7kvy = 1
+		ae.value_18py9m85ip6k9 = 1
 		return nil
 	case "UNCONFIRMED":
-		ae.value_kul8a2iq7kvy = 2
+		ae.value_18py9m85ip6k9 = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling addressStatusEnum\n", s)
@@ -1164,7 +1251,7 @@ AddressTypeEnum
 
 ******************************/
 
-type AddressTypeEnum struct{ value_vrk6dms6pa3x uint8 }
+type AddressTypeEnum struct{ value_jcqh7y8pcyc uint8 }
 
 var AddressType = struct {
 	Residential AddressTypeEnum
@@ -1174,9 +1261,9 @@ var AddressType = struct {
 	// Used to iterate in range loops
 	Values [3]AddressTypeEnum
 }{
-	Residential: AddressTypeEnum{value_vrk6dms6pa3x: 1},
-	Business:    AddressTypeEnum{value_vrk6dms6pa3x: 2},
-	Mailbox:     AddressTypeEnum{value_vrk6dms6pa3x: 3},
+	Residential: AddressTypeEnum{value_jcqh7y8pcyc: 1},
+	Business:    AddressTypeEnum{value_jcqh7y8pcyc: 2},
+	Mailbox:     AddressTypeEnum{value_jcqh7y8pcyc: 3},
 }
 
 func init() {
@@ -1187,17 +1274,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (Ae AddressTypeEnum) Value() uint8 {
-	return Ae.value_vrk6dms6pa3x
+	return Ae.value_jcqh7y8pcyc
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (Ae AddressTypeEnum) IntValue() int {
-	return int(Ae.value_vrk6dms6pa3x)
+	return int(Ae.value_jcqh7y8pcyc)
 }
 
 // Name returns the name of the variant as a string.
 func (Ae AddressTypeEnum) Name() string {
-	switch Ae.value_vrk6dms6pa3x {
+	switch Ae.value_jcqh7y8pcyc {
 	case 1:
 		return "Residential"
 	case 2:
@@ -1213,7 +1300,7 @@ func (Ae AddressTypeEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (Ae AddressTypeEnum) String() string {
-	switch Ae.value_vrk6dms6pa3x {
+	switch Ae.value_jcqh7y8pcyc {
 	case 1:
 		return "residential"
 	case 2:
@@ -1228,7 +1315,7 @@ func (Ae AddressTypeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (Ae AddressTypeEnum) Description() string {
-	switch Ae.value_vrk6dms6pa3x {
+	switch Ae.value_jcqh7y8pcyc {
 	case 1:
 		return "residential"
 	case 2:
@@ -1256,13 +1343,13 @@ func (Ae *AddressTypeEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "residential":
-		Ae.value_vrk6dms6pa3x = 1
+		Ae.value_jcqh7y8pcyc = 1
 		return nil
 	case "business":
-		Ae.value_vrk6dms6pa3x = 2
+		Ae.value_jcqh7y8pcyc = 2
 		return nil
 	case "mailbox":
-		Ae.value_vrk6dms6pa3x = 3
+		Ae.value_jcqh7y8pcyc = 3
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling AddressTypeEnum\n", s)
@@ -1277,7 +1364,7 @@ PaymentMethodEnum
 
 ******************************/
 
-type PaymentMethodEnum struct{ value_1821y24ims5bu uint8 }
+type PaymentMethodEnum struct{ value_zsykahv5fn6d uint8 }
 
 var PaymentMethod = struct {
 	CreditCard PaymentMethodEnum
@@ -1286,8 +1373,8 @@ var PaymentMethod = struct {
 	// Used to iterate in range loops
 	Values [2]PaymentMethodEnum
 }{
-	CreditCard: PaymentMethodEnum{value_1821y24ims5bu: 1},
-	PayPal:     PaymentMethodEnum{value_1821y24ims5bu: 2},
+	CreditCard: PaymentMethodEnum{value_zsykahv5fn6d: 1},
+	PayPal:     PaymentMethodEnum{value_zsykahv5fn6d: 2},
 }
 
 func init() {
@@ -1298,17 +1385,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (Pe PaymentMethodEnum) Value() uint8 {
-	return Pe.value_1821y24ims5bu
+	return Pe.value_zsykahv5fn6d
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (Pe PaymentMethodEnum) IntValue() int {
-	return int(Pe.value_1821y24ims5bu)
+	return int(Pe.value_zsykahv5fn6d)
 }
 
 // Name returns the name of the variant as a string.
 func (Pe PaymentMethodEnum) Name() string {
-	switch Pe.value_1821y24ims5bu {
+	switch Pe.value_zsykahv5fn6d {
 	case 1:
 		return "CreditCard"
 	case 2:
@@ -1322,7 +1409,7 @@ func (Pe PaymentMethodEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (Pe PaymentMethodEnum) String() string {
-	switch Pe.value_1821y24ims5bu {
+	switch Pe.value_zsykahv5fn6d {
 	case 1:
 		return "credit_card"
 	case 2:
@@ -1335,7 +1422,7 @@ func (Pe PaymentMethodEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (Pe PaymentMethodEnum) Description() string {
-	switch Pe.value_1821y24ims5bu {
+	switch Pe.value_zsykahv5fn6d {
 	case 1:
 		return "credit_card"
 	case 2:
@@ -1361,10 +1448,10 @@ func (Pe *PaymentMethodEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "credit_card":
-		Pe.value_1821y24ims5bu = 1
+		Pe.value_zsykahv5fn6d = 1
 		return nil
 	case "paypal":
-		Pe.value_1821y24ims5bu = 2
+		Pe.value_zsykahv5fn6d = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling PaymentMethodEnum\n", s)
@@ -1379,7 +1466,7 @@ TaxIdTypeEnum
 
 ******************************/
 
-type TaxIdTypeEnum struct{ value_1ehmxowasjzv5 uint8 }
+type TaxIdTypeEnum struct{ value_323lma2h4zmz uint8 }
 
 var TaxIdType = struct {
 	BrCpf  TaxIdTypeEnum
@@ -1388,8 +1475,8 @@ var TaxIdType = struct {
 	// Used to iterate in range loops
 	Values [2]TaxIdTypeEnum
 }{
-	BrCpf:  TaxIdTypeEnum{value_1ehmxowasjzv5: 1},
-	BrCnpj: TaxIdTypeEnum{value_1ehmxowasjzv5: 2},
+	BrCpf:  TaxIdTypeEnum{value_323lma2h4zmz: 1},
+	BrCnpj: TaxIdTypeEnum{value_323lma2h4zmz: 2},
 }
 
 func init() {
@@ -1400,17 +1487,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (Te TaxIdTypeEnum) Value() uint8 {
-	return Te.value_1ehmxowasjzv5
+	return Te.value_323lma2h4zmz
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (Te TaxIdTypeEnum) IntValue() int {
-	return int(Te.value_1ehmxowasjzv5)
+	return int(Te.value_323lma2h4zmz)
 }
 
 // Name returns the name of the variant as a string.
 func (Te TaxIdTypeEnum) Name() string {
-	switch Te.value_1ehmxowasjzv5 {
+	switch Te.value_323lma2h4zmz {
 	case 1:
 		return "BrCpf"
 	case 2:
@@ -1424,7 +1511,7 @@ func (Te TaxIdTypeEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (Te TaxIdTypeEnum) String() string {
-	switch Te.value_1ehmxowasjzv5 {
+	switch Te.value_323lma2h4zmz {
 	case 1:
 		return "BR_CPF"
 	case 2:
@@ -1437,7 +1524,7 @@ func (Te TaxIdTypeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (Te TaxIdTypeEnum) Description() string {
-	switch Te.value_1ehmxowasjzv5 {
+	switch Te.value_323lma2h4zmz {
 	case 1:
 		return "BR_CPF"
 	case 2:
@@ -1463,10 +1550,10 @@ func (Te *TaxIdTypeEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "BR_CPF":
-		Te.value_1ehmxowasjzv5 = 1
+		Te.value_323lma2h4zmz = 1
 		return nil
 	case "BR_CNPJ":
-		Te.value_1ehmxowasjzv5 = 2
+		Te.value_323lma2h4zmz = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling TaxIdTypeEnum\n", s)
@@ -1481,7 +1568,7 @@ CreditCardTypeEnum
 
 ******************************/
 
-type CreditCardTypeEnum struct{ value_1p6m3obtdfnjh uint8 }
+type CreditCardTypeEnum struct{ value_r6smf5b521td uint8 }
 
 var CreditCardType = struct {
 	Visa       CreditCardTypeEnum
@@ -1492,10 +1579,10 @@ var CreditCardType = struct {
 	// Used to iterate in range loops
 	Values [4]CreditCardTypeEnum
 }{
-	Visa:       CreditCardTypeEnum{value_1p6m3obtdfnjh: 1},
-	MasterCard: CreditCardTypeEnum{value_1p6m3obtdfnjh: 2},
-	Discover:   CreditCardTypeEnum{value_1p6m3obtdfnjh: 3},
-	Amex:       CreditCardTypeEnum{value_1p6m3obtdfnjh: 4},
+	Visa:       CreditCardTypeEnum{value_r6smf5b521td: 1},
+	MasterCard: CreditCardTypeEnum{value_r6smf5b521td: 2},
+	Discover:   CreditCardTypeEnum{value_r6smf5b521td: 3},
+	Amex:       CreditCardTypeEnum{value_r6smf5b521td: 4},
 }
 
 func init() {
@@ -1506,17 +1593,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (Ce CreditCardTypeEnum) Value() uint8 {
-	return Ce.value_1p6m3obtdfnjh
+	return Ce.value_r6smf5b521td
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (Ce CreditCardTypeEnum) IntValue() int {
-	return int(Ce.value_1p6m3obtdfnjh)
+	return int(Ce.value_r6smf5b521td)
 }
 
 // Name returns the name of the variant as a string.
 func (Ce CreditCardTypeEnum) Name() string {
-	switch Ce.value_1p6m3obtdfnjh {
+	switch Ce.value_r6smf5b521td {
 	case 1:
 		return "Visa"
 	case 2:
@@ -1534,7 +1621,7 @@ func (Ce CreditCardTypeEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (Ce CreditCardTypeEnum) String() string {
-	switch Ce.value_1p6m3obtdfnjh {
+	switch Ce.value_r6smf5b521td {
 	case 1:
 		return "visa"
 	case 2:
@@ -1551,7 +1638,7 @@ func (Ce CreditCardTypeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (Ce CreditCardTypeEnum) Description() string {
-	switch Ce.value_1p6m3obtdfnjh {
+	switch Ce.value_r6smf5b521td {
 	case 1:
 		return "visa"
 	case 2:
@@ -1581,16 +1668,16 @@ func (Ce *CreditCardTypeEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "visa":
-		Ce.value_1p6m3obtdfnjh = 1
+		Ce.value_r6smf5b521td = 1
 		return nil
 	case "mastercard":
-		Ce.value_1p6m3obtdfnjh = 2
+		Ce.value_r6smf5b521td = 2
 		return nil
 	case "discover":
-		Ce.value_1p6m3obtdfnjh = 3
+		Ce.value_r6smf5b521td = 3
 		return nil
 	case "amex":
-		Ce.value_1p6m3obtdfnjh = 4
+		Ce.value_r6smf5b521td = 4
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling CreditCardTypeEnum\n", s)
@@ -1605,7 +1692,7 @@ stateEnum
 
 ******************************/
 
-type stateEnum struct{ value_omb6bmf1aop8 uint8 }
+type stateEnum struct{ value_1d1rmifv4vfpw uint8 }
 
 var state = struct {
 	Created           stateEnum
@@ -1627,21 +1714,21 @@ var state = struct {
 	// Used to iterate in range loops
 	Values [15]stateEnum
 }{
-	Created:           stateEnum{value_omb6bmf1aop8: 1},
-	Approved:          stateEnum{value_omb6bmf1aop8: 2},
-	Canceled:          stateEnum{value_omb6bmf1aop8: 3},
-	InProgress:        stateEnum{value_omb6bmf1aop8: 4},
-	Failed:            stateEnum{value_omb6bmf1aop8: 5},
-	Pending:           stateEnum{value_omb6bmf1aop8: 6},
-	Completed:         stateEnum{value_omb6bmf1aop8: 7},
-	Refunded:          stateEnum{value_omb6bmf1aop8: 8},
-	PartiallyRefunded: stateEnum{value_omb6bmf1aop8: 9},
-	Expired:           stateEnum{value_omb6bmf1aop8: 10},
-	Ok:                stateEnum{value_omb6bmf1aop8: 11},
-	Authorized:        stateEnum{value_omb6bmf1aop8: 12},
-	Captured:          stateEnum{value_omb6bmf1aop8: 13},
-	PartiallyCaptured: stateEnum{value_omb6bmf1aop8: 14},
-	Voided:            stateEnum{value_omb6bmf1aop8: 15},
+	Created:           stateEnum{value_1d1rmifv4vfpw: 1},
+	Approved:          stateEnum{value_1d1rmifv4vfpw: 2},
+	Canceled:          stateEnum{value_1d1rmifv4vfpw: 3},
+	InProgress:        stateEnum{value_1d1rmifv4vfpw: 4},
+	Failed:            stateEnum{value_1d1rmifv4vfpw: 5},
+	Pending:           stateEnum{value_1d1rmifv4vfpw: 6},
+	Completed:         stateEnum{value_1d1rmifv4vfpw: 7},
+	Refunded:          stateEnum{value_1d1rmifv4vfpw: 8},
+	PartiallyRefunded: stateEnum{value_1d1rmifv4vfpw: 9},
+	Expired:           stateEnum{value_1d1rmifv4vfpw: 10},
+	Ok:                stateEnum{value_1d1rmifv4vfpw: 11},
+	Authorized:        stateEnum{value_1d1rmifv4vfpw: 12},
+	Captured:          stateEnum{value_1d1rmifv4vfpw: 13},
+	PartiallyCaptured: stateEnum{value_1d1rmifv4vfpw: 14},
+	Voided:            stateEnum{value_1d1rmifv4vfpw: 15},
 }
 
 func init() {
@@ -1652,17 +1739,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (se stateEnum) Value() uint8 {
-	return se.value_omb6bmf1aop8
+	return se.value_1d1rmifv4vfpw
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (se stateEnum) IntValue() int {
-	return int(se.value_omb6bmf1aop8)
+	return int(se.value_1d1rmifv4vfpw)
 }
 
 // Name returns the name of the variant as a string.
 func (se stateEnum) Name() string {
-	switch se.value_omb6bmf1aop8 {
+	switch se.value_1d1rmifv4vfpw {
 	case 1:
 		return "Created"
 	case 2:
@@ -1702,7 +1789,7 @@ func (se stateEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (se stateEnum) String() string {
-	switch se.value_omb6bmf1aop8 {
+	switch se.value_1d1rmifv4vfpw {
 	case 1:
 		return "created"
 	case 2:
@@ -1741,7 +1828,7 @@ func (se stateEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (se stateEnum) Description() string {
-	switch se.value_omb6bmf1aop8 {
+	switch se.value_1d1rmifv4vfpw {
 	case 1:
 		return "created"
 	case 2:
@@ -1793,49 +1880,49 @@ func (se *stateEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "created":
-		se.value_omb6bmf1aop8 = 1
+		se.value_1d1rmifv4vfpw = 1
 		return nil
 	case "approved":
-		se.value_omb6bmf1aop8 = 2
+		se.value_1d1rmifv4vfpw = 2
 		return nil
 	case "canceled":
-		se.value_omb6bmf1aop8 = 3
+		se.value_1d1rmifv4vfpw = 3
 		return nil
 	case "in_progress":
-		se.value_omb6bmf1aop8 = 4
+		se.value_1d1rmifv4vfpw = 4
 		return nil
 	case "failed":
-		se.value_omb6bmf1aop8 = 5
+		se.value_1d1rmifv4vfpw = 5
 		return nil
 	case "pending":
-		se.value_omb6bmf1aop8 = 6
+		se.value_1d1rmifv4vfpw = 6
 		return nil
 	case "completed":
-		se.value_omb6bmf1aop8 = 7
+		se.value_1d1rmifv4vfpw = 7
 		return nil
 	case "refunded":
-		se.value_omb6bmf1aop8 = 8
+		se.value_1d1rmifv4vfpw = 8
 		return nil
 	case "partially_refunded":
-		se.value_omb6bmf1aop8 = 9
+		se.value_1d1rmifv4vfpw = 9
 		return nil
 	case "expired":
-		se.value_omb6bmf1aop8 = 10
+		se.value_1d1rmifv4vfpw = 10
 		return nil
 	case "ok":
-		se.value_omb6bmf1aop8 = 11
+		se.value_1d1rmifv4vfpw = 11
 		return nil
 	case "authorized":
-		se.value_omb6bmf1aop8 = 12
+		se.value_1d1rmifv4vfpw = 12
 		return nil
 	case "captured":
-		se.value_omb6bmf1aop8 = 13
+		se.value_1d1rmifv4vfpw = 13
 		return nil
 	case "partially_captured":
-		se.value_omb6bmf1aop8 = 14
+		se.value_1d1rmifv4vfpw = 14
 		return nil
 	case "voided":
-		se.value_omb6bmf1aop8 = 15
+		se.value_1d1rmifv4vfpw = 15
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling stateEnum\n", s)
@@ -1850,7 +1937,7 @@ reasonCodeEnum
 
 ******************************/
 
-type reasonCodeEnum struct{ value_b5cij0mmuwtb uint8 }
+type reasonCodeEnum struct{ value_odpluzth8oyk uint8 }
 
 var reasonCode = struct {
 	chargeback                              reasonCodeEnum
@@ -1869,18 +1956,18 @@ var reasonCode = struct {
 	// Used to iterate in range loops
 	Values [12]reasonCodeEnum
 }{
-	chargeback:                              reasonCodeEnum{value_b5cij0mmuwtb: 1},
-	guarantee:                               reasonCodeEnum{value_b5cij0mmuwtb: 2},
-	buyerComplaint:                          reasonCodeEnum{value_b5cij0mmuwtb: 3},
-	refundCode:                              reasonCodeEnum{value_b5cij0mmuwtb: 4},
-	unconfirmedShippingAddress:              reasonCodeEnum{value_b5cij0mmuwtb: 5},
-	echeckCode:                              reasonCodeEnum{value_b5cij0mmuwtb: 6},
-	internationalWithdrawal:                 reasonCodeEnum{value_b5cij0mmuwtb: 7},
-	receivingPreferenceMandatesManualAction: reasonCodeEnum{value_b5cij0mmuwtb: 8},
-	paymentReview:                           reasonCodeEnum{value_b5cij0mmuwtb: 9},
-	regulatoryReview:                        reasonCodeEnum{value_b5cij0mmuwtb: 10},
-	unilateral:                              reasonCodeEnum{value_b5cij0mmuwtb: 11},
-	verificationRequired:                    reasonCodeEnum{value_b5cij0mmuwtb: 12},
+	chargeback:                              reasonCodeEnum{value_odpluzth8oyk: 1},
+	guarantee:                               reasonCodeEnum{value_odpluzth8oyk: 2},
+	buyerComplaint:                          reasonCodeEnum{value_odpluzth8oyk: 3},
+	refundCode:                              reasonCodeEnum{value_odpluzth8oyk: 4},
+	unconfirmedShippingAddress:              reasonCodeEnum{value_odpluzth8oyk: 5},
+	echeckCode:                              reasonCodeEnum{value_odpluzth8oyk: 6},
+	internationalWithdrawal:                 reasonCodeEnum{value_odpluzth8oyk: 7},
+	receivingPreferenceMandatesManualAction: reasonCodeEnum{value_odpluzth8oyk: 8},
+	paymentReview:                           reasonCodeEnum{value_odpluzth8oyk: 9},
+	regulatoryReview:                        reasonCodeEnum{value_odpluzth8oyk: 10},
+	unilateral:                              reasonCodeEnum{value_odpluzth8oyk: 11},
+	verificationRequired:                    reasonCodeEnum{value_odpluzth8oyk: 12},
 }
 
 func init() {
@@ -1891,17 +1978,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (re reasonCodeEnum) Value() uint8 {
-	return re.value_b5cij0mmuwtb
+	return re.value_odpluzth8oyk
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (re reasonCodeEnum) IntValue() int {
-	return int(re.value_b5cij0mmuwtb)
+	return int(re.value_odpluzth8oyk)
 }
 
 // Name returns the name of the variant as a string.
 func (re reasonCodeEnum) Name() string {
-	switch re.value_b5cij0mmuwtb {
+	switch re.value_odpluzth8oyk {
 	case 1:
 		return "chargeback"
 	case 2:
@@ -1935,7 +2022,7 @@ func (re reasonCodeEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (re reasonCodeEnum) String() string {
-	switch re.value_b5cij0mmuwtb {
+	switch re.value_odpluzth8oyk {
 	case 1:
 		return "CHARGEBACK"
 	case 2:
@@ -1968,7 +2055,7 @@ func (re reasonCodeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (re reasonCodeEnum) Description() string {
-	switch re.value_b5cij0mmuwtb {
+	switch re.value_odpluzth8oyk {
 	case 1:
 		return "CHARGEBACK"
 	case 2:
@@ -2014,40 +2101,40 @@ func (re *reasonCodeEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "CHARGEBACK":
-		re.value_b5cij0mmuwtb = 1
+		re.value_odpluzth8oyk = 1
 		return nil
 	case "GUARANTEE":
-		re.value_b5cij0mmuwtb = 2
+		re.value_odpluzth8oyk = 2
 		return nil
 	case "BUYER_COMPLAINT":
-		re.value_b5cij0mmuwtb = 3
+		re.value_odpluzth8oyk = 3
 		return nil
 	case "REFUND":
-		re.value_b5cij0mmuwtb = 4
+		re.value_odpluzth8oyk = 4
 		return nil
 	case "UNCONFIRMED_SHIPPING_ADDRESS":
-		re.value_b5cij0mmuwtb = 5
+		re.value_odpluzth8oyk = 5
 		return nil
 	case "ECHECK":
-		re.value_b5cij0mmuwtb = 6
+		re.value_odpluzth8oyk = 6
 		return nil
 	case "INTERNATIONAL_WITHDRAWAL":
-		re.value_b5cij0mmuwtb = 7
+		re.value_odpluzth8oyk = 7
 		return nil
 	case "RECEIVING_PREFERENCE_MANDATES_MANUAL_ACTION":
-		re.value_b5cij0mmuwtb = 8
+		re.value_odpluzth8oyk = 8
 		return nil
 	case "PAYMENT_REVIEW":
-		re.value_b5cij0mmuwtb = 9
+		re.value_odpluzth8oyk = 9
 		return nil
 	case "REGULATORY_REVIEW":
-		re.value_b5cij0mmuwtb = 10
+		re.value_odpluzth8oyk = 10
 		return nil
 	case "UNILATERAL":
-		re.value_b5cij0mmuwtb = 11
+		re.value_odpluzth8oyk = 11
 		return nil
 	case "VERIFICATION_REQUIRED":
-		re.value_b5cij0mmuwtb = 12
+		re.value_odpluzth8oyk = 12
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling reasonCodeEnum\n", s)
@@ -2062,7 +2149,7 @@ protectionEligEnum
 
 ******************************/
 
-type protectionEligEnum struct{ value_138j8kz41zau3 uint8 }
+type protectionEligEnum struct{ value_xtf2lngp9bff uint8 }
 
 var protectionElig = struct {
 	eligible          protectionEligEnum
@@ -2072,9 +2159,9 @@ var protectionElig = struct {
 	// Used to iterate in range loops
 	Values [3]protectionEligEnum
 }{
-	eligible:          protectionEligEnum{value_138j8kz41zau3: 1},
-	partiallyEligible: protectionEligEnum{value_138j8kz41zau3: 2},
-	ineligibile:       protectionEligEnum{value_138j8kz41zau3: 3},
+	eligible:          protectionEligEnum{value_xtf2lngp9bff: 1},
+	partiallyEligible: protectionEligEnum{value_xtf2lngp9bff: 2},
+	ineligibile:       protectionEligEnum{value_xtf2lngp9bff: 3},
 }
 
 func init() {
@@ -2085,17 +2172,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (pe protectionEligEnum) Value() uint8 {
-	return pe.value_138j8kz41zau3
+	return pe.value_xtf2lngp9bff
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (pe protectionEligEnum) IntValue() int {
-	return int(pe.value_138j8kz41zau3)
+	return int(pe.value_xtf2lngp9bff)
 }
 
 // Name returns the name of the variant as a string.
 func (pe protectionEligEnum) Name() string {
-	switch pe.value_138j8kz41zau3 {
+	switch pe.value_xtf2lngp9bff {
 	case 1:
 		return "eligible"
 	case 2:
@@ -2111,7 +2198,7 @@ func (pe protectionEligEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (pe protectionEligEnum) String() string {
-	switch pe.value_138j8kz41zau3 {
+	switch pe.value_xtf2lngp9bff {
 	case 1:
 		return "ELIGIBLE"
 	case 2:
@@ -2126,7 +2213,7 @@ func (pe protectionEligEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (pe protectionEligEnum) Description() string {
-	switch pe.value_138j8kz41zau3 {
+	switch pe.value_xtf2lngp9bff {
 	case 1:
 		return "Merchant is protected by PayPal's Seller Protection Policy for Unauthorized. Payments and Item Not Received."
 	case 2:
@@ -2154,13 +2241,13 @@ func (pe *protectionEligEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "ELIGIBLE":
-		pe.value_138j8kz41zau3 = 1
+		pe.value_xtf2lngp9bff = 1
 		return nil
 	case "PARTIALLY_ELIGIBLE":
-		pe.value_138j8kz41zau3 = 2
+		pe.value_xtf2lngp9bff = 2
 		return nil
 	case "INELIGIBLE":
-		pe.value_138j8kz41zau3 = 3
+		pe.value_xtf2lngp9bff = 3
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling protectionEligEnum\n", s)
@@ -2175,7 +2262,7 @@ protectionEligTypeEnum
 
 ******************************/
 
-type protectionEligTypeEnum struct{ value_gecvkxn7756a uint8 }
+type protectionEligTypeEnum struct{ value_1jp3oc42hpst2 uint8 }
 
 var protectionEligType = struct {
 	itemNotReceivedEligible     protectionEligTypeEnum
@@ -2184,8 +2271,8 @@ var protectionEligType = struct {
 	// Used to iterate in range loops
 	Values [2]protectionEligTypeEnum
 }{
-	itemNotReceivedEligible:     protectionEligTypeEnum{value_gecvkxn7756a: 1},
-	unauthorizedPaymentEligible: protectionEligTypeEnum{value_gecvkxn7756a: 2},
+	itemNotReceivedEligible:     protectionEligTypeEnum{value_1jp3oc42hpst2: 1},
+	unauthorizedPaymentEligible: protectionEligTypeEnum{value_1jp3oc42hpst2: 2},
 }
 
 func init() {
@@ -2196,17 +2283,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (pe protectionEligTypeEnum) Value() uint8 {
-	return pe.value_gecvkxn7756a
+	return pe.value_1jp3oc42hpst2
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (pe protectionEligTypeEnum) IntValue() int {
-	return int(pe.value_gecvkxn7756a)
+	return int(pe.value_1jp3oc42hpst2)
 }
 
 // Name returns the name of the variant as a string.
 func (pe protectionEligTypeEnum) Name() string {
-	switch pe.value_gecvkxn7756a {
+	switch pe.value_1jp3oc42hpst2 {
 	case 1:
 		return "itemNotReceivedEligible"
 	case 2:
@@ -2220,7 +2307,7 @@ func (pe protectionEligTypeEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (pe protectionEligTypeEnum) String() string {
-	switch pe.value_gecvkxn7756a {
+	switch pe.value_1jp3oc42hpst2 {
 	case 1:
 		return "ITEM_NOT_RECEIVED_ELIGIBLE"
 	case 2:
@@ -2233,7 +2320,7 @@ func (pe protectionEligTypeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (pe protectionEligTypeEnum) Description() string {
-	switch pe.value_gecvkxn7756a {
+	switch pe.value_1jp3oc42hpst2 {
 	case 1:
 		return "Sellers are protected against claims for items not received."
 	case 2:
@@ -2259,10 +2346,10 @@ func (pe *protectionEligTypeEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "ITEM_NOT_RECEIVED_ELIGIBLE":
-		pe.value_gecvkxn7756a = 1
+		pe.value_1jp3oc42hpst2 = 1
 		return nil
 	case "UNAUTHORIZED_PAYMENT_ELIGIBLE":
-		pe.value_gecvkxn7756a = 2
+		pe.value_1jp3oc42hpst2 = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling protectionEligTypeEnum\n", s)
@@ -2277,7 +2364,7 @@ paymentModeEnum
 
 ******************************/
 
-type paymentModeEnum struct{ value_1ou6c5fhzv0v4 uint8 }
+type paymentModeEnum struct{ value_19cjrfbpie4qv uint8 }
 
 var paymentMode = struct {
 	instantTransfer    paymentModeEnum
@@ -2288,10 +2375,10 @@ var paymentMode = struct {
 	// Used to iterate in range loops
 	Values [4]paymentModeEnum
 }{
-	instantTransfer:    paymentModeEnum{value_1ou6c5fhzv0v4: 1},
-	manualBankTransfer: paymentModeEnum{value_1ou6c5fhzv0v4: 2},
-	delayedTransfer:    paymentModeEnum{value_1ou6c5fhzv0v4: 3},
-	echeck:             paymentModeEnum{value_1ou6c5fhzv0v4: 4},
+	instantTransfer:    paymentModeEnum{value_19cjrfbpie4qv: 1},
+	manualBankTransfer: paymentModeEnum{value_19cjrfbpie4qv: 2},
+	delayedTransfer:    paymentModeEnum{value_19cjrfbpie4qv: 3},
+	echeck:             paymentModeEnum{value_19cjrfbpie4qv: 4},
 }
 
 func init() {
@@ -2302,17 +2389,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (pe paymentModeEnum) Value() uint8 {
-	return pe.value_1ou6c5fhzv0v4
+	return pe.value_19cjrfbpie4qv
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (pe paymentModeEnum) IntValue() int {
-	return int(pe.value_1ou6c5fhzv0v4)
+	return int(pe.value_19cjrfbpie4qv)
 }
 
 // Name returns the name of the variant as a string.
 func (pe paymentModeEnum) Name() string {
-	switch pe.value_1ou6c5fhzv0v4 {
+	switch pe.value_19cjrfbpie4qv {
 	case 1:
 		return "instantTransfer"
 	case 2:
@@ -2330,7 +2417,7 @@ func (pe paymentModeEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (pe paymentModeEnum) String() string {
-	switch pe.value_1ou6c5fhzv0v4 {
+	switch pe.value_19cjrfbpie4qv {
 	case 1:
 		return "INSTANT_TRANSFER"
 	case 2:
@@ -2347,7 +2434,7 @@ func (pe paymentModeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (pe paymentModeEnum) Description() string {
-	switch pe.value_1ou6c5fhzv0v4 {
+	switch pe.value_19cjrfbpie4qv {
 	case 1:
 		return "INSTANT_TRANSFER"
 	case 2:
@@ -2377,16 +2464,16 @@ func (pe *paymentModeEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "INSTANT_TRANSFER":
-		pe.value_1ou6c5fhzv0v4 = 1
+		pe.value_19cjrfbpie4qv = 1
 		return nil
 	case "MANUAL_BANK_TRANSFER":
-		pe.value_1ou6c5fhzv0v4 = 2
+		pe.value_19cjrfbpie4qv = 2
 		return nil
 	case "DELAYED_TRANSFER":
-		pe.value_1ou6c5fhzv0v4 = 3
+		pe.value_19cjrfbpie4qv = 3
 		return nil
 	case "ECHECK":
-		pe.value_1ou6c5fhzv0v4 = 4
+		pe.value_19cjrfbpie4qv = 4
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling paymentModeEnum\n", s)
@@ -2401,7 +2488,7 @@ pendingReasonEnum
 
 ******************************/
 
-type pendingReasonEnum struct{ value_1ad13gwdkzi6c uint8 }
+type pendingReasonEnum struct{ value_amd2px21zm59 uint8 }
 
 var pendingReason = struct {
 	payerShippingUnconfirmed pendingReasonEnum
@@ -2415,13 +2502,13 @@ var pendingReason = struct {
 	// Used to iterate in range loops
 	Values [7]pendingReasonEnum
 }{
-	payerShippingUnconfirmed: pendingReasonEnum{value_1ad13gwdkzi6c: 1},
-	multiCurrency:            pendingReasonEnum{value_1ad13gwdkzi6c: 2},
-	riskReview:               pendingReasonEnum{value_1ad13gwdkzi6c: 3},
-	regulatoryReview:         pendingReasonEnum{value_1ad13gwdkzi6c: 4},
-	verificationRequired:     pendingReasonEnum{value_1ad13gwdkzi6c: 5},
-	orderPending:             pendingReasonEnum{value_1ad13gwdkzi6c: 6},
-	otherPending:             pendingReasonEnum{value_1ad13gwdkzi6c: 7},
+	payerShippingUnconfirmed: pendingReasonEnum{value_amd2px21zm59: 1},
+	multiCurrency:            pendingReasonEnum{value_amd2px21zm59: 2},
+	riskReview:               pendingReasonEnum{value_amd2px21zm59: 3},
+	regulatoryReview:         pendingReasonEnum{value_amd2px21zm59: 4},
+	verificationRequired:     pendingReasonEnum{value_amd2px21zm59: 5},
+	orderPending:             pendingReasonEnum{value_amd2px21zm59: 6},
+	otherPending:             pendingReasonEnum{value_amd2px21zm59: 7},
 }
 
 func init() {
@@ -2432,17 +2519,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (pe pendingReasonEnum) Value() uint8 {
-	return pe.value_1ad13gwdkzi6c
+	return pe.value_amd2px21zm59
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (pe pendingReasonEnum) IntValue() int {
-	return int(pe.value_1ad13gwdkzi6c)
+	return int(pe.value_amd2px21zm59)
 }
 
 // Name returns the name of the variant as a string.
 func (pe pendingReasonEnum) Name() string {
-	switch pe.value_1ad13gwdkzi6c {
+	switch pe.value_amd2px21zm59 {
 	case 1:
 		return "payerShippingUnconfirmed"
 	case 2:
@@ -2466,7 +2553,7 @@ func (pe pendingReasonEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (pe pendingReasonEnum) String() string {
-	switch pe.value_1ad13gwdkzi6c {
+	switch pe.value_amd2px21zm59 {
 	case 1:
 		return "PAYER-SHIPPING-UNCONFIRMED"
 	case 2:
@@ -2489,7 +2576,7 @@ func (pe pendingReasonEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (pe pendingReasonEnum) Description() string {
-	switch pe.value_1ad13gwdkzi6c {
+	switch pe.value_amd2px21zm59 {
 	case 1:
 		return "PAYER-SHIPPING-UNCONFIRMED"
 	case 2:
@@ -2525,25 +2612,25 @@ func (pe *pendingReasonEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "PAYER-SHIPPING-UNCONFIRMED":
-		pe.value_1ad13gwdkzi6c = 1
+		pe.value_amd2px21zm59 = 1
 		return nil
 	case "MULTI-CURRENCY":
-		pe.value_1ad13gwdkzi6c = 2
+		pe.value_amd2px21zm59 = 2
 		return nil
 	case "RISK-REVIEW":
-		pe.value_1ad13gwdkzi6c = 3
+		pe.value_amd2px21zm59 = 3
 		return nil
 	case "REGULATORY-REVIEW":
-		pe.value_1ad13gwdkzi6c = 4
+		pe.value_amd2px21zm59 = 4
 		return nil
 	case "VERIFICATION-REQUIRED":
-		pe.value_1ad13gwdkzi6c = 5
+		pe.value_amd2px21zm59 = 5
 		return nil
 	case "ORDER":
-		pe.value_1ad13gwdkzi6c = 6
+		pe.value_amd2px21zm59 = 6
 		return nil
 	case "OTHER":
-		pe.value_1ad13gwdkzi6c = 7
+		pe.value_amd2px21zm59 = 7
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling pendingReasonEnum\n", s)
@@ -2558,7 +2645,7 @@ CurrencyTypeEnum
 
 ******************************/
 
-type CurrencyTypeEnum struct{ value_z51rytcpgnnj uint8 }
+type CurrencyTypeEnum struct{ value_1bi93cxvvkyho uint8 }
 
 var CurrencyType = struct {
 	AUD CurrencyTypeEnum
@@ -2589,30 +2676,30 @@ var CurrencyType = struct {
 	// Used to iterate in range loops
 	Values [24]CurrencyTypeEnum
 }{
-	AUD: CurrencyTypeEnum{value_z51rytcpgnnj: 1},
-	BRL: CurrencyTypeEnum{value_z51rytcpgnnj: 2},
-	CAD: CurrencyTypeEnum{value_z51rytcpgnnj: 3},
-	CZK: CurrencyTypeEnum{value_z51rytcpgnnj: 4},
-	DKK: CurrencyTypeEnum{value_z51rytcpgnnj: 5},
-	EUR: CurrencyTypeEnum{value_z51rytcpgnnj: 6},
-	HKD: CurrencyTypeEnum{value_z51rytcpgnnj: 7},
-	HUF: CurrencyTypeEnum{value_z51rytcpgnnj: 8},
-	ILS: CurrencyTypeEnum{value_z51rytcpgnnj: 9},
-	JPY: CurrencyTypeEnum{value_z51rytcpgnnj: 10},
-	MYR: CurrencyTypeEnum{value_z51rytcpgnnj: 11},
-	MXN: CurrencyTypeEnum{value_z51rytcpgnnj: 12},
-	TWD: CurrencyTypeEnum{value_z51rytcpgnnj: 13},
-	NZD: CurrencyTypeEnum{value_z51rytcpgnnj: 14},
-	NOK: CurrencyTypeEnum{value_z51rytcpgnnj: 15},
-	PHP: CurrencyTypeEnum{value_z51rytcpgnnj: 16},
-	PLN: CurrencyTypeEnum{value_z51rytcpgnnj: 17},
-	GBP: CurrencyTypeEnum{value_z51rytcpgnnj: 18},
-	SGD: CurrencyTypeEnum{value_z51rytcpgnnj: 19},
-	SEK: CurrencyTypeEnum{value_z51rytcpgnnj: 20},
-	CHF: CurrencyTypeEnum{value_z51rytcpgnnj: 21},
-	THB: CurrencyTypeEnum{value_z51rytcpgnnj: 22},
-	TRY: CurrencyTypeEnum{value_z51rytcpgnnj: 23},
-	USD: CurrencyTypeEnum{value_z51rytcpgnnj: 24},
+	AUD: CurrencyTypeEnum{value_1bi93cxvvkyho: 1},
+	BRL: CurrencyTypeEnum{value_1bi93cxvvkyho: 2},
+	CAD: CurrencyTypeEnum{value_1bi93cxvvkyho: 3},
+	CZK: CurrencyTypeEnum{value_1bi93cxvvkyho: 4},
+	DKK: CurrencyTypeEnum{value_1bi93cxvvkyho: 5},
+	EUR: CurrencyTypeEnum{value_1bi93cxvvkyho: 6},
+	HKD: CurrencyTypeEnum{value_1bi93cxvvkyho: 7},
+	HUF: CurrencyTypeEnum{value_1bi93cxvvkyho: 8},
+	ILS: CurrencyTypeEnum{value_1bi93cxvvkyho: 9},
+	JPY: CurrencyTypeEnum{value_1bi93cxvvkyho: 10},
+	MYR: CurrencyTypeEnum{value_1bi93cxvvkyho: 11},
+	MXN: CurrencyTypeEnum{value_1bi93cxvvkyho: 12},
+	TWD: CurrencyTypeEnum{value_1bi93cxvvkyho: 13},
+	NZD: CurrencyTypeEnum{value_1bi93cxvvkyho: 14},
+	NOK: CurrencyTypeEnum{value_1bi93cxvvkyho: 15},
+	PHP: CurrencyTypeEnum{value_1bi93cxvvkyho: 16},
+	PLN: CurrencyTypeEnum{value_1bi93cxvvkyho: 17},
+	GBP: CurrencyTypeEnum{value_1bi93cxvvkyho: 18},
+	SGD: CurrencyTypeEnum{value_1bi93cxvvkyho: 19},
+	SEK: CurrencyTypeEnum{value_1bi93cxvvkyho: 20},
+	CHF: CurrencyTypeEnum{value_1bi93cxvvkyho: 21},
+	THB: CurrencyTypeEnum{value_1bi93cxvvkyho: 22},
+	TRY: CurrencyTypeEnum{value_1bi93cxvvkyho: 23},
+	USD: CurrencyTypeEnum{value_1bi93cxvvkyho: 24},
 }
 
 func init() {
@@ -2623,17 +2710,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (Ce CurrencyTypeEnum) Value() uint8 {
-	return Ce.value_z51rytcpgnnj
+	return Ce.value_1bi93cxvvkyho
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (Ce CurrencyTypeEnum) IntValue() int {
-	return int(Ce.value_z51rytcpgnnj)
+	return int(Ce.value_1bi93cxvvkyho)
 }
 
 // Name returns the name of the variant as a string.
 func (Ce CurrencyTypeEnum) Name() string {
-	switch Ce.value_z51rytcpgnnj {
+	switch Ce.value_1bi93cxvvkyho {
 	case 1:
 		return "AUD"
 	case 2:
@@ -2691,7 +2778,7 @@ func (Ce CurrencyTypeEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (Ce CurrencyTypeEnum) String() string {
-	switch Ce.value_z51rytcpgnnj {
+	switch Ce.value_1bi93cxvvkyho {
 	case 1:
 		return "AUD"
 	case 2:
@@ -2748,7 +2835,7 @@ func (Ce CurrencyTypeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (Ce CurrencyTypeEnum) Description() string {
-	switch Ce.value_z51rytcpgnnj {
+	switch Ce.value_1bi93cxvvkyho {
 	case 1:
 		return "Australian dollar"
 	case 2:
@@ -2818,76 +2905,76 @@ func (Ce *CurrencyTypeEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "AUD":
-		Ce.value_z51rytcpgnnj = 1
+		Ce.value_1bi93cxvvkyho = 1
 		return nil
 	case "BRL":
-		Ce.value_z51rytcpgnnj = 2
+		Ce.value_1bi93cxvvkyho = 2
 		return nil
 	case "CAD":
-		Ce.value_z51rytcpgnnj = 3
+		Ce.value_1bi93cxvvkyho = 3
 		return nil
 	case "CZK":
-		Ce.value_z51rytcpgnnj = 4
+		Ce.value_1bi93cxvvkyho = 4
 		return nil
 	case "DKK":
-		Ce.value_z51rytcpgnnj = 5
+		Ce.value_1bi93cxvvkyho = 5
 		return nil
 	case "EUR":
-		Ce.value_z51rytcpgnnj = 6
+		Ce.value_1bi93cxvvkyho = 6
 		return nil
 	case "HKD":
-		Ce.value_z51rytcpgnnj = 7
+		Ce.value_1bi93cxvvkyho = 7
 		return nil
 	case "HUF":
-		Ce.value_z51rytcpgnnj = 8
+		Ce.value_1bi93cxvvkyho = 8
 		return nil
 	case "ILS":
-		Ce.value_z51rytcpgnnj = 9
+		Ce.value_1bi93cxvvkyho = 9
 		return nil
 	case "JPY":
-		Ce.value_z51rytcpgnnj = 10
+		Ce.value_1bi93cxvvkyho = 10
 		return nil
 	case "MYR":
-		Ce.value_z51rytcpgnnj = 11
+		Ce.value_1bi93cxvvkyho = 11
 		return nil
 	case "MXN":
-		Ce.value_z51rytcpgnnj = 12
+		Ce.value_1bi93cxvvkyho = 12
 		return nil
 	case "TWD":
-		Ce.value_z51rytcpgnnj = 13
+		Ce.value_1bi93cxvvkyho = 13
 		return nil
 	case "NZD":
-		Ce.value_z51rytcpgnnj = 14
+		Ce.value_1bi93cxvvkyho = 14
 		return nil
 	case "NOK":
-		Ce.value_z51rytcpgnnj = 15
+		Ce.value_1bi93cxvvkyho = 15
 		return nil
 	case "PHP":
-		Ce.value_z51rytcpgnnj = 16
+		Ce.value_1bi93cxvvkyho = 16
 		return nil
 	case "PLN":
-		Ce.value_z51rytcpgnnj = 17
+		Ce.value_1bi93cxvvkyho = 17
 		return nil
 	case "GBP":
-		Ce.value_z51rytcpgnnj = 18
+		Ce.value_1bi93cxvvkyho = 18
 		return nil
 	case "SGD":
-		Ce.value_z51rytcpgnnj = 19
+		Ce.value_1bi93cxvvkyho = 19
 		return nil
 	case "SEK":
-		Ce.value_z51rytcpgnnj = 20
+		Ce.value_1bi93cxvvkyho = 20
 		return nil
 	case "CHF":
-		Ce.value_z51rytcpgnnj = 21
+		Ce.value_1bi93cxvvkyho = 21
 		return nil
 	case "THB":
-		Ce.value_z51rytcpgnnj = 22
+		Ce.value_1bi93cxvvkyho = 22
 		return nil
 	case "TRY":
-		Ce.value_z51rytcpgnnj = 23
+		Ce.value_1bi93cxvvkyho = 23
 		return nil
 	case "USD":
-		Ce.value_z51rytcpgnnj = 24
+		Ce.value_1bi93cxvvkyho = 24
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling CurrencyTypeEnum\n", s)
@@ -2902,7 +2989,7 @@ CountryCodeEnum
 
 ******************************/
 
-type CountryCodeEnum struct{ value_1kgw4p57ttugo uint8 }
+type CountryCodeEnum struct{ value_1kutjmnrzrp1p uint8 }
 
 var CountryCode = struct {
 	AL CountryCodeEnum
@@ -3103,200 +3190,200 @@ var CountryCode = struct {
 	// Used to iterate in range loops
 	Values [194]CountryCodeEnum
 }{
-	AL: CountryCodeEnum{value_1kgw4p57ttugo: 1},
-	DZ: CountryCodeEnum{value_1kgw4p57ttugo: 2},
-	AD: CountryCodeEnum{value_1kgw4p57ttugo: 3},
-	AO: CountryCodeEnum{value_1kgw4p57ttugo: 4},
-	AI: CountryCodeEnum{value_1kgw4p57ttugo: 5},
-	AG: CountryCodeEnum{value_1kgw4p57ttugo: 6},
-	AR: CountryCodeEnum{value_1kgw4p57ttugo: 7},
-	AM: CountryCodeEnum{value_1kgw4p57ttugo: 8},
-	AW: CountryCodeEnum{value_1kgw4p57ttugo: 9},
-	AU: CountryCodeEnum{value_1kgw4p57ttugo: 10},
-	AT: CountryCodeEnum{value_1kgw4p57ttugo: 11},
-	AZ: CountryCodeEnum{value_1kgw4p57ttugo: 12},
-	BS: CountryCodeEnum{value_1kgw4p57ttugo: 13},
-	BH: CountryCodeEnum{value_1kgw4p57ttugo: 14},
-	BB: CountryCodeEnum{value_1kgw4p57ttugo: 15},
-	BE: CountryCodeEnum{value_1kgw4p57ttugo: 16},
-	BZ: CountryCodeEnum{value_1kgw4p57ttugo: 17},
-	BJ: CountryCodeEnum{value_1kgw4p57ttugo: 18},
-	BM: CountryCodeEnum{value_1kgw4p57ttugo: 19},
-	BT: CountryCodeEnum{value_1kgw4p57ttugo: 20},
-	BO: CountryCodeEnum{value_1kgw4p57ttugo: 21},
-	BA: CountryCodeEnum{value_1kgw4p57ttugo: 22},
-	BW: CountryCodeEnum{value_1kgw4p57ttugo: 23},
-	BR: CountryCodeEnum{value_1kgw4p57ttugo: 24},
-	BN: CountryCodeEnum{value_1kgw4p57ttugo: 25},
-	BG: CountryCodeEnum{value_1kgw4p57ttugo: 26},
-	BF: CountryCodeEnum{value_1kgw4p57ttugo: 27},
-	BI: CountryCodeEnum{value_1kgw4p57ttugo: 28},
-	KH: CountryCodeEnum{value_1kgw4p57ttugo: 29},
-	CA: CountryCodeEnum{value_1kgw4p57ttugo: 30},
-	CV: CountryCodeEnum{value_1kgw4p57ttugo: 31},
-	KY: CountryCodeEnum{value_1kgw4p57ttugo: 32},
-	TD: CountryCodeEnum{value_1kgw4p57ttugo: 33},
-	CL: CountryCodeEnum{value_1kgw4p57ttugo: 34},
-	CN: CountryCodeEnum{value_1kgw4p57ttugo: 35},
-	C2: CountryCodeEnum{value_1kgw4p57ttugo: 36},
-	CO: CountryCodeEnum{value_1kgw4p57ttugo: 37},
-	KM: CountryCodeEnum{value_1kgw4p57ttugo: 38},
-	CD: CountryCodeEnum{value_1kgw4p57ttugo: 39},
-	CG: CountryCodeEnum{value_1kgw4p57ttugo: 40},
-	CK: CountryCodeEnum{value_1kgw4p57ttugo: 41},
-	CR: CountryCodeEnum{value_1kgw4p57ttugo: 42},
-	HR: CountryCodeEnum{value_1kgw4p57ttugo: 43},
-	CY: CountryCodeEnum{value_1kgw4p57ttugo: 44},
-	CZ: CountryCodeEnum{value_1kgw4p57ttugo: 45},
-	DK: CountryCodeEnum{value_1kgw4p57ttugo: 46},
-	DJ: CountryCodeEnum{value_1kgw4p57ttugo: 47},
-	DM: CountryCodeEnum{value_1kgw4p57ttugo: 48},
-	DO: CountryCodeEnum{value_1kgw4p57ttugo: 49},
-	EC: CountryCodeEnum{value_1kgw4p57ttugo: 50},
-	EG: CountryCodeEnum{value_1kgw4p57ttugo: 51},
-	SV: CountryCodeEnum{value_1kgw4p57ttugo: 52},
-	ER: CountryCodeEnum{value_1kgw4p57ttugo: 53},
-	EE: CountryCodeEnum{value_1kgw4p57ttugo: 54},
-	ET: CountryCodeEnum{value_1kgw4p57ttugo: 55},
-	FK: CountryCodeEnum{value_1kgw4p57ttugo: 56},
-	FJ: CountryCodeEnum{value_1kgw4p57ttugo: 57},
-	FI: CountryCodeEnum{value_1kgw4p57ttugo: 58},
-	FR: CountryCodeEnum{value_1kgw4p57ttugo: 59},
-	GF: CountryCodeEnum{value_1kgw4p57ttugo: 60},
-	PF: CountryCodeEnum{value_1kgw4p57ttugo: 61},
-	GA: CountryCodeEnum{value_1kgw4p57ttugo: 62},
-	GM: CountryCodeEnum{value_1kgw4p57ttugo: 63},
-	GE: CountryCodeEnum{value_1kgw4p57ttugo: 64},
-	DE: CountryCodeEnum{value_1kgw4p57ttugo: 65},
-	GI: CountryCodeEnum{value_1kgw4p57ttugo: 66},
-	GR: CountryCodeEnum{value_1kgw4p57ttugo: 67},
-	GL: CountryCodeEnum{value_1kgw4p57ttugo: 68},
-	GD: CountryCodeEnum{value_1kgw4p57ttugo: 69},
-	GP: CountryCodeEnum{value_1kgw4p57ttugo: 70},
-	GU: CountryCodeEnum{value_1kgw4p57ttugo: 71},
-	GT: CountryCodeEnum{value_1kgw4p57ttugo: 72},
-	GN: CountryCodeEnum{value_1kgw4p57ttugo: 73},
-	GW: CountryCodeEnum{value_1kgw4p57ttugo: 74},
-	GY: CountryCodeEnum{value_1kgw4p57ttugo: 75},
-	VA: CountryCodeEnum{value_1kgw4p57ttugo: 76},
-	HN: CountryCodeEnum{value_1kgw4p57ttugo: 77},
-	HK: CountryCodeEnum{value_1kgw4p57ttugo: 78},
-	HU: CountryCodeEnum{value_1kgw4p57ttugo: 79},
-	IS: CountryCodeEnum{value_1kgw4p57ttugo: 80},
-	IN: CountryCodeEnum{value_1kgw4p57ttugo: 81},
-	ID: CountryCodeEnum{value_1kgw4p57ttugo: 82},
-	IE: CountryCodeEnum{value_1kgw4p57ttugo: 83},
-	IL: CountryCodeEnum{value_1kgw4p57ttugo: 84},
-	IT: CountryCodeEnum{value_1kgw4p57ttugo: 85},
-	JM: CountryCodeEnum{value_1kgw4p57ttugo: 86},
-	JP: CountryCodeEnum{value_1kgw4p57ttugo: 87},
-	JO: CountryCodeEnum{value_1kgw4p57ttugo: 88},
-	KZ: CountryCodeEnum{value_1kgw4p57ttugo: 89},
-	KE: CountryCodeEnum{value_1kgw4p57ttugo: 90},
-	KI: CountryCodeEnum{value_1kgw4p57ttugo: 91},
-	KR: CountryCodeEnum{value_1kgw4p57ttugo: 92},
-	KW: CountryCodeEnum{value_1kgw4p57ttugo: 93},
-	KG: CountryCodeEnum{value_1kgw4p57ttugo: 94},
-	LA: CountryCodeEnum{value_1kgw4p57ttugo: 95},
-	LV: CountryCodeEnum{value_1kgw4p57ttugo: 96},
-	LS: CountryCodeEnum{value_1kgw4p57ttugo: 97},
-	LI: CountryCodeEnum{value_1kgw4p57ttugo: 98},
-	LT: CountryCodeEnum{value_1kgw4p57ttugo: 99},
-	LU: CountryCodeEnum{value_1kgw4p57ttugo: 100},
-	MG: CountryCodeEnum{value_1kgw4p57ttugo: 101},
-	MW: CountryCodeEnum{value_1kgw4p57ttugo: 102},
-	MY: CountryCodeEnum{value_1kgw4p57ttugo: 103},
-	MV: CountryCodeEnum{value_1kgw4p57ttugo: 104},
-	ML: CountryCodeEnum{value_1kgw4p57ttugo: 105},
-	MT: CountryCodeEnum{value_1kgw4p57ttugo: 106},
-	MH: CountryCodeEnum{value_1kgw4p57ttugo: 107},
-	MQ: CountryCodeEnum{value_1kgw4p57ttugo: 108},
-	MR: CountryCodeEnum{value_1kgw4p57ttugo: 109},
-	MU: CountryCodeEnum{value_1kgw4p57ttugo: 110},
-	YT: CountryCodeEnum{value_1kgw4p57ttugo: 111},
-	MX: CountryCodeEnum{value_1kgw4p57ttugo: 112},
-	FM: CountryCodeEnum{value_1kgw4p57ttugo: 113},
-	MN: CountryCodeEnum{value_1kgw4p57ttugo: 114},
-	MS: CountryCodeEnum{value_1kgw4p57ttugo: 115},
-	MA: CountryCodeEnum{value_1kgw4p57ttugo: 116},
-	MZ: CountryCodeEnum{value_1kgw4p57ttugo: 117},
-	NA: CountryCodeEnum{value_1kgw4p57ttugo: 118},
-	NR: CountryCodeEnum{value_1kgw4p57ttugo: 119},
-	NP: CountryCodeEnum{value_1kgw4p57ttugo: 120},
-	NL: CountryCodeEnum{value_1kgw4p57ttugo: 121},
-	AN: CountryCodeEnum{value_1kgw4p57ttugo: 122},
-	NC: CountryCodeEnum{value_1kgw4p57ttugo: 123},
-	NZ: CountryCodeEnum{value_1kgw4p57ttugo: 124},
-	NI: CountryCodeEnum{value_1kgw4p57ttugo: 125},
-	NE: CountryCodeEnum{value_1kgw4p57ttugo: 126},
-	NU: CountryCodeEnum{value_1kgw4p57ttugo: 127},
-	NF: CountryCodeEnum{value_1kgw4p57ttugo: 128},
-	NO: CountryCodeEnum{value_1kgw4p57ttugo: 129},
-	OM: CountryCodeEnum{value_1kgw4p57ttugo: 130},
-	PW: CountryCodeEnum{value_1kgw4p57ttugo: 131},
-	PA: CountryCodeEnum{value_1kgw4p57ttugo: 132},
-	PG: CountryCodeEnum{value_1kgw4p57ttugo: 133},
-	PE: CountryCodeEnum{value_1kgw4p57ttugo: 134},
-	PH: CountryCodeEnum{value_1kgw4p57ttugo: 135},
-	PN: CountryCodeEnum{value_1kgw4p57ttugo: 136},
-	PL: CountryCodeEnum{value_1kgw4p57ttugo: 137},
-	PT: CountryCodeEnum{value_1kgw4p57ttugo: 138},
-	QA: CountryCodeEnum{value_1kgw4p57ttugo: 139},
-	RE: CountryCodeEnum{value_1kgw4p57ttugo: 140},
-	RO: CountryCodeEnum{value_1kgw4p57ttugo: 141},
-	RU: CountryCodeEnum{value_1kgw4p57ttugo: 142},
-	RW: CountryCodeEnum{value_1kgw4p57ttugo: 143},
-	SH: CountryCodeEnum{value_1kgw4p57ttugo: 144},
-	KN: CountryCodeEnum{value_1kgw4p57ttugo: 145},
-	LC: CountryCodeEnum{value_1kgw4p57ttugo: 146},
-	PM: CountryCodeEnum{value_1kgw4p57ttugo: 147},
-	VC: CountryCodeEnum{value_1kgw4p57ttugo: 148},
-	WS: CountryCodeEnum{value_1kgw4p57ttugo: 149},
-	SM: CountryCodeEnum{value_1kgw4p57ttugo: 150},
-	ST: CountryCodeEnum{value_1kgw4p57ttugo: 151},
-	SA: CountryCodeEnum{value_1kgw4p57ttugo: 152},
-	SN: CountryCodeEnum{value_1kgw4p57ttugo: 153},
-	RS: CountryCodeEnum{value_1kgw4p57ttugo: 154},
-	SC: CountryCodeEnum{value_1kgw4p57ttugo: 155},
-	SL: CountryCodeEnum{value_1kgw4p57ttugo: 156},
-	SG: CountryCodeEnum{value_1kgw4p57ttugo: 157},
-	SK: CountryCodeEnum{value_1kgw4p57ttugo: 158},
-	SI: CountryCodeEnum{value_1kgw4p57ttugo: 159},
-	SB: CountryCodeEnum{value_1kgw4p57ttugo: 160},
-	SO: CountryCodeEnum{value_1kgw4p57ttugo: 161},
-	ZA: CountryCodeEnum{value_1kgw4p57ttugo: 162},
-	ES: CountryCodeEnum{value_1kgw4p57ttugo: 163},
-	LK: CountryCodeEnum{value_1kgw4p57ttugo: 164},
-	SR: CountryCodeEnum{value_1kgw4p57ttugo: 165},
-	SJ: CountryCodeEnum{value_1kgw4p57ttugo: 166},
-	SZ: CountryCodeEnum{value_1kgw4p57ttugo: 167},
-	SE: CountryCodeEnum{value_1kgw4p57ttugo: 168},
-	CH: CountryCodeEnum{value_1kgw4p57ttugo: 169},
-	TW: CountryCodeEnum{value_1kgw4p57ttugo: 170},
-	TJ: CountryCodeEnum{value_1kgw4p57ttugo: 171},
-	TZ: CountryCodeEnum{value_1kgw4p57ttugo: 172},
-	TH: CountryCodeEnum{value_1kgw4p57ttugo: 173},
-	TG: CountryCodeEnum{value_1kgw4p57ttugo: 174},
-	TO: CountryCodeEnum{value_1kgw4p57ttugo: 175},
-	TT: CountryCodeEnum{value_1kgw4p57ttugo: 176},
-	TN: CountryCodeEnum{value_1kgw4p57ttugo: 177},
-	TR: CountryCodeEnum{value_1kgw4p57ttugo: 178},
-	TM: CountryCodeEnum{value_1kgw4p57ttugo: 179},
-	TC: CountryCodeEnum{value_1kgw4p57ttugo: 180},
-	TV: CountryCodeEnum{value_1kgw4p57ttugo: 181},
-	UG: CountryCodeEnum{value_1kgw4p57ttugo: 182},
-	UA: CountryCodeEnum{value_1kgw4p57ttugo: 183},
-	AE: CountryCodeEnum{value_1kgw4p57ttugo: 184},
-	GB: CountryCodeEnum{value_1kgw4p57ttugo: 185},
-	US: CountryCodeEnum{value_1kgw4p57ttugo: 186},
-	UY: CountryCodeEnum{value_1kgw4p57ttugo: 187},
-	VU: CountryCodeEnum{value_1kgw4p57ttugo: 188},
-	VE: CountryCodeEnum{value_1kgw4p57ttugo: 189},
-	VN: CountryCodeEnum{value_1kgw4p57ttugo: 190},
-	VG: CountryCodeEnum{value_1kgw4p57ttugo: 191},
-	WF: CountryCodeEnum{value_1kgw4p57ttugo: 192},
-	YE: CountryCodeEnum{value_1kgw4p57ttugo: 193},
-	ZM: CountryCodeEnum{value_1kgw4p57ttugo: 194},
+	AL: CountryCodeEnum{value_1kutjmnrzrp1p: 1},
+	DZ: CountryCodeEnum{value_1kutjmnrzrp1p: 2},
+	AD: CountryCodeEnum{value_1kutjmnrzrp1p: 3},
+	AO: CountryCodeEnum{value_1kutjmnrzrp1p: 4},
+	AI: CountryCodeEnum{value_1kutjmnrzrp1p: 5},
+	AG: CountryCodeEnum{value_1kutjmnrzrp1p: 6},
+	AR: CountryCodeEnum{value_1kutjmnrzrp1p: 7},
+	AM: CountryCodeEnum{value_1kutjmnrzrp1p: 8},
+	AW: CountryCodeEnum{value_1kutjmnrzrp1p: 9},
+	AU: CountryCodeEnum{value_1kutjmnrzrp1p: 10},
+	AT: CountryCodeEnum{value_1kutjmnrzrp1p: 11},
+	AZ: CountryCodeEnum{value_1kutjmnrzrp1p: 12},
+	BS: CountryCodeEnum{value_1kutjmnrzrp1p: 13},
+	BH: CountryCodeEnum{value_1kutjmnrzrp1p: 14},
+	BB: CountryCodeEnum{value_1kutjmnrzrp1p: 15},
+	BE: CountryCodeEnum{value_1kutjmnrzrp1p: 16},
+	BZ: CountryCodeEnum{value_1kutjmnrzrp1p: 17},
+	BJ: CountryCodeEnum{value_1kutjmnrzrp1p: 18},
+	BM: CountryCodeEnum{value_1kutjmnrzrp1p: 19},
+	BT: CountryCodeEnum{value_1kutjmnrzrp1p: 20},
+	BO: CountryCodeEnum{value_1kutjmnrzrp1p: 21},
+	BA: CountryCodeEnum{value_1kutjmnrzrp1p: 22},
+	BW: CountryCodeEnum{value_1kutjmnrzrp1p: 23},
+	BR: CountryCodeEnum{value_1kutjmnrzrp1p: 24},
+	BN: CountryCodeEnum{value_1kutjmnrzrp1p: 25},
+	BG: CountryCodeEnum{value_1kutjmnrzrp1p: 26},
+	BF: CountryCodeEnum{value_1kutjmnrzrp1p: 27},
+	BI: CountryCodeEnum{value_1kutjmnrzrp1p: 28},
+	KH: CountryCodeEnum{value_1kutjmnrzrp1p: 29},
+	CA: CountryCodeEnum{value_1kutjmnrzrp1p: 30},
+	CV: CountryCodeEnum{value_1kutjmnrzrp1p: 31},
+	KY: CountryCodeEnum{value_1kutjmnrzrp1p: 32},
+	TD: CountryCodeEnum{value_1kutjmnrzrp1p: 33},
+	CL: CountryCodeEnum{value_1kutjmnrzrp1p: 34},
+	CN: CountryCodeEnum{value_1kutjmnrzrp1p: 35},
+	C2: CountryCodeEnum{value_1kutjmnrzrp1p: 36},
+	CO: CountryCodeEnum{value_1kutjmnrzrp1p: 37},
+	KM: CountryCodeEnum{value_1kutjmnrzrp1p: 38},
+	CD: CountryCodeEnum{value_1kutjmnrzrp1p: 39},
+	CG: CountryCodeEnum{value_1kutjmnrzrp1p: 40},
+	CK: CountryCodeEnum{value_1kutjmnrzrp1p: 41},
+	CR: CountryCodeEnum{value_1kutjmnrzrp1p: 42},
+	HR: CountryCodeEnum{value_1kutjmnrzrp1p: 43},
+	CY: CountryCodeEnum{value_1kutjmnrzrp1p: 44},
+	CZ: CountryCodeEnum{value_1kutjmnrzrp1p: 45},
+	DK: CountryCodeEnum{value_1kutjmnrzrp1p: 46},
+	DJ: CountryCodeEnum{value_1kutjmnrzrp1p: 47},
+	DM: CountryCodeEnum{value_1kutjmnrzrp1p: 48},
+	DO: CountryCodeEnum{value_1kutjmnrzrp1p: 49},
+	EC: CountryCodeEnum{value_1kutjmnrzrp1p: 50},
+	EG: CountryCodeEnum{value_1kutjmnrzrp1p: 51},
+	SV: CountryCodeEnum{value_1kutjmnrzrp1p: 52},
+	ER: CountryCodeEnum{value_1kutjmnrzrp1p: 53},
+	EE: CountryCodeEnum{value_1kutjmnrzrp1p: 54},
+	ET: CountryCodeEnum{value_1kutjmnrzrp1p: 55},
+	FK: CountryCodeEnum{value_1kutjmnrzrp1p: 56},
+	FJ: CountryCodeEnum{value_1kutjmnrzrp1p: 57},
+	FI: CountryCodeEnum{value_1kutjmnrzrp1p: 58},
+	FR: CountryCodeEnum{value_1kutjmnrzrp1p: 59},
+	GF: CountryCodeEnum{value_1kutjmnrzrp1p: 60},
+	PF: CountryCodeEnum{value_1kutjmnrzrp1p: 61},
+	GA: CountryCodeEnum{value_1kutjmnrzrp1p: 62},
+	GM: CountryCodeEnum{value_1kutjmnrzrp1p: 63},
+	GE: CountryCodeEnum{value_1kutjmnrzrp1p: 64},
+	DE: CountryCodeEnum{value_1kutjmnrzrp1p: 65},
+	GI: CountryCodeEnum{value_1kutjmnrzrp1p: 66},
+	GR: CountryCodeEnum{value_1kutjmnrzrp1p: 67},
+	GL: CountryCodeEnum{value_1kutjmnrzrp1p: 68},
+	GD: CountryCodeEnum{value_1kutjmnrzrp1p: 69},
+	GP: CountryCodeEnum{value_1kutjmnrzrp1p: 70},
+	GU: CountryCodeEnum{value_1kutjmnrzrp1p: 71},
+	GT: CountryCodeEnum{value_1kutjmnrzrp1p: 72},
+	GN: CountryCodeEnum{value_1kutjmnrzrp1p: 73},
+	GW: CountryCodeEnum{value_1kutjmnrzrp1p: 74},
+	GY: CountryCodeEnum{value_1kutjmnrzrp1p: 75},
+	VA: CountryCodeEnum{value_1kutjmnrzrp1p: 76},
+	HN: CountryCodeEnum{value_1kutjmnrzrp1p: 77},
+	HK: CountryCodeEnum{value_1kutjmnrzrp1p: 78},
+	HU: CountryCodeEnum{value_1kutjmnrzrp1p: 79},
+	IS: CountryCodeEnum{value_1kutjmnrzrp1p: 80},
+	IN: CountryCodeEnum{value_1kutjmnrzrp1p: 81},
+	ID: CountryCodeEnum{value_1kutjmnrzrp1p: 82},
+	IE: CountryCodeEnum{value_1kutjmnrzrp1p: 83},
+	IL: CountryCodeEnum{value_1kutjmnrzrp1p: 84},
+	IT: CountryCodeEnum{value_1kutjmnrzrp1p: 85},
+	JM: CountryCodeEnum{value_1kutjmnrzrp1p: 86},
+	JP: CountryCodeEnum{value_1kutjmnrzrp1p: 87},
+	JO: CountryCodeEnum{value_1kutjmnrzrp1p: 88},
+	KZ: CountryCodeEnum{value_1kutjmnrzrp1p: 89},
+	KE: CountryCodeEnum{value_1kutjmnrzrp1p: 90},
+	KI: CountryCodeEnum{value_1kutjmnrzrp1p: 91},
+	KR: CountryCodeEnum{value_1kutjmnrzrp1p: 92},
+	KW: CountryCodeEnum{value_1kutjmnrzrp1p: 93},
+	KG: CountryCodeEnum{value_1kutjmnrzrp1p: 94},
+	LA: CountryCodeEnum{value_1kutjmnrzrp1p: 95},
+	LV: CountryCodeEnum{value_1kutjmnrzrp1p: 96},
+	LS: CountryCodeEnum{value_1kutjmnrzrp1p: 97},
+	LI: CountryCodeEnum{value_1kutjmnrzrp1p: 98},
+	LT: CountryCodeEnum{value_1kutjmnrzrp1p: 99},
+	LU: CountryCodeEnum{value_1kutjmnrzrp1p: 100},
+	MG: CountryCodeEnum{value_1kutjmnrzrp1p: 101},
+	MW: CountryCodeEnum{value_1kutjmnrzrp1p: 102},
+	MY: CountryCodeEnum{value_1kutjmnrzrp1p: 103},
+	MV: CountryCodeEnum{value_1kutjmnrzrp1p: 104},
+	ML: CountryCodeEnum{value_1kutjmnrzrp1p: 105},
+	MT: CountryCodeEnum{value_1kutjmnrzrp1p: 106},
+	MH: CountryCodeEnum{value_1kutjmnrzrp1p: 107},
+	MQ: CountryCodeEnum{value_1kutjmnrzrp1p: 108},
+	MR: CountryCodeEnum{value_1kutjmnrzrp1p: 109},
+	MU: CountryCodeEnum{value_1kutjmnrzrp1p: 110},
+	YT: CountryCodeEnum{value_1kutjmnrzrp1p: 111},
+	MX: CountryCodeEnum{value_1kutjmnrzrp1p: 112},
+	FM: CountryCodeEnum{value_1kutjmnrzrp1p: 113},
+	MN: CountryCodeEnum{value_1kutjmnrzrp1p: 114},
+	MS: CountryCodeEnum{value_1kutjmnrzrp1p: 115},
+	MA: CountryCodeEnum{value_1kutjmnrzrp1p: 116},
+	MZ: CountryCodeEnum{value_1kutjmnrzrp1p: 117},
+	NA: CountryCodeEnum{value_1kutjmnrzrp1p: 118},
+	NR: CountryCodeEnum{value_1kutjmnrzrp1p: 119},
+	NP: CountryCodeEnum{value_1kutjmnrzrp1p: 120},
+	NL: CountryCodeEnum{value_1kutjmnrzrp1p: 121},
+	AN: CountryCodeEnum{value_1kutjmnrzrp1p: 122},
+	NC: CountryCodeEnum{value_1kutjmnrzrp1p: 123},
+	NZ: CountryCodeEnum{value_1kutjmnrzrp1p: 124},
+	NI: CountryCodeEnum{value_1kutjmnrzrp1p: 125},
+	NE: CountryCodeEnum{value_1kutjmnrzrp1p: 126},
+	NU: CountryCodeEnum{value_1kutjmnrzrp1p: 127},
+	NF: CountryCodeEnum{value_1kutjmnrzrp1p: 128},
+	NO: CountryCodeEnum{value_1kutjmnrzrp1p: 129},
+	OM: CountryCodeEnum{value_1kutjmnrzrp1p: 130},
+	PW: CountryCodeEnum{value_1kutjmnrzrp1p: 131},
+	PA: CountryCodeEnum{value_1kutjmnrzrp1p: 132},
+	PG: CountryCodeEnum{value_1kutjmnrzrp1p: 133},
+	PE: CountryCodeEnum{value_1kutjmnrzrp1p: 134},
+	PH: CountryCodeEnum{value_1kutjmnrzrp1p: 135},
+	PN: CountryCodeEnum{value_1kutjmnrzrp1p: 136},
+	PL: CountryCodeEnum{value_1kutjmnrzrp1p: 137},
+	PT: CountryCodeEnum{value_1kutjmnrzrp1p: 138},
+	QA: CountryCodeEnum{value_1kutjmnrzrp1p: 139},
+	RE: CountryCodeEnum{value_1kutjmnrzrp1p: 140},
+	RO: CountryCodeEnum{value_1kutjmnrzrp1p: 141},
+	RU: CountryCodeEnum{value_1kutjmnrzrp1p: 142},
+	RW: CountryCodeEnum{value_1kutjmnrzrp1p: 143},
+	SH: CountryCodeEnum{value_1kutjmnrzrp1p: 144},
+	KN: CountryCodeEnum{value_1kutjmnrzrp1p: 145},
+	LC: CountryCodeEnum{value_1kutjmnrzrp1p: 146},
+	PM: CountryCodeEnum{value_1kutjmnrzrp1p: 147},
+	VC: CountryCodeEnum{value_1kutjmnrzrp1p: 148},
+	WS: CountryCodeEnum{value_1kutjmnrzrp1p: 149},
+	SM: CountryCodeEnum{value_1kutjmnrzrp1p: 150},
+	ST: CountryCodeEnum{value_1kutjmnrzrp1p: 151},
+	SA: CountryCodeEnum{value_1kutjmnrzrp1p: 152},
+	SN: CountryCodeEnum{value_1kutjmnrzrp1p: 153},
+	RS: CountryCodeEnum{value_1kutjmnrzrp1p: 154},
+	SC: CountryCodeEnum{value_1kutjmnrzrp1p: 155},
+	SL: CountryCodeEnum{value_1kutjmnrzrp1p: 156},
+	SG: CountryCodeEnum{value_1kutjmnrzrp1p: 157},
+	SK: CountryCodeEnum{value_1kutjmnrzrp1p: 158},
+	SI: CountryCodeEnum{value_1kutjmnrzrp1p: 159},
+	SB: CountryCodeEnum{value_1kutjmnrzrp1p: 160},
+	SO: CountryCodeEnum{value_1kutjmnrzrp1p: 161},
+	ZA: CountryCodeEnum{value_1kutjmnrzrp1p: 162},
+	ES: CountryCodeEnum{value_1kutjmnrzrp1p: 163},
+	LK: CountryCodeEnum{value_1kutjmnrzrp1p: 164},
+	SR: CountryCodeEnum{value_1kutjmnrzrp1p: 165},
+	SJ: CountryCodeEnum{value_1kutjmnrzrp1p: 166},
+	SZ: CountryCodeEnum{value_1kutjmnrzrp1p: 167},
+	SE: CountryCodeEnum{value_1kutjmnrzrp1p: 168},
+	CH: CountryCodeEnum{value_1kutjmnrzrp1p: 169},
+	TW: CountryCodeEnum{value_1kutjmnrzrp1p: 170},
+	TJ: CountryCodeEnum{value_1kutjmnrzrp1p: 171},
+	TZ: CountryCodeEnum{value_1kutjmnrzrp1p: 172},
+	TH: CountryCodeEnum{value_1kutjmnrzrp1p: 173},
+	TG: CountryCodeEnum{value_1kutjmnrzrp1p: 174},
+	TO: CountryCodeEnum{value_1kutjmnrzrp1p: 175},
+	TT: CountryCodeEnum{value_1kutjmnrzrp1p: 176},
+	TN: CountryCodeEnum{value_1kutjmnrzrp1p: 177},
+	TR: CountryCodeEnum{value_1kutjmnrzrp1p: 178},
+	TM: CountryCodeEnum{value_1kutjmnrzrp1p: 179},
+	TC: CountryCodeEnum{value_1kutjmnrzrp1p: 180},
+	TV: CountryCodeEnum{value_1kutjmnrzrp1p: 181},
+	UG: CountryCodeEnum{value_1kutjmnrzrp1p: 182},
+	UA: CountryCodeEnum{value_1kutjmnrzrp1p: 183},
+	AE: CountryCodeEnum{value_1kutjmnrzrp1p: 184},
+	GB: CountryCodeEnum{value_1kutjmnrzrp1p: 185},
+	US: CountryCodeEnum{value_1kutjmnrzrp1p: 186},
+	UY: CountryCodeEnum{value_1kutjmnrzrp1p: 187},
+	VU: CountryCodeEnum{value_1kutjmnrzrp1p: 188},
+	VE: CountryCodeEnum{value_1kutjmnrzrp1p: 189},
+	VN: CountryCodeEnum{value_1kutjmnrzrp1p: 190},
+	VG: CountryCodeEnum{value_1kutjmnrzrp1p: 191},
+	WF: CountryCodeEnum{value_1kutjmnrzrp1p: 192},
+	YE: CountryCodeEnum{value_1kutjmnrzrp1p: 193},
+	ZM: CountryCodeEnum{value_1kutjmnrzrp1p: 194},
 }
 
 func init() {
@@ -3307,17 +3394,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (Ce CountryCodeEnum) Value() uint8 {
-	return Ce.value_1kgw4p57ttugo
+	return Ce.value_1kutjmnrzrp1p
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (Ce CountryCodeEnum) IntValue() int {
-	return int(Ce.value_1kgw4p57ttugo)
+	return int(Ce.value_1kutjmnrzrp1p)
 }
 
 // Name returns the name of the variant as a string.
 func (Ce CountryCodeEnum) Name() string {
-	switch Ce.value_1kgw4p57ttugo {
+	switch Ce.value_1kutjmnrzrp1p {
 	case 1:
 		return "AL"
 	case 2:
@@ -3715,7 +3802,7 @@ func (Ce CountryCodeEnum) Name() string {
 // its return value is as though 'Name()' had been called.
 
 func (Ce CountryCodeEnum) String() string {
-	switch Ce.value_1kgw4p57ttugo {
+	switch Ce.value_1kutjmnrzrp1p {
 	case 1:
 		return "AL"
 	case 2:
@@ -4112,7 +4199,7 @@ func (Ce CountryCodeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (Ce CountryCodeEnum) Description() string {
-	switch Ce.value_1kgw4p57ttugo {
+	switch Ce.value_1kutjmnrzrp1p {
 	case 1:
 		return "ALBANIA"
 	case 2:
@@ -4522,586 +4609,586 @@ func (Ce *CountryCodeEnum) UnmarshalJSON(b []byte) error {
 
 	switch s {
 	case "AL":
-		Ce.value_1kgw4p57ttugo = 1
+		Ce.value_1kutjmnrzrp1p = 1
 		return nil
 	case "DZ":
-		Ce.value_1kgw4p57ttugo = 2
+		Ce.value_1kutjmnrzrp1p = 2
 		return nil
 	case "AD":
-		Ce.value_1kgw4p57ttugo = 3
+		Ce.value_1kutjmnrzrp1p = 3
 		return nil
 	case "AO":
-		Ce.value_1kgw4p57ttugo = 4
+		Ce.value_1kutjmnrzrp1p = 4
 		return nil
 	case "AI":
-		Ce.value_1kgw4p57ttugo = 5
+		Ce.value_1kutjmnrzrp1p = 5
 		return nil
 	case "AG":
-		Ce.value_1kgw4p57ttugo = 6
+		Ce.value_1kutjmnrzrp1p = 6
 		return nil
 	case "AR":
-		Ce.value_1kgw4p57ttugo = 7
+		Ce.value_1kutjmnrzrp1p = 7
 		return nil
 	case "AM":
-		Ce.value_1kgw4p57ttugo = 8
+		Ce.value_1kutjmnrzrp1p = 8
 		return nil
 	case "AW":
-		Ce.value_1kgw4p57ttugo = 9
+		Ce.value_1kutjmnrzrp1p = 9
 		return nil
 	case "AU":
-		Ce.value_1kgw4p57ttugo = 10
+		Ce.value_1kutjmnrzrp1p = 10
 		return nil
 	case "AT":
-		Ce.value_1kgw4p57ttugo = 11
+		Ce.value_1kutjmnrzrp1p = 11
 		return nil
 	case "AZ":
-		Ce.value_1kgw4p57ttugo = 12
+		Ce.value_1kutjmnrzrp1p = 12
 		return nil
 	case "BS":
-		Ce.value_1kgw4p57ttugo = 13
+		Ce.value_1kutjmnrzrp1p = 13
 		return nil
 	case "BH":
-		Ce.value_1kgw4p57ttugo = 14
+		Ce.value_1kutjmnrzrp1p = 14
 		return nil
 	case "BB":
-		Ce.value_1kgw4p57ttugo = 15
+		Ce.value_1kutjmnrzrp1p = 15
 		return nil
 	case "BE":
-		Ce.value_1kgw4p57ttugo = 16
+		Ce.value_1kutjmnrzrp1p = 16
 		return nil
 	case "BZ":
-		Ce.value_1kgw4p57ttugo = 17
+		Ce.value_1kutjmnrzrp1p = 17
 		return nil
 	case "BJ":
-		Ce.value_1kgw4p57ttugo = 18
+		Ce.value_1kutjmnrzrp1p = 18
 		return nil
 	case "BM":
-		Ce.value_1kgw4p57ttugo = 19
+		Ce.value_1kutjmnrzrp1p = 19
 		return nil
 	case "BT":
-		Ce.value_1kgw4p57ttugo = 20
+		Ce.value_1kutjmnrzrp1p = 20
 		return nil
 	case "BO":
-		Ce.value_1kgw4p57ttugo = 21
+		Ce.value_1kutjmnrzrp1p = 21
 		return nil
 	case "BA":
-		Ce.value_1kgw4p57ttugo = 22
+		Ce.value_1kutjmnrzrp1p = 22
 		return nil
 	case "BW":
-		Ce.value_1kgw4p57ttugo = 23
+		Ce.value_1kutjmnrzrp1p = 23
 		return nil
 	case "BR":
-		Ce.value_1kgw4p57ttugo = 24
+		Ce.value_1kutjmnrzrp1p = 24
 		return nil
 	case "BN":
-		Ce.value_1kgw4p57ttugo = 25
+		Ce.value_1kutjmnrzrp1p = 25
 		return nil
 	case "BG":
-		Ce.value_1kgw4p57ttugo = 26
+		Ce.value_1kutjmnrzrp1p = 26
 		return nil
 	case "BF":
-		Ce.value_1kgw4p57ttugo = 27
+		Ce.value_1kutjmnrzrp1p = 27
 		return nil
 	case "BI":
-		Ce.value_1kgw4p57ttugo = 28
+		Ce.value_1kutjmnrzrp1p = 28
 		return nil
 	case "KH":
-		Ce.value_1kgw4p57ttugo = 29
+		Ce.value_1kutjmnrzrp1p = 29
 		return nil
 	case "CA":
-		Ce.value_1kgw4p57ttugo = 30
+		Ce.value_1kutjmnrzrp1p = 30
 		return nil
 	case "CV":
-		Ce.value_1kgw4p57ttugo = 31
+		Ce.value_1kutjmnrzrp1p = 31
 		return nil
 	case "KY":
-		Ce.value_1kgw4p57ttugo = 32
+		Ce.value_1kutjmnrzrp1p = 32
 		return nil
 	case "TD":
-		Ce.value_1kgw4p57ttugo = 33
+		Ce.value_1kutjmnrzrp1p = 33
 		return nil
 	case "CL":
-		Ce.value_1kgw4p57ttugo = 34
+		Ce.value_1kutjmnrzrp1p = 34
 		return nil
 	case "CN":
-		Ce.value_1kgw4p57ttugo = 35
+		Ce.value_1kutjmnrzrp1p = 35
 		return nil
 	case "C2":
-		Ce.value_1kgw4p57ttugo = 36
+		Ce.value_1kutjmnrzrp1p = 36
 		return nil
 	case "CO":
-		Ce.value_1kgw4p57ttugo = 37
+		Ce.value_1kutjmnrzrp1p = 37
 		return nil
 	case "KM":
-		Ce.value_1kgw4p57ttugo = 38
+		Ce.value_1kutjmnrzrp1p = 38
 		return nil
 	case "CD":
-		Ce.value_1kgw4p57ttugo = 39
+		Ce.value_1kutjmnrzrp1p = 39
 		return nil
 	case "CG":
-		Ce.value_1kgw4p57ttugo = 40
+		Ce.value_1kutjmnrzrp1p = 40
 		return nil
 	case "CK":
-		Ce.value_1kgw4p57ttugo = 41
+		Ce.value_1kutjmnrzrp1p = 41
 		return nil
 	case "CR":
-		Ce.value_1kgw4p57ttugo = 42
+		Ce.value_1kutjmnrzrp1p = 42
 		return nil
 	case "HR":
-		Ce.value_1kgw4p57ttugo = 43
+		Ce.value_1kutjmnrzrp1p = 43
 		return nil
 	case "CY":
-		Ce.value_1kgw4p57ttugo = 44
+		Ce.value_1kutjmnrzrp1p = 44
 		return nil
 	case "CZ":
-		Ce.value_1kgw4p57ttugo = 45
+		Ce.value_1kutjmnrzrp1p = 45
 		return nil
 	case "DK":
-		Ce.value_1kgw4p57ttugo = 46
+		Ce.value_1kutjmnrzrp1p = 46
 		return nil
 	case "DJ":
-		Ce.value_1kgw4p57ttugo = 47
+		Ce.value_1kutjmnrzrp1p = 47
 		return nil
 	case "DM":
-		Ce.value_1kgw4p57ttugo = 48
+		Ce.value_1kutjmnrzrp1p = 48
 		return nil
 	case "DO":
-		Ce.value_1kgw4p57ttugo = 49
+		Ce.value_1kutjmnrzrp1p = 49
 		return nil
 	case "EC":
-		Ce.value_1kgw4p57ttugo = 50
+		Ce.value_1kutjmnrzrp1p = 50
 		return nil
 	case "EG":
-		Ce.value_1kgw4p57ttugo = 51
+		Ce.value_1kutjmnrzrp1p = 51
 		return nil
 	case "SV":
-		Ce.value_1kgw4p57ttugo = 52
+		Ce.value_1kutjmnrzrp1p = 52
 		return nil
 	case "ER":
-		Ce.value_1kgw4p57ttugo = 53
+		Ce.value_1kutjmnrzrp1p = 53
 		return nil
 	case "EE":
-		Ce.value_1kgw4p57ttugo = 54
+		Ce.value_1kutjmnrzrp1p = 54
 		return nil
 	case "ET":
-		Ce.value_1kgw4p57ttugo = 55
+		Ce.value_1kutjmnrzrp1p = 55
 		return nil
 	case "FK":
-		Ce.value_1kgw4p57ttugo = 56
+		Ce.value_1kutjmnrzrp1p = 56
 		return nil
 	case "FJ":
-		Ce.value_1kgw4p57ttugo = 57
+		Ce.value_1kutjmnrzrp1p = 57
 		return nil
 	case "FI":
-		Ce.value_1kgw4p57ttugo = 58
+		Ce.value_1kutjmnrzrp1p = 58
 		return nil
 	case "FR":
-		Ce.value_1kgw4p57ttugo = 59
+		Ce.value_1kutjmnrzrp1p = 59
 		return nil
 	case "GF":
-		Ce.value_1kgw4p57ttugo = 60
+		Ce.value_1kutjmnrzrp1p = 60
 		return nil
 	case "PF":
-		Ce.value_1kgw4p57ttugo = 61
+		Ce.value_1kutjmnrzrp1p = 61
 		return nil
 	case "GA":
-		Ce.value_1kgw4p57ttugo = 62
+		Ce.value_1kutjmnrzrp1p = 62
 		return nil
 	case "GM":
-		Ce.value_1kgw4p57ttugo = 63
+		Ce.value_1kutjmnrzrp1p = 63
 		return nil
 	case "GE":
-		Ce.value_1kgw4p57ttugo = 64
+		Ce.value_1kutjmnrzrp1p = 64
 		return nil
 	case "DE":
-		Ce.value_1kgw4p57ttugo = 65
+		Ce.value_1kutjmnrzrp1p = 65
 		return nil
 	case "GI":
-		Ce.value_1kgw4p57ttugo = 66
+		Ce.value_1kutjmnrzrp1p = 66
 		return nil
 	case "GR":
-		Ce.value_1kgw4p57ttugo = 67
+		Ce.value_1kutjmnrzrp1p = 67
 		return nil
 	case "GL":
-		Ce.value_1kgw4p57ttugo = 68
+		Ce.value_1kutjmnrzrp1p = 68
 		return nil
 	case "GD":
-		Ce.value_1kgw4p57ttugo = 69
+		Ce.value_1kutjmnrzrp1p = 69
 		return nil
 	case "GP":
-		Ce.value_1kgw4p57ttugo = 70
+		Ce.value_1kutjmnrzrp1p = 70
 		return nil
 	case "GU":
-		Ce.value_1kgw4p57ttugo = 71
+		Ce.value_1kutjmnrzrp1p = 71
 		return nil
 	case "GT":
-		Ce.value_1kgw4p57ttugo = 72
+		Ce.value_1kutjmnrzrp1p = 72
 		return nil
 	case "GN":
-		Ce.value_1kgw4p57ttugo = 73
+		Ce.value_1kutjmnrzrp1p = 73
 		return nil
 	case "GW":
-		Ce.value_1kgw4p57ttugo = 74
+		Ce.value_1kutjmnrzrp1p = 74
 		return nil
 	case "GY":
-		Ce.value_1kgw4p57ttugo = 75
+		Ce.value_1kutjmnrzrp1p = 75
 		return nil
 	case "VA":
-		Ce.value_1kgw4p57ttugo = 76
+		Ce.value_1kutjmnrzrp1p = 76
 		return nil
 	case "HN":
-		Ce.value_1kgw4p57ttugo = 77
+		Ce.value_1kutjmnrzrp1p = 77
 		return nil
 	case "HK":
-		Ce.value_1kgw4p57ttugo = 78
+		Ce.value_1kutjmnrzrp1p = 78
 		return nil
 	case "HU":
-		Ce.value_1kgw4p57ttugo = 79
+		Ce.value_1kutjmnrzrp1p = 79
 		return nil
 	case "IS":
-		Ce.value_1kgw4p57ttugo = 80
+		Ce.value_1kutjmnrzrp1p = 80
 		return nil
 	case "IN":
-		Ce.value_1kgw4p57ttugo = 81
+		Ce.value_1kutjmnrzrp1p = 81
 		return nil
 	case "ID":
-		Ce.value_1kgw4p57ttugo = 82
+		Ce.value_1kutjmnrzrp1p = 82
 		return nil
 	case "IE":
-		Ce.value_1kgw4p57ttugo = 83
+		Ce.value_1kutjmnrzrp1p = 83
 		return nil
 	case "IL":
-		Ce.value_1kgw4p57ttugo = 84
+		Ce.value_1kutjmnrzrp1p = 84
 		return nil
 	case "IT":
-		Ce.value_1kgw4p57ttugo = 85
+		Ce.value_1kutjmnrzrp1p = 85
 		return nil
 	case "JM":
-		Ce.value_1kgw4p57ttugo = 86
+		Ce.value_1kutjmnrzrp1p = 86
 		return nil
 	case "JP":
-		Ce.value_1kgw4p57ttugo = 87
+		Ce.value_1kutjmnrzrp1p = 87
 		return nil
 	case "JO":
-		Ce.value_1kgw4p57ttugo = 88
+		Ce.value_1kutjmnrzrp1p = 88
 		return nil
 	case "KZ":
-		Ce.value_1kgw4p57ttugo = 89
+		Ce.value_1kutjmnrzrp1p = 89
 		return nil
 	case "KE":
-		Ce.value_1kgw4p57ttugo = 90
+		Ce.value_1kutjmnrzrp1p = 90
 		return nil
 	case "KI":
-		Ce.value_1kgw4p57ttugo = 91
+		Ce.value_1kutjmnrzrp1p = 91
 		return nil
 	case "KR":
-		Ce.value_1kgw4p57ttugo = 92
+		Ce.value_1kutjmnrzrp1p = 92
 		return nil
 	case "KW":
-		Ce.value_1kgw4p57ttugo = 93
+		Ce.value_1kutjmnrzrp1p = 93
 		return nil
 	case "KG":
-		Ce.value_1kgw4p57ttugo = 94
+		Ce.value_1kutjmnrzrp1p = 94
 		return nil
 	case "LA":
-		Ce.value_1kgw4p57ttugo = 95
+		Ce.value_1kutjmnrzrp1p = 95
 		return nil
 	case "LV":
-		Ce.value_1kgw4p57ttugo = 96
+		Ce.value_1kutjmnrzrp1p = 96
 		return nil
 	case "LS":
-		Ce.value_1kgw4p57ttugo = 97
+		Ce.value_1kutjmnrzrp1p = 97
 		return nil
 	case "LI":
-		Ce.value_1kgw4p57ttugo = 98
+		Ce.value_1kutjmnrzrp1p = 98
 		return nil
 	case "LT":
-		Ce.value_1kgw4p57ttugo = 99
+		Ce.value_1kutjmnrzrp1p = 99
 		return nil
 	case "LU":
-		Ce.value_1kgw4p57ttugo = 100
+		Ce.value_1kutjmnrzrp1p = 100
 		return nil
 	case "MG":
-		Ce.value_1kgw4p57ttugo = 101
+		Ce.value_1kutjmnrzrp1p = 101
 		return nil
 	case "MW":
-		Ce.value_1kgw4p57ttugo = 102
+		Ce.value_1kutjmnrzrp1p = 102
 		return nil
 	case "MY":
-		Ce.value_1kgw4p57ttugo = 103
+		Ce.value_1kutjmnrzrp1p = 103
 		return nil
 	case "MV":
-		Ce.value_1kgw4p57ttugo = 104
+		Ce.value_1kutjmnrzrp1p = 104
 		return nil
 	case "ML":
-		Ce.value_1kgw4p57ttugo = 105
+		Ce.value_1kutjmnrzrp1p = 105
 		return nil
 	case "MT":
-		Ce.value_1kgw4p57ttugo = 106
+		Ce.value_1kutjmnrzrp1p = 106
 		return nil
 	case "MH":
-		Ce.value_1kgw4p57ttugo = 107
+		Ce.value_1kutjmnrzrp1p = 107
 		return nil
 	case "MQ":
-		Ce.value_1kgw4p57ttugo = 108
+		Ce.value_1kutjmnrzrp1p = 108
 		return nil
 	case "MR":
-		Ce.value_1kgw4p57ttugo = 109
+		Ce.value_1kutjmnrzrp1p = 109
 		return nil
 	case "MU":
-		Ce.value_1kgw4p57ttugo = 110
+		Ce.value_1kutjmnrzrp1p = 110
 		return nil
 	case "YT":
-		Ce.value_1kgw4p57ttugo = 111
+		Ce.value_1kutjmnrzrp1p = 111
 		return nil
 	case "MX":
-		Ce.value_1kgw4p57ttugo = 112
+		Ce.value_1kutjmnrzrp1p = 112
 		return nil
 	case "FM":
-		Ce.value_1kgw4p57ttugo = 113
+		Ce.value_1kutjmnrzrp1p = 113
 		return nil
 	case "MN":
-		Ce.value_1kgw4p57ttugo = 114
+		Ce.value_1kutjmnrzrp1p = 114
 		return nil
 	case "MS":
-		Ce.value_1kgw4p57ttugo = 115
+		Ce.value_1kutjmnrzrp1p = 115
 		return nil
 	case "MA":
-		Ce.value_1kgw4p57ttugo = 116
+		Ce.value_1kutjmnrzrp1p = 116
 		return nil
 	case "MZ":
-		Ce.value_1kgw4p57ttugo = 117
+		Ce.value_1kutjmnrzrp1p = 117
 		return nil
 	case "NA":
-		Ce.value_1kgw4p57ttugo = 118
+		Ce.value_1kutjmnrzrp1p = 118
 		return nil
 	case "NR":
-		Ce.value_1kgw4p57ttugo = 119
+		Ce.value_1kutjmnrzrp1p = 119
 		return nil
 	case "NP":
-		Ce.value_1kgw4p57ttugo = 120
+		Ce.value_1kutjmnrzrp1p = 120
 		return nil
 	case "NL":
-		Ce.value_1kgw4p57ttugo = 121
+		Ce.value_1kutjmnrzrp1p = 121
 		return nil
 	case "AN":
-		Ce.value_1kgw4p57ttugo = 122
+		Ce.value_1kutjmnrzrp1p = 122
 		return nil
 	case "NC":
-		Ce.value_1kgw4p57ttugo = 123
+		Ce.value_1kutjmnrzrp1p = 123
 		return nil
 	case "NZ":
-		Ce.value_1kgw4p57ttugo = 124
+		Ce.value_1kutjmnrzrp1p = 124
 		return nil
 	case "NI":
-		Ce.value_1kgw4p57ttugo = 125
+		Ce.value_1kutjmnrzrp1p = 125
 		return nil
 	case "NE":
-		Ce.value_1kgw4p57ttugo = 126
+		Ce.value_1kutjmnrzrp1p = 126
 		return nil
 	case "NU":
-		Ce.value_1kgw4p57ttugo = 127
+		Ce.value_1kutjmnrzrp1p = 127
 		return nil
 	case "NF":
-		Ce.value_1kgw4p57ttugo = 128
+		Ce.value_1kutjmnrzrp1p = 128
 		return nil
 	case "NO":
-		Ce.value_1kgw4p57ttugo = 129
+		Ce.value_1kutjmnrzrp1p = 129
 		return nil
 	case "OM":
-		Ce.value_1kgw4p57ttugo = 130
+		Ce.value_1kutjmnrzrp1p = 130
 		return nil
 	case "PW":
-		Ce.value_1kgw4p57ttugo = 131
+		Ce.value_1kutjmnrzrp1p = 131
 		return nil
 	case "PA":
-		Ce.value_1kgw4p57ttugo = 132
+		Ce.value_1kutjmnrzrp1p = 132
 		return nil
 	case "PG":
-		Ce.value_1kgw4p57ttugo = 133
+		Ce.value_1kutjmnrzrp1p = 133
 		return nil
 	case "PE":
-		Ce.value_1kgw4p57ttugo = 134
+		Ce.value_1kutjmnrzrp1p = 134
 		return nil
 	case "PH":
-		Ce.value_1kgw4p57ttugo = 135
+		Ce.value_1kutjmnrzrp1p = 135
 		return nil
 	case "PN":
-		Ce.value_1kgw4p57ttugo = 136
+		Ce.value_1kutjmnrzrp1p = 136
 		return nil
 	case "PL":
-		Ce.value_1kgw4p57ttugo = 137
+		Ce.value_1kutjmnrzrp1p = 137
 		return nil
 	case "PT":
-		Ce.value_1kgw4p57ttugo = 138
+		Ce.value_1kutjmnrzrp1p = 138
 		return nil
 	case "QA":
-		Ce.value_1kgw4p57ttugo = 139
+		Ce.value_1kutjmnrzrp1p = 139
 		return nil
 	case "RE":
-		Ce.value_1kgw4p57ttugo = 140
+		Ce.value_1kutjmnrzrp1p = 140
 		return nil
 	case "RO":
-		Ce.value_1kgw4p57ttugo = 141
+		Ce.value_1kutjmnrzrp1p = 141
 		return nil
 	case "RU":
-		Ce.value_1kgw4p57ttugo = 142
+		Ce.value_1kutjmnrzrp1p = 142
 		return nil
 	case "RW":
-		Ce.value_1kgw4p57ttugo = 143
+		Ce.value_1kutjmnrzrp1p = 143
 		return nil
 	case "SH":
-		Ce.value_1kgw4p57ttugo = 144
+		Ce.value_1kutjmnrzrp1p = 144
 		return nil
 	case "KN":
-		Ce.value_1kgw4p57ttugo = 145
+		Ce.value_1kutjmnrzrp1p = 145
 		return nil
 	case "LC":
-		Ce.value_1kgw4p57ttugo = 146
+		Ce.value_1kutjmnrzrp1p = 146
 		return nil
 	case "PM":
-		Ce.value_1kgw4p57ttugo = 147
+		Ce.value_1kutjmnrzrp1p = 147
 		return nil
 	case "VC":
-		Ce.value_1kgw4p57ttugo = 148
+		Ce.value_1kutjmnrzrp1p = 148
 		return nil
 	case "WS":
-		Ce.value_1kgw4p57ttugo = 149
+		Ce.value_1kutjmnrzrp1p = 149
 		return nil
 	case "SM":
-		Ce.value_1kgw4p57ttugo = 150
+		Ce.value_1kutjmnrzrp1p = 150
 		return nil
 	case "ST":
-		Ce.value_1kgw4p57ttugo = 151
+		Ce.value_1kutjmnrzrp1p = 151
 		return nil
 	case "SA":
-		Ce.value_1kgw4p57ttugo = 152
+		Ce.value_1kutjmnrzrp1p = 152
 		return nil
 	case "SN":
-		Ce.value_1kgw4p57ttugo = 153
+		Ce.value_1kutjmnrzrp1p = 153
 		return nil
 	case "RS":
-		Ce.value_1kgw4p57ttugo = 154
+		Ce.value_1kutjmnrzrp1p = 154
 		return nil
 	case "SC":
-		Ce.value_1kgw4p57ttugo = 155
+		Ce.value_1kutjmnrzrp1p = 155
 		return nil
 	case "SL":
-		Ce.value_1kgw4p57ttugo = 156
+		Ce.value_1kutjmnrzrp1p = 156
 		return nil
 	case "SG":
-		Ce.value_1kgw4p57ttugo = 157
+		Ce.value_1kutjmnrzrp1p = 157
 		return nil
 	case "SK":
-		Ce.value_1kgw4p57ttugo = 158
+		Ce.value_1kutjmnrzrp1p = 158
 		return nil
 	case "SI":
-		Ce.value_1kgw4p57ttugo = 159
+		Ce.value_1kutjmnrzrp1p = 159
 		return nil
 	case "SB":
-		Ce.value_1kgw4p57ttugo = 160
+		Ce.value_1kutjmnrzrp1p = 160
 		return nil
 	case "SO":
-		Ce.value_1kgw4p57ttugo = 161
+		Ce.value_1kutjmnrzrp1p = 161
 		return nil
 	case "ZA":
-		Ce.value_1kgw4p57ttugo = 162
+		Ce.value_1kutjmnrzrp1p = 162
 		return nil
 	case "ES":
-		Ce.value_1kgw4p57ttugo = 163
+		Ce.value_1kutjmnrzrp1p = 163
 		return nil
 	case "LK":
-		Ce.value_1kgw4p57ttugo = 164
+		Ce.value_1kutjmnrzrp1p = 164
 		return nil
 	case "SR":
-		Ce.value_1kgw4p57ttugo = 165
+		Ce.value_1kutjmnrzrp1p = 165
 		return nil
 	case "SJ":
-		Ce.value_1kgw4p57ttugo = 166
+		Ce.value_1kutjmnrzrp1p = 166
 		return nil
 	case "SZ":
-		Ce.value_1kgw4p57ttugo = 167
+		Ce.value_1kutjmnrzrp1p = 167
 		return nil
 	case "SE":
-		Ce.value_1kgw4p57ttugo = 168
+		Ce.value_1kutjmnrzrp1p = 168
 		return nil
 	case "CH":
-		Ce.value_1kgw4p57ttugo = 169
+		Ce.value_1kutjmnrzrp1p = 169
 		return nil
 	case "TW":
-		Ce.value_1kgw4p57ttugo = 170
+		Ce.value_1kutjmnrzrp1p = 170
 		return nil
 	case "TJ":
-		Ce.value_1kgw4p57ttugo = 171
+		Ce.value_1kutjmnrzrp1p = 171
 		return nil
 	case "TZ":
-		Ce.value_1kgw4p57ttugo = 172
+		Ce.value_1kutjmnrzrp1p = 172
 		return nil
 	case "TH":
-		Ce.value_1kgw4p57ttugo = 173
+		Ce.value_1kutjmnrzrp1p = 173
 		return nil
 	case "TG":
-		Ce.value_1kgw4p57ttugo = 174
+		Ce.value_1kutjmnrzrp1p = 174
 		return nil
 	case "TO":
-		Ce.value_1kgw4p57ttugo = 175
+		Ce.value_1kutjmnrzrp1p = 175
 		return nil
 	case "TT":
-		Ce.value_1kgw4p57ttugo = 176
+		Ce.value_1kutjmnrzrp1p = 176
 		return nil
 	case "TN":
-		Ce.value_1kgw4p57ttugo = 177
+		Ce.value_1kutjmnrzrp1p = 177
 		return nil
 	case "TR":
-		Ce.value_1kgw4p57ttugo = 178
+		Ce.value_1kutjmnrzrp1p = 178
 		return nil
 	case "TM":
-		Ce.value_1kgw4p57ttugo = 179
+		Ce.value_1kutjmnrzrp1p = 179
 		return nil
 	case "TC":
-		Ce.value_1kgw4p57ttugo = 180
+		Ce.value_1kutjmnrzrp1p = 180
 		return nil
 	case "TV":
-		Ce.value_1kgw4p57ttugo = 181
+		Ce.value_1kutjmnrzrp1p = 181
 		return nil
 	case "UG":
-		Ce.value_1kgw4p57ttugo = 182
+		Ce.value_1kutjmnrzrp1p = 182
 		return nil
 	case "UA":
-		Ce.value_1kgw4p57ttugo = 183
+		Ce.value_1kutjmnrzrp1p = 183
 		return nil
 	case "AE":
-		Ce.value_1kgw4p57ttugo = 184
+		Ce.value_1kutjmnrzrp1p = 184
 		return nil
 	case "GB":
-		Ce.value_1kgw4p57ttugo = 185
+		Ce.value_1kutjmnrzrp1p = 185
 		return nil
 	case "US":
-		Ce.value_1kgw4p57ttugo = 186
+		Ce.value_1kutjmnrzrp1p = 186
 		return nil
 	case "UY":
-		Ce.value_1kgw4p57ttugo = 187
+		Ce.value_1kutjmnrzrp1p = 187
 		return nil
 	case "VU":
-		Ce.value_1kgw4p57ttugo = 188
+		Ce.value_1kutjmnrzrp1p = 188
 		return nil
 	case "VE":
-		Ce.value_1kgw4p57ttugo = 189
+		Ce.value_1kutjmnrzrp1p = 189
 		return nil
 	case "VN":
-		Ce.value_1kgw4p57ttugo = 190
+		Ce.value_1kutjmnrzrp1p = 190
 		return nil
 	case "VG":
-		Ce.value_1kgw4p57ttugo = 191
+		Ce.value_1kutjmnrzrp1p = 191
 		return nil
 	case "WF":
-		Ce.value_1kgw4p57ttugo = 192
+		Ce.value_1kutjmnrzrp1p = 192
 		return nil
 	case "YE":
-		Ce.value_1kgw4p57ttugo = 193
+		Ce.value_1kutjmnrzrp1p = 193
 		return nil
 	case "ZM":
-		Ce.value_1kgw4p57ttugo = 194
+		Ce.value_1kutjmnrzrp1p = 194
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling CountryCodeEnum\n", s)

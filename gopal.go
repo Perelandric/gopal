@@ -14,29 +14,14 @@ import "strings"
 import "strconv"
 import "time"
 
-type request struct {
-	method    methodEnum
-	path      string
-	body      interface{}
-	response  errorable
-	isAuthReq bool
-}
-
-type connection struct {
-	live       bool
-	id, secret string
-	tokeninfo  tokeninfo
-	client     http.Client
-}
-
-func NewConnection(live bool, id, secret string) (conn *connection, err error) {
-	conn = &connection{
-		live:   live,
+func NewConnection(s ServerEnum, id, secret string) (c *connection, err error) {
+	c = &connection{
+		server: s,
 		id:     id,
 		secret: secret,
 	}
 
-	if err = conn.authenticate(); err != nil {
+	if err = c.authenticate(); err != nil {
 		return nil, err
 	}
 	return
@@ -70,34 +55,14 @@ func (self *connection) authenticate() error {
 	}
 
 	// Set the duration to expire 3 minutes early to avoid expiration during a request cycle
-	duration = time.Duration(self.tokeninfo.Expires_in)*time.Second - 3*time.Minute
+	duration = time.Duration(self.tokeninfo.ExpiresIn)*time.Second - 3*time.Minute
 	self.tokeninfo.expiration = time.Now().Add(duration)
 
 	return nil
 }
 
-// Authorization response
-type tokeninfo struct {
-	Scope         string `json:"scope,omitempty"`
-	Access_token  string `json:"access_token,omitempty"`
-	Refresh_token string `json:"refresh_token,omitempty"`
-	Token_type    string `json:"token_type,omitempty"`
-	Expires_in    uint   `json:"expires_in,omitempty"`
-
-	// Not sure about this field. Appears in response, but not in documentation.
-	App_id string `json:"app_id,omitempty"`
-
-	// Derived fields
-	expiration time.Time
-
-	RawData []byte `json:"-"`
-
-	// Handles the case where an error is received instead
-	*identity_error
-}
-
 func (ti *tokeninfo) auth_token() string {
-	return ti.Token_type + " " + ti.Access_token
+	return ti.TokenType + " " + ti.AccessToken
 }
 
 func (pp *connection) send(reqData *request) error {
@@ -109,10 +74,10 @@ func (pp *connection) send(reqData *request) error {
 	var url string
 
 	// use sandbox url if requested
-	if pp.live {
-		url = path.Join("https://api.paypal.com/v1", reqData.path)
-	} else {
+	if pp.server == Server.Sandbox {
 		url = path.Join("https://api.sandbox.paypal.com/v1", reqData.path)
+	} else {
+		url = path.Join("https://api.paypal.com/v1", reqData.path)
 	}
 
 	switch val := reqData.body.(type) {
@@ -123,12 +88,11 @@ func (pp *connection) send(reqData *request) error {
 	case nil:
 		body_reader = bytes.NewReader(nil)
 	default:
-		result, err = json.Marshal(val)
-		if err != nil {
+		if result, err := json.Marshal(val); err != nil {
 			return err
+		} else {
+			body_reader = bytes.NewReader(result)
 		}
-		body_reader = bytes.NewReader(result)
-		result = nil
 	}
 
 	// TODO: Paypal docs mention a `nonce`. Research that.

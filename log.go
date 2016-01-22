@@ -20,7 +20,6 @@ type CommunicationLog struct {
 	TransactionID string
 	CommunicationID string // UUID for this communication. It's the same as its Transaction UUID, but with the type prepended
 	Type int // TODO: This should be a const enum type. Request, Response, Internal
-	RawData string
 	TimeStamp time.Time
 }
 
