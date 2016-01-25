@@ -41,7 +41,29 @@ func (self *connection) CreatePayment(
 
 ***************************/
 
-func (self *Payment) AddTransaction(t transaction) {
+func (self *Payment) AddTransaction(
+	c CurrencyTypeEnum, desc string, shp *ShippingAddress, itms ...item) {
+
+	if len(desc) > descMax { // Log and truncate if description is too long
+		log.Printf("Description exceeds %d characters: %q\n", descMax, desc)
+		desc = desc[0:descMax]
+	}
+
+	var t = transaction{
+		update_transaction: update_transaction{
+			Amount: amount{
+				Currency: c,
+				Total:    "0",
+			},
+		},
+		Description: desc,
+	}
+
+	if shp != nil {
+		t.ItemList = &itemList{
+			ShippingAddress: shp,
+		}
+	}
 	self.Transactions = append(self.Transactions, &t)
 }
 
@@ -225,9 +247,13 @@ type payment_request struct {
 type Payment struct {
 	payment_request
 
-	// Payment creation time as defined in RFC 3339 Section 5.6. and the
-	// time that the resource was last updated. Values assigned by PayPal.
-	_times
+	// Payment creation time as defined in RFC 3339 Section 5.6
+	// Value assigned by PayPal.
+	CreateTime dateTime `json:"create_time,omitempty"`
+
+	// The time that the resource was last updated.
+	// Value assigned by Payal.
+	UpdateTime dateTime `json:"update_time,omitempty"`
 
 	// ID of the created payment. Value assigned by PayPal.
 	Id string `json:"id,omitempty"`
@@ -261,38 +287,10 @@ type paymentExecution struct {
 
 **********************/
 
-func NewTransaction(
-	c CurrencyTypeEnum, desc string, shp *ShippingAddress) *transaction {
-
-	if len(desc) > descMax { // Log and truncate if description is too long
-		log.Printf("Description exceeds %d characters: %q\n", descMax, desc)
-		desc = desc[0:descMax]
-	}
-
-	var t = &transaction{
-		update_transaction: update_transaction{
-			Amount: amount{
-				Currency: c,
-				Total:    "0",
-			},
-		},
-		Description: desc,
-	}
-
-	if shp != nil {
-		t.ItemList = &itemList{
-			ShippingAddress: shp,
-		}
-	}
-
-	return t
-}
-
-func (t *transaction) AddItem(
-	qty int, price float64, curr CurrencyTypeEnum, name, sku string) {
-
+// Prices are assumed to use the CurrencyType passed to NewTransaction.
+func (t *transaction) AddItem(qty int, price float64, name, sku string) {
 	if qty < 1 {
-		qty = 1
+		return
 	}
 
 	if t.ItemList == nil {
@@ -302,36 +300,9 @@ func (t *transaction) AddItem(
 		Quantity: qty,
 		Name:     name,
 		Price:    price,
-		Currency: curr,
+		Currency: t.update_transaction.Amount.Currency,
 		Sku:      sku,
 	})
-}
-
-// Amount Object
-//  A`Transaction` object also may have an `ItemList`, which has dollar amounts.
-//  These amounts are used to calculate the `Total` field of the `Amount` object
-//
-//	All other uses of `Amount` do have `shipping`, `shipping_discount` and
-// `subtotal` to calculate the `Total`.
-type amount struct {
-	// 3 letter currency code. PayPal does not support all currencies. REQUIRED.
-	Currency CurrencyTypeEnum `json:"currency"`
-
-	// Total amount charged from the payer to the payee. In case of a refund, this
-	// is the refunded amount to the original payer from the payee. 10 characters
-	// max with support for 2 decimal places. REQUIRED.
-	Total string `json:"total"`
-
-	Details *details `json:"details,omitempty"`
-}
-
-func (self *amount) setTotal(amt float64) error {
-	if s, err := make10CharAmount(amt); err != nil {
-		return err
-	} else {
-		self.Total = s
-	}
-	return nil
 }
 
 type details struct {
@@ -403,7 +374,7 @@ type transaction struct {
 
 	// Financial transactions related to a payment. (Only in PayPal responses?)
 	// Sale, Authorization, Capture, or Refund objects
-	RelatedResources RelatedResources `json:"related_resources,omitempty"`
+	RelatedResources relatedResources `json:"related_resources,omitempty"`
 
 	// Invoice number used to track the payment. Only supported when the
 	// `payment_method` is set to `paypal`. 256 characters max.
@@ -421,13 +392,11 @@ type transaction struct {
 	PaymentOptions paymentOptions `json:"payment_options,omitempty"`
 }
 
-type RelatedResources []Resource
-
-//func (self *RelatedResources) MarshalJSON() ([]byte, error) {
+//func (self *relatedResources) MarshalJSON() ([]byte, error) {
 //	return []byte("[]"), nil
 //}
 
-func (self *RelatedResources) UnmarshalJSON(b []byte) error {
+func (self *relatedResources) UnmarshalJSON(b []byte) error {
 	if self == nil || len(*self) == 0 {
 		return nil
 	}
@@ -440,7 +409,7 @@ func (self *RelatedResources) UnmarshalJSON(b []byte) error {
 
 	for _, m := range a {
 		for name, rawMesg := range m {
-			var t Resource // for unmarshaling the current item
+			var t resource // for unmarshaling the current item
 
 			switch name {
 			case SaleType:
@@ -452,7 +421,7 @@ func (self *RelatedResources) UnmarshalJSON(b []byte) error {
 			case RefundType:
 				t = new(Refund)
 			default:
-				log.Printf("Unexpected Resource type: %s\n", name)
+				log.Printf("Unexpected resource type: %s\n", name)
 				continue
 			}
 			if err = json.Unmarshal(rawMesg, t); err != nil {

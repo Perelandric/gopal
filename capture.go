@@ -11,22 +11,14 @@ import "path"
 
 **************************************************************/
 
-// State values are: pending, completed, refunded, partially_refunded
-type Capture struct {
-	_trans
-
-	// Transaction fee applicable for this payment.
-	TransactionFee currency `json:"transaction_fee"`
-
-	// If set to `true`, all remaining funds held by the authorization will be
-	// released in the funding instrument. Default is `false`.
-	IsFinalCapture bool `json:"is_final_capture,omitempty"`
-}
-
-// Implement the Resource interface
+// Implement the resource interface
 
 func (self *Capture) getPath() string {
 	return path.Join(_capturePath, self.Id)
+}
+
+func (self *Capture) getAmount() amount {
+	return self.Amount
 }
 
 // Implement `refundable` interface
@@ -73,5 +65,5 @@ func (self *Capture) Refund(amt float64) (*Refund, error) {
 }
 
 func (self *Capture) FullRefund() (*Refund, error) {
-	return self.doRefund(self, self.totalAsFloat())
+	return self.doRefund(self, self.Amount.totalAsFloat())
 }

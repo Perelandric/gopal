@@ -12,51 +12,14 @@ import "path"
 
 **************************************************************/
 
-// State items are: pending, authorized, captured, partially_captured, expired,
-// 									voided
-type Authorization struct {
-	_trans
-
-	// ID of the billing agreement used as reference to execute this transaction.
-	BillingAgreementId string `json:"billing_agreement_id"`
-
-	// Specifies the payment mode of the transaction.
-	PaymentMode paymentModeEnum `json:"payment_mode"`
-
-	// Reason code, AUTHORIZATION, for a transaction state of `pending`. Value
-	// assigned by PayPal.
-	ReasonCode reasonCodeEnum `json:"reason_code"`
-
-	// Authorization expiration time and date as defined in RFC 3339 Section 5.6.
-	// Value assigned by PayPal.
-	ValidUntil dateTime `json:"valid_until"`
-
-	// Expected clearing time for eCheck transactions. Only supported when the
-	// payment_method is set to paypal. Value assigned by PayPal.
-	ClearingTime string `json:"clearing_time"`
-
-	// The level of seller protection in force for the transaction. Only supported
-	// when the payment_method is set to paypal.
-	ProtectionElig protectionEligEnum `json:"protection_eligibility"`
-
-	// The kind of seller protection in force for the transaction. This property
-	// is returned only when the protection_eligibility property is set to
-	// ELIGIBLE or PARTIALLY_ELIGIBLE. Only supported when the `payment_method` is
-	// set to `paypal`.
-	ProtectionEligType protectionEligTypeEnum `json:"protection_eligibility_type"`
-
-	// Fraud Management Filter (FMF) details applied for the payment that could
-	// result in accept, deny, or pending action. Returned in a payment response
-	// only if the merchant has enabled FMF in the profile settings and one of the
-	// fraud filters was triggered based on those settings. See "Fraud Management
-	// Filters Summary" for more information.
-	FmfDetails fmfDetails `json:"fmf_details"`
-}
-
-// Implement the Resource interface
+// Implement the resource interface
 
 func (self *Authorization) getPath() string {
 	return path.Join(_authorizationPath, self.Id)
+}
+
+func (self *Authorization) getAmount() amount {
+	return self.Amount
 }
 
 /*************************************************************
@@ -98,9 +61,8 @@ To use this resource, the original payment call must have the intent set to auth
 
 func (self *Authorization) Capture(amt *amount, is_final bool) (*Capture, error) {
 	var capt_req = &Capture{
-		_trans: _trans{
-			Amount: *amt,
-		},
+		Amount:         *amt,
+		_shared:        _shared{},
 		IsFinalCapture: is_final,
 	}
 	var capt_resp = new(Capture)

@@ -20,22 +20,14 @@ import (
 
 **************************************************************/
 
-// State items are: pending; completed; failed
-type Refund struct {
-	_trans
-
-	// ID of the Sale transaction being refunded. One among sale_id or capture_id
-	// will be returned based on the resource used to initiate refund.
-	SaleId string `json:"sale_id,omitempty"`
-
-	// ID of the sale transaction being refunded.
-	CaptureId string `json:"capture_id,omitempty"`
-}
-
-// Implement the Resource interface
+// Implement the resource interface
 
 func (self *Refund) getPath() string {
 	return path.Join(_refundPath, self.Id)
+}
+
+func (self *Refund) getAmount() amount {
+	return self.Amount
 }
 
 // General purpose function for performing a refund.
@@ -47,7 +39,7 @@ func (self *connection) doRefund(obj refundable, amt float64) (*Refund, error) {
 
 	ref := &Refund{}
 
-	ref.Amount.Currency = obj.getCurrencyType()
+	ref.Amount.Currency = obj.getAmount().Currency
 	if err := ref.Amount.setTotal(amt); err != nil {
 		return nil, err
 	}

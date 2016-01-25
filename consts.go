@@ -88,6 +88,32 @@ sale
 authorize
 order
 
+@enum fmfFilter --json=string
+accept  --string=ACCEPT --description="An ACCEPT filter is triggered only for the TOTAL_PURCHASE_PRICE_MINIMUM filter setting and is returned only in direct credit card payments where payment is accepted."
+pending --string=PENDING --description="Triggers a PENDING filter action where you need to explicitly accept or deny the transaction."
+deny  --string=DENY --description="Triggers a DENY action where payment is denied automatically."
+report --string=REPORT --description="Triggers the Flag testing mode where payment is accepted."
+
+@enum filterId
+maximumTransactionAmount --string=MAXIMUM_TRANSACTION_AMOUNT --description="basic filter"
+unconfirmedAddress --string=UNCONFIRMED_ADDRESS --description="basic filter"
+countryMonitor --string=COUNTRY_MONITOR --description="basic filter"
+avsNoMatch --string=AVS_NO_MATCH --description="Address Verification Service No Match (advanced filter)"
+avsPartialMatch --string=AVS_PARTIAL_MATCH --description="Address Verification Service Partial Match (advanced filter)"
+avsUnavailableOrUnsupported --string=AVS_UNAVAILABLE_OR_UNSUPPORTED --description="Address Verification Service Unavailable or Not Supported (advanced filter)"
+cardSecurityCodeMismatch --string=CARD_SECURITY_CODE_MISMATCH --description="advanced filter"
+billingOrShippingAddressMismatch --string=BILLING_OR_SHIPPING_ADDRESS_MISMATCH --description="advanced filter"
+riskyZipCode --string=RISKY_ZIP_CODE --description="high risk lists filter"
+suspectedFreightForwarderCheck --string=SUSPECTED_FREIGHT_FORWARDER_CHECK --description="high risk lists filter"
+riskyEmailAddressDomainCheck --string=RISKY_EMAIL_ADDRESS_DOMAIN_CHECK --description="high risk lists filter"
+riskyBankIdentificationNumberCheck --string=RISKY_BANK_IDENTIFICATION_NUMBER_CHECK --description="high risk lists filter"
+riskyIpAddressRange --string=RISKY_IP_ADDRESS_RANGE --description="high risk lists filter"
+largeOrderNumber --string=LARGE_ORDER_NUMBER --description="transaction data filter"
+totalPurchasePriceMinimum --string=TOTAL_PURCHASE_PRICE_MINIMUM --description="transaction data filter"
+ipAddressVelocity --string=IP_ADDRESS_VELOCITY --description="transaction data filter"
+paypalFraudModel --string=PAYPAL_FRAUD_MODEL --description="transaction data filter"
+
+
 @enum normStatus --json=string
 unknown --string=UNKNOWN
 unnormalizedUserPreferred --string=UNNORMALIZED_USER_PREFERRED

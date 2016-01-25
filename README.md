@@ -29,7 +29,7 @@ func main() {
     })
 
   // Create a transaction for the payment. Only the CurrencyType is required.
-  var trans = p.NewTransaction(p.CurrencyType.USD,
+  var trans = pymt.AddTransaction(p.CurrencyType.USD,
     "The description of the transaction",
     &p.ShippingAddress {
       RecipientName: "Bob Woo",
@@ -38,11 +38,21 @@ func main() {
       	Line1: "12345 67th Place",
         Line2: "Apt #890",
         City: "Whoville",
-        CountryCode: CountryCode.US,
-        PostalCode: "90210",
         State: "CA",
+        PostalCode: "90210",
+        CountryCode: CountryCode.US,
         Phone: "555-555-5555",
       },
     })
+
+    // TODO: The `AddItem` doesn't really do anything except add the item. So
+    // why not make `NewTransaction()` a variadic function that receives items?
+    // Then it will also make more sense to have it a method on the Payment.
+    // The items would then need to be a struct, which is probably better.
+
+  // Add items to the transaction. Quantities < 1 are ignored. Price is to be
+  // given according to the CurrencyType that was provided to NewTransaction().
+  trans.AddItem(1, 23.45, "Roast Beast", "987654321")
+
 }
 ```
