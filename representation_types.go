@@ -1,16 +1,17 @@
 package gopal
 
 import (
-	"log"
+	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 )
+
+//go:generate Golific $GOFILE
 
 type resource interface {
 	errorable
 	getPath() string
-	getAmount() amount
+	Amount() amount
 }
 
 type relatedResources []resource
@@ -75,206 +76,235 @@ type tokeninfo struct {
 	*identity_error
 }
 
-// State items are: pending, authorized, captured, partially_captured, expired,
-// 									voided
-type Authorization struct {
-	_shared
-
-	// Details about the amount
-	Amount amount `json:"amount"`
-
-	// ID of the billing agreement used as reference to execute this transaction.
-	// Read only.
-	BillingAgreementId string `json:"billing_agreement_id"`
-
-	// Specifies the payment mode of the transaction.
-	// Read only.
-	PaymentMode paymentModeEnum `json:"payment_mode"`
-
-	// Reason code, AUTHORIZATION, for a transaction state of `pending`.
-	// Read only.
-	ReasonCode reasonCodeEnum `json:"reason_code"`
-
-	// Authorization expiration time and date as defined in RFC 3339 Section 5.6.
-	// Read only.
-	ValidUntil dateTime `json:"valid_until"`
-
-	// Expected clearing time for eCheck transactions. Only supported when the
-	// payment_method is set to paypal.
-	// Read only.
-	ClearingTime string `json:"clearing_time"`
-
-	// The level of seller protection in force for the transaction. Only supported
-	// when the payment_method is set to paypal.
-	// Read only.
-	ProtectionElig protectionEligEnum `json:"protection_eligibility"`
-
-	// The kind of seller protection in force for the transaction. This property
-	// is returned only when the protection_eligibility property is set to
-	// ELIGIBLE or PARTIALLY_ELIGIBLE. Only supported when the `payment_method` is
-	// set to `paypal`.
-	// Read only.
-	ProtectionEligType protectionEligTypeEnum `json:"protection_eligibility_type"`
-
-	// Fraud Management Filter (FMF) details applied for the payment that could
-	// result in accept, deny, or pending action. Returned in a payment response
-	// only if the merchant has enabled FMF in the profile settings and one of the
-	// fraud filters was triggered based on those settings. See "Fraud Management
-	// Filters Summary" for more information.
-	// Read only.
-	FmfDetails fmfDetails `json:"fmf_details"`
-}
-
-// State values are: pending, completed, refunded, partially_refunded
-type Capture struct {
-	_shared
-
-	// Details about the amount
-	Amount amount `json:"amount"`
-
-	// Transaction fee applicable for this payment.
-	TransactionFee currency `json:"transaction_fee"`
-
-	// If set to `true`, all remaining funds held by the authorization will be
-	// released in the funding instrument. Default is `false`.
-	IsFinalCapture bool `json:"is_final_capture,omitempty"`
-}
-
-// State values are: pending; completed; refunded; partially_refunded
-type Sale struct {
-	_shared
-
-	// Details about the amount
-	Amount amount `json:"amount"`
-
-	// Description of sale.
-	Description string `json:"description,omitempty"`
-
-	// Transaction fee charged by PayPal for this transaction.
-	TransactionFee currency `json:"transaction_fee"`
-
-	// Net amount the merchant receives for this transaction in their receivable
-	// currency. Returned only in cross-currency use cases where a merchant bills
-	// a buyer in a non-primary currency for that buyer.
-	ReceivableAmount currency `json:"receivable_amount"`
-
-	// Reason the transaction is in pending state. Only supported when the
-	// `payment_method` is set to `paypal`
-	// Read only.
-	// TODO: This appears in the old docs under the general Sale object description
-	// but not under the lower "sale object" definition. The new docs have it
-	// marked as [DEPRECATED] in one area, but not another.
-	PendingReason pendingReasonEnum `json:"pending_reason"`
-
-	// Specifies payment mode of the transaction. Only supported when the
-	// `payment_method` is set to `paypal`.
-	// Read only.
-	PaymentMode paymentModeEnum `json:"payment_mode"`
-
-	// Exchange rate applied for this transaction. Returned only in cross-currency
-	// use cases where a merchant bills a buyer in a non-primary currency for that
-	// buyer.
-	// Read only.
-	ExchangeRate string `json:"exchange_rate"`
-
-	// Fraud Management Filter (FMF) details applied for the payment that could
-	// result in accept, deny, or pending action. Returned in a payment response
-	// only if the merchant has enabled FMF in the profile settings and one of the
-	// fraud filters was triggered based on those settings. See "Fraud Management
-	// Filters Summary" for more information.
-	// Read only.
-	FmfDetails fmfDetails `json:"fmf_details"`
-
-	// Receipt ID is a 16-digit payment identification number returned for guest
-	// users to identify the payment.
-	// Read only.
-	ReceiptId string `json:"receipt_id"`
-
-	// Reason code for the transaction state being Pending or Reversed. Only
-	// supported when the `payment_method` is set to `paypal`.
-	// Read only.
-	ReasonCode reasonCodeEnum `json:"reason_code"`
-
-	// The level of seller protection in force for the transaction. Only supported
-	// when the `payment_method` is set to `paypal`.
-	// Read only.
-	ProtectionEligibility protectionEligEnum `json:"protection_eligibility"`
-
-	// The kind of seller protection in force for the transaction. This property
-	// is returned only when the protection_eligibility property is set to
-	// `ELIGIBLE` or `PARTIALLY_ELIGIBLE`. Only supported when the `payment_method`
-	// is set to paypal. One or both of the allowed values can be returned.
-	// Read only.
-	ProtectionEligibilityType protectionEligTypeEnum `json:"protection_eligibility_type"`
-
-	// Expected clearing time for eCheck transactions. Only supported when the
-	// payment_method is set to paypal.
-	// Read only.
-	ClearingTime string `json:"clearing_time"`
-
-	// ID of the billing agreement used as reference to execute this transaction.
-	// Read only.
-	BillingAgreementId string `json:"billing_agreement_id"`
-}
-
-// State items are: pending; completed; failed
-type Refund struct {
-	_shared
-
-	// Details about the amount
-	Amount amount `json:"amount"`
-
-	// Description of what is being refunded
-	Description string `json:"description,omitempty"`
-
-	// Reason description for the Sale transaction being refunded.
-	Reason string `json:"reason,omitempty"`
-
-	// ID of the Sale transaction being refunded. One among sale_id or capture_id
-	// will be returned based on the resource used to initiate refund.
-	// Read Only.
-	SaleId string `json:"sale_id,omitempty"`
-
-	// ID of the sale transaction being refunded.
-	// Read Only.
-	CaptureId string `json:"capture_id,omitempty"`
+type Redirects struct {
+	Return string `json:"return_url,omitempty"`
+	Cancel string `json:"cancel_url,omitempty"`
 }
 
 type dateTime string // TODO: How should this be done? [Un]Marshalers?
 
-type _shared struct {
+// TODO: only needed until Golific acknowledges more types
+type fundingInstruments []*fundingInstrument
+type Transactions []*Transaction
+type Items []*Item
+
+/**********************
+
+Payment Object
+
+**********************/
+
+// TODO: Add `billing_agreement_tokens`, `payment_instruction`
+/*
+@struct Payment
 	*connection
+	ExperienceProfileId string `json:"experience_profile_id"` --read --write
+	Intent							intentEnum `json:"intent,omitempty"` --read
+	Payer 							payer `json:"payer,omitempty"` --read
+	Transactions				Transactions `json:"transactions,omitempty"` --read
+	RedirectUrls				Redirects `json:"redirect_urls,omitempty"` --read
+	State 							stateEnum `json:"state,omitempty"` --read
+	Id 									string `json:"id,omitempty"` --read
+	FailureReason				FailureReasonEnum `json:"failure_reason,omitempty"` --read
+	CreateTime 					dateTime `json:"create_time,omitempty"` --read
+	UpdateTime 					dateTime `json:"update_time,omitempty"` --read
+	Links 							links `json:"links,omitempty"` --read
+	*payment_error
+*/
 
-	// ID of the Sale/Refund/Capture/Authorization.
-	// Read Only.
-	Id string `json:"id,omitempty"`
+// TODO: Needs to validate some sub-properties that are valid only when
+// Payer.PaymentMethod is "paypal"
+func (self *Payment) validate() (err error) {
+	if len(self.private.Transactions) == 0 {
+		return fmt.Errorf("A Payment needs at least one Transaction")
+	}
+	for _, t := range self.private.Transactions {
+		if err = t.validate(); err != nil {
+			return err
+		}
+	}
 
-	// Time of sale as defined in RFC 3339 Section 5.6
-	// Read Only.
-	CreateTime dateTime `json:"create_time,omitempty"`
+	// TODO: More validation
 
-	// Time that the resource was last updated.
-	// Read Only.
-	UpdateTime dateTime `json:"update_time,omitempty"`
-
-	// State of the Sale/Refund/Capture/Auth
-	// Read Only.
-	State stateEnum `json:"state,omitempty"`
-
-	// ID of the payment resource on which this transaction is based.
-	// Read Only.
-	ParentPayment string `json:"parent_payment,omitempty"`
-
-	// HATEOAS links related to this call. Value generated by PayPal.
-	// Read Only.
-	Links links `json:"links,omitempty"`
-
-	*identity_error
+	return nil
 }
+
+func (self *Payment) calculateToAuthorize() {
+	for _, t := range self.private.Transactions {
+		t.calculateToAuthorize()
+	}
+}
+
+/*
+@struct Transaction
+	ItemList 				*itemList `json:"item_list,omitempty"` --read
+	Amount 					amount `json:"amount"` --read
+	RelatedResources relatedResources `json:"related_resources,omitempty"` --read
+	Description 		string `json:"description,omitempty"` --read --write
+	InvoiceNumber 	string `json:"invoice_number,omitempty"` --read --write
+	Custom 					string `json:"custom,omitempty"` --read --write
+	SoftDescriptor 	string `json:"soft_descriptor,omitempty"` --read --write
+	PaymentOptions  paymentOptions `json:"payment_options,omitempty"` --read --write
+*/
+
+func (self *Transaction) validate() error {
+	if err := self.private.ItemList.validate(); err != nil {
+		return err
+	}
+
+	checkStr("Transaction.Description", &self.Description, 127, false, false)
+	checkStr("Transaction.InvoiceNumber", &self.InvoiceNumber, 256, false, false)
+	checkStr("Transaction.Custom", &self.Custom, 256, false, false)
+	checkStr("Transaction.SoftDescriptor", &self.SoftDescriptor, 22, false, false)
+
+	// TODO: More validation... check docs
+
+	return nil
+}
+
+func (self *Transaction) calculateToAuthorize() {
+	// Calculate totals from itemList
+	for _, item := range self.private.ItemList.private.Items {
+		self.private.Amount.Details.Subtotal = roundTwoDecimalPlaces(
+			self.private.Amount.Details.Subtotal + (item.Price * float64(item.Quantity)))
+
+		self.private.Amount.Details.Tax = roundTwoDecimalPlaces(
+			self.private.Amount.Details.Tax + (item.Tax * float64(item.Quantity)))
+	}
+
+	// Set Total, which is sum of Details
+	self.private.Amount.private.Total = roundTwoDecimalPlaces(
+		self.private.Amount.Details.Subtotal +
+			self.private.Amount.Details.Tax +
+			self.private.Amount.Details.Shipping +
+			self.private.Amount.Details.Insurance -
+			self.private.Amount.Details.ShippingDiscount)
+}
+
+/*
+@struct itemList
+	Items           Items          	 `json:"items,omitempty"` --read
+	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"` --read
+*/
+
+func (self *itemList) validate() (err error) {
+	if self == nil {
+		return nil
+	}
+	if len(self.private.Items) == 0 {
+		return fmt.Errorf("Transaction item list must have at least one Item")
+	}
+	for _, item := range self.private.Items {
+		if err = item.validate(); err != nil {
+			return err
+		}
+	}
+	return self.private.ShippingAddress.validate()
+}
+
+/*
+@struct Item
+	Currency 		CurrencyTypeEnum 	`json:"currency"` --read
+	Quantity 		int64 			`json:"quantity,string"` --read --write
+	Name 				string 			`json:"name"` --read --write
+	Price 			float64 		`json:"price,string"` --read --write
+	Tax 				float64 		`json:"tax,omitempty"` --read --write
+	Sku 				string 			`json:"sku,omitempty"` --read --write
+	Description string 			`json:"description,omitempty"` --read --write
+*/
+
+func (self *Item) validate() (err error) {
+	if self.Tax < 0 { // TODO: No other validation here???
+		return fmt.Errorf("%q must not be a negative number", "Item.Tax")
+	}
+	if err = checkStr("Item.Name", &self.Name, 127, true, true); err != nil {
+		return err
+	}
+	if err = checkStr("Item.Sku", &self.Sku, 50, false, true); err != nil {
+		return err
+	}
+	_ = checkStr("Item.Description", &self.Description, 127, false, false)
+
+	if err = checkFloat7_10("Item.Price", &self.Price); err != nil {
+		return err
+	}
+	return checkInt10("Item.Quantity", self.Quantity)
+}
+
+/*
+@struct _shared --drop_ctor
+	*connection
+	Id 						string `json:"id,omitempty"` 						--read
+	CreateTime 		dateTime `json:"create_time,omitempty"` --read
+	UpdateTime 		dateTime `json:"update_time,omitempty"` --read
+	State 				stateEnum `json:"state,omitempty"` 			--read
+	ParentPayment string `json:"parent_payment,omitempty"` --read
+	Links 				links `json:"links,omitempty"`
+	*identity_error
+*/
 
 func (self *_shared) FetchParentPayment() (*Payment, error) {
-	return self.FetchPayment(self.ParentPayment)
+	return self.FetchPayment(self.private.ParentPayment)
 }
+
+// State items are: pending, authorized, captured, partially_captured, expired,
+// 									voided
+/*
+@struct Authorization --drop_ctor
+	_shared
+	Amount 						amount `json:"amount"` --read
+	BillingAgreementId string `json:"billing_agreement_id"` --read
+	PaymentMode 			paymentModeEnum `json:"payment_mode"` --read
+	ReasonCode 				reasonCodeEnum `json:"reason_code"` --read
+	ValidUntil 				dateTime `json:"valid_until"` --read
+	ClearingTime 			string `json:"clearing_time"` --read
+	ProtectionElig 		protectionEligEnum `json:"protection_eligibility"` --read
+	ProtectionEligType protectionEligTypeEnum `json:"protection_eligibility_type"` --read
+	FmfDetails 				fmfDetails `json:"fmf_details"` --read
+*/
+
+// State values are: pending, completed, refunded, partially_refunded
+/*
+@struct Capture
+	_shared
+	Amount 				 amount `json:"amount"` --read
+	TransactionFee currency `json:"transaction_fee"` --read --write
+	IsFinalCapture bool `json:"is_final_capture,omitempty"` --read --write
+*/
+
+// State values are: pending; completed; refunded; partially_refunded
+// TODO: PendingReason appears in the old docs under the general Sale object description
+// but not under the lower "sale object" definition. The new docs have it
+// marked as [DEPRECATED] in one area, but not another.
+/*
+@struct Sale
+	_shared
+	Amount 										amount `json:"amount"` --read
+	Description 							string `json:"description,omitempty"` --read --write
+	TransactionFee 						currency `json:"transaction_fee"` --read --write
+	ReceivableAmount 					currency `json:"receivable_amount"` --read --write
+	PendingReason 						pendingReasonEnum `json:"pending_reason"` --read
+	PaymentMode 							paymentModeEnum `json:"payment_mode"` --read
+	ExchangeRate 							string `json:"exchange_rate"` --read
+	FmfDetails 								fmfDetails `json:"fmf_details"` --read
+	ReceiptId 								string `json:"receipt_id"` --read
+	ReasonCode 								reasonCodeEnum `json:"reason_code"` --read
+	ProtectionEligibility 		protectionEligEnum `json:"protection_eligibility"` --read
+	ProtectionEligibilityType protectionEligTypeEnum `json:"protection_eligibility_type"` --read
+	ClearingTime 							string `json:"clearing_time"` --read
+	BillingAgreementId 				string `json:"billing_agreement_id"` --read
+*/
+
+// State items are: pending; completed; failed
+/*
+@struct Refund
+	_shared
+	Amount 			amount `json:"amount"` --read
+	Description string `json:"description,omitempty"` --read --write
+	Reason 			string `json:"reason,omitempty"` --read --write
+	SaleId 			string `json:"sale_id,omitempty"` --read
+	CaptureId 	string `json:"capture_id,omitempty"` --read
+*/
 
 // Amount Object
 //  A`Transaction` object also may have an `ItemList`, which has dollar amounts.
@@ -282,107 +312,66 @@ func (self *_shared) FetchParentPayment() (*Payment, error) {
 //
 //	All other uses of `Amount` do have `shipping`, `shipping_discount` and
 // `subtotal` to calculate the `Total`.
-type amount struct {
-	// 3 letter currency code. PayPal does not support all currencies. REQUIRED.
-	Currency CurrencyTypeEnum `json:"currency"`
+/*
+@struct amount
+	Currency CurrencyTypeEnum `json:"currency"` --read
+	Total 	 float64 					`json:"total"` --read
+	Details *details 					`json:"details,omitempty"` --read --write
+*/
 
-	// Total amount charged from the payer to the payee. In case of a refund, this
-	// is the refunded amount to the original payer from the payee. 10 characters
-	// max with support for 2 decimal places. REQUIRED.
-	Total string `json:"total"`
-
-	Details *details `json:"details,omitempty"`
-}
-
-func (self *amount) setTotal(amt float64) error {
-	if s, err := make10CharAmount(amt); err != nil {
+func (self amount) validate() (err error) {
+	if self.private.Currency.Value() == 0 {
+		return fmt.Errorf(`"Amount.Currency" is required.`)
+	}
+	if err = checkFloat7_10("Amount.Total", &self.private.Total); err != nil {
 		return err
-	} else {
-		self.Total = s
 	}
 	return nil
-}
-
-func (self amount) getCurrencyType() CurrencyTypeEnum {
-	return self.Currency
-}
-
-func (self amount) totalAsFloat() float64 {
-	f, err := strconv.ParseFloat(self.Total, 64)
-	if err != nil {
-		log.Printf("Invalid Amount.Total: %s\n", self.Total)
-		return 0.0
-	}
-	return f
 }
 
 type links []link
 
 func (l links) get(r relTypeEnum) (string, string) {
 	for i, _ := range l {
-		if l[i].Rel == r {
-			return l[i].Href, l[i].Method
+		if l[i].private.Rel == r {
+			return l[i].private.Href, l[i].private.Method
 		}
 	}
 	return "", ""
 }
 
-type link struct {
-	// URL of the related HATEOAS link you can use for subsequent calls
-	Href string `json:"href,omitempty"`
-
-	// Link relation that describes how this link relates to the previous call.
-	// Examples include `self` (get details of the current call), `parent_payment`
-	// (get details of the parent payment), or a related call such as `execute` or
-	// `refund`
-	Rel relTypeEnum `json:"rel,omitempty"`
-
-	// The HTTP method required for the related call
+/*
+@struct link
+	Href 	 string `json:"href,omitempty"`
+	Rel 	 relTypeEnum `json:"rel,omitempty"`
 	Method string `json:"method,omitempty"`
-}
+*/
 
 // Base object for all financial value related fields (balance, payment due, etc.)
-type currency struct {
-	// 3 letter currency code as defined by ISO 4217. Required.
-	Currency string `json:"currency"`
-
-	// amount up to N digit after the decimals separator as defined in ISO 4217
-	// for the appropriate currency code. Required.
-	Value string `json:"value"`
-}
+/*
+@struct currency
+	Currency string `json:"currency"` --read --write
+	Value 	 string `json:"value"` --read --write
+*/
 
 // This object represents Fraud Management Filter (FMF) details for a payment.
-type fmfDetails struct {
-	// Type of filter
-	FilterType fmfFilterEnum `json:"filter_type"`
-
-	// Name of the fraud management filter. For more information about filters,
-	// see Fraud Management Filters Summary.
-	FilterID filterIdEnum `json:"filter_id"`
-
-	// Name of the filter. This property is reserved for future use.
-	Name string `json:"name"`
-
-	// Description of the filter. This property is reserved for future use.
-	Description string `json:"description"`
-}
+/*
+@struct fmfDetails
+	FilterType 	fmfFilterEnum `json:"filter_type"` --read
+	FilterID 		filterIdEnum `json:"filter_id"` --read
+	Name 				string `json:"name"` --read
+	Description string `json:"description"` --read
+*/
 
 // Source of the funds for this payment represented by a PayPal account or a
 // credit card.
-type payer struct {
-	// Payment method used. Must be either credit_card or paypal. Required.
-	PaymentMethod PaymentMethodEnum `json:"payment_method,omitempty"`
-
-	// A list of funding instruments for the current payment
-	FundingInstruments []*fundingInstrument `json:"funding_instruments,omitempty"`
-
-	// Information related to the payer.
-	PayerInfo *payerInfo `json:"payer_info,omitempty"`
-
-	// Status of the payer’s PayPal account. Only supported when the
-	// payment_method is set to paypal. Allowed values: VERIFIED or UNVERIFIED.
-	Status payerStatusEnum `json:"status,omitempty"`
-}
+/*
+@struct payer
+	PaymentMethod      PaymentMethodEnum `json:"payment_method,omitempty"` --read --write
+	FundingInstruments fundingInstruments `json:"funding_instruments,omitempty"` --read --write
+	PayerInfo          *payerInfo `json:"payer_info,omitempty"` --read --write
+	Status 						 payerStatusEnum `json:"status,omitempty"` --read --write
+*/
 
 // This object is pre-filled by PayPal when the payment_method is paypal.
 type payerInfo struct {
@@ -458,6 +447,34 @@ type Address struct {
 	Status addressStatusEnum `json:"status,omitempty"`
 }
 
+func (self *Address) validate() (err error) {
+	if err = checkStr("Address.Line1", &self.Line1, 100, true, true); err != nil {
+		return err
+	}
+	if err = checkStr("Address.Line2", &self.Line2, 100, false, true); err != nil {
+		return err
+	}
+	if err = checkStr("Address.City", &self.City, 50, true, true); err != nil {
+		return err
+	}
+	if err = self.CountryCode.validate(); err != nil {
+		return err
+	}
+	// TODO: If the country is the united states, should verify that a State was given
+	if err = checkStr("Address.State", &self.State, 100, false, true); err != nil {
+		return err
+	}
+	if err = checkStr("Address.Phone", &self.Phone, 50, false, true); err != nil {
+		return err
+	}
+	// PostalCode "0" is used for countries that do not have postal codes.
+	// TODO: Provide an marshaler/unmarshaler that handles "0"
+	return checkStr("Address.PostalCode", &self.PostalCode, 20, true, true)
+
+	// TODO: Anything should be done with NormalizationStatus?
+	// TODO: Anything should be done with AddressStatus?
+}
+
 type ShippingAddress struct {
 	Address
 
@@ -467,6 +484,18 @@ type ShippingAddress struct {
 	// Address type. Must be one of the following: `residential`, `business`, or
 	// `mailbox`.
 	Type AddressTypeEnum `json:"type,omitempty"`
+}
+
+func (self *ShippingAddress) validate() (err error) {
+	err = checkStr(
+		"ShippingAddress.RecipientName", &self.RecipientName, 50, true, true)
+	if err != nil {
+		return err
+	}
+	if err = self.Type.validate(); err != nil {
+		return err
+	}
+	return self.Address.validate()
 }
 
 type identityAddress struct {

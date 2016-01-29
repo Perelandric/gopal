@@ -18,17 +18,13 @@ import "path"
 // Implement the resource interface
 
 func (self *Sale) getPath() string {
-	return path.Join(_salePath, self.Id)
-}
-
-func (self *Sale) getAmount() amount {
-	return self.Amount
+	return path.Join(_salePath, self._shared.private.Id)
 }
 
 // Implement `refundable` interface
 
 func (self *Sale) getRefundPath() string {
-	return path.Join(_salePath, self.Id, _refund)
+	return path.Join(_salePath, self._shared.private.Id, _refund)
 }
 
 /*************************************************************
@@ -72,5 +68,5 @@ func (self *Sale) Refund(amt float64) (*Refund, error) {
 }
 
 func (self *Sale) FullRefund() (*Refund, error) {
-	return self.doRefund(self, self.Amount.totalAsFloat())
+	return self.doRefund(self, self.private.Amount.private.Total)
 }

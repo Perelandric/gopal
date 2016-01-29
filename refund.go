@@ -23,11 +23,7 @@ import (
 // Implement the resource interface
 
 func (self *Refund) getPath() string {
-	return path.Join(_refundPath, self.Id)
-}
-
-func (self *Refund) getAmount() amount {
-	return self.Amount
+	return path.Join(_refundPath, self._shared.private.Id)
 }
 
 // General purpose function for performing a refund.
@@ -39,8 +35,10 @@ func (self *connection) doRefund(obj refundable, amt float64) (*Refund, error) {
 
 	ref := &Refund{}
 
-	ref.Amount.Currency = obj.getAmount().Currency
-	if err := ref.Amount.setTotal(amt); err != nil {
+	ref.private.Amount.private.Currency = obj.Amount().private.Currency
+	ref.private.Amount.private.Total = amt
+
+	if err := ref.private.Amount.validate(); err != nil {
 		return nil, err
 	}
 

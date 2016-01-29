@@ -4,35 +4,31 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
+	"net/url"
 	"path"
 	"time"
 )
 
-func (self *connection) CreatePayment(
-	method PaymentMethodEnum,
-	urls Redirects) (*payment_request, error) {
+func (self *connection) NewPaypalPayment(
+	payer payer, urls Redirects) (*Payment, error) {
 
-	if method == PaymentMethod.PayPal {
-		// Make sure we're still authenticated. Will refresh if not.
+	// Make sure we're still authenticated. Will refresh if not.
 
-		// TODO: Should I really authenticate here? Seems like I should wait for the
-		// actual request to be made.
-		if err := self.authenticate(); err != nil {
-			return nil, err
-		}
-
-		return &payment_request{
-			connection: self,
-			Intent:     intent.sale,
-			Payer: payer{
-				PaymentMethod: method,
-			},
-			Transactions: make([]*transaction, 0),
-			RedirectUrls: urls,
-		}, nil
+	// TODO: Should I really authenticate here? Seems like I should wait for the
+	// actual request to be made.
+	if err := self.authenticate(); err != nil {
+		return nil, err
 	}
-	return nil, nil
+
+	var pymt = Payment{
+		connection: self,
+	}
+	pymt.private.Payer = payer
+	pymt.private.Intent = intent.sale
+	pymt.private.Transactions = make([]*Transaction, 0)
+	pymt.private.RedirectUrls = urls
+
+	return &pymt, nil
 }
 
 /***************************
@@ -42,45 +38,67 @@ func (self *connection) CreatePayment(
 ***************************/
 
 func (self *Payment) AddTransaction(
-	c CurrencyTypeEnum, desc string, shp *ShippingAddress, itms ...item) {
+	c CurrencyTypeEnum, shp *ShippingAddress) *Transaction {
 
-	if len(desc) > descMax { // Log and truncate if description is too long
-		log.Printf("Description exceeds %d characters: %q\n", descMax, desc)
-		desc = desc[0:descMax]
-	}
+	var t Transaction
+	t.private.Amount = amount{}
+	t.private.ItemList = &itemList{}
 
-	var t = transaction{
-		update_transaction: update_transaction{
-			Amount: amount{
-				Currency: c,
-				Total:    "0",
-			},
-		},
-		Description: desc,
-	}
+	t.private.Amount.private.Currency = c
+	t.private.Amount.private.Total = 0
 
-	if shp != nil {
-		t.ItemList = &itemList{
-			ShippingAddress: shp,
-		}
-	}
-	self.Transactions = append(self.Transactions, &t)
+	t.private.ItemList.private.Items = make([]*Item, 0, 1)
+	t.private.ItemList.private.ShippingAddress = shp
+
+	self.private.Transactions = append(self.private.Transactions, &t)
+
+	return &t
 }
 
-// TODO: The tkn parameter is ignored, but should send a query string parameter `token=tkn`
-func (self *Payment) Authorize(tkn string) (to string, code int, err error) {
+// Prices are assumed to use the CurrencyType passed to NewTransaction.
+func (t *Transaction) AddItem(item *Item) (err error) {
+	if item == nil {
+		log.Println("Transaction received unexpected nil Item")
+		return nil
+	}
+	if err = item.validate(); err != nil {
+		return err
+	}
+
+	if item.Price == 0 {
+		// TODO: should have some sort of non-zero flag to denote a zero amount
+	}
+
+	item.private.Currency = t.private.Amount.private.Currency
+
+	t.private.ItemList.private.Items =
+		append(t.private.ItemList.private.Items, item)
+	return nil
+}
+
+// TODO: Should send a query string parameter `token=[some token]`
+func (self *Payment) Authorize() (to string, code int, err error) {
+	if err = self.validate(); err != nil {
+		return "", 0, err
+	}
+
+	self.calculateToAuthorize()
+
+	// Create Totals
+	var pymt Payment
+
 	err = self.send(&request{
 		method:   method.post,
 		path:     _paymentsPath,
 		body:     self,
-		response: self,
+		response: &pymt,
 	})
 
 	if err == nil {
-		switch self.State {
+		switch pymt.private.State {
 		case state.Created:
 			// Set url to redirect to PayPal site to begin approval process
-			to, _ = self.Links.get(relType.approvalUrl)
+			to, _ = pymt.private.Links.get(relType.approvalUrl)
 			code = 303
 		default:
 			// otherwise cancel the payment and return an error
@@ -91,13 +109,8 @@ func (self *Payment) Authorize(tkn string) (to string, code int, err error) {
 	return to, code, err
 }
 
-func (self *Payment) Execute(req *http.Request) error {
-	var query = req.URL.Query()
-
-	// TODO: Is this right? Does URL.Query() ever return nil?
-	if query == nil {
-		return fmt.Errorf("Attempt to execute a payment that has not been approved")
-	}
+func (self *connection) Execute(u url.URL) error {
+	var query = u.Query()
 
 	var payerid = query.Get("PayerID")
 	if payerid == "" {
@@ -120,7 +133,7 @@ func (self *Payment) Execute(req *http.Request) error {
 		return err
 	}
 
-	if pymt.State != state.Approved {
+	if pymt.private.State != state.Approved {
 		return fmt.Errorf(
 			"Payment with ID %q for payer %q was not approved\n", pymtid, payerid)
 	}
@@ -130,11 +143,10 @@ func (self *Payment) Execute(req *http.Request) error {
 
 // TODO: I'm returning a list of Sale objects because every payment can have multiple transactions.
 //		I need to find out why a payment can have multiple transactions, and see if I should eliminate that in the API
-//		Also, I need to find out why `related_resources` is an array. Can there be more than one per type?
-func (self *Payment) GetSale() []*Sale {
+func (self *Payment) FetchSale() []*Sale {
 	var sales = []*Sale{}
-	for _, transaction := range self.Transactions {
-		for _, related_resource := range transaction.RelatedResources {
+	for _, trans := range self.private.Transactions {
+		for _, related_resource := range trans.private.RelatedResources {
 			if s, ok := related_resource.(*Sale); ok {
 				sales = append(sales, s)
 			}
@@ -145,9 +157,7 @@ func (self *Payment) GetSale() []*Sale {
 
 func (self *connection) FetchPayment(payment_id string) (*Payment, error) {
 	var pymt = &Payment{
-		payment_request: payment_request{
-			connection: self,
-		},
+		connection: self,
 	}
 
 	if err := self.send(&request{
@@ -161,124 +171,14 @@ func (self *connection) FetchPayment(payment_id string) (*Payment, error) {
 	return pymt, nil
 }
 
-// Pagination
-//	Assuming `start_time`, `start_index` and `start_id` are mutually exclusive
-//	...going to treat them that way anyhow until I understand better.
-
-// I'm going to ignore `start_index` for now since I don't see its usefulness
-
-func (self *connection) GetAllPayments(
-	size int,
-	sort_by sortByEnum, sort_order sortOrderEnum, time_range ...time.Time,
-) *PaymentBatcher {
-
-	if size < 0 {
-		size = 0
-	} else if size > 20 {
-		size = 20
-	}
-
-	var qry = fmt.Sprintf("?sort_order=%s&sort_by=%s&count=%d", sort_by, sort_order, size)
-
-	if len(time_range) > 0 {
-		if time_range[0].IsZero() == false {
-			qry = fmt.Sprintf("%s&start_time=%s", qry, time_range[0].Format(time.RFC3339))
-		}
-		if len(time_range) > 1 && time_range[1].After(time_range[0]) {
-			qry = fmt.Sprintf("%s&end_time=%s", qry, time_range[1].Format(time.RFC3339))
-		}
-	}
-
-	return &PaymentBatcher{
-		connection: self,
-		base_query: qry,
-		next_id:    "",
-		done:       false,
-	}
-}
-
-// These provide a way to both get and set the `next_id`.
-// This gives the ability to cache the ID, and then set it in a new Batcher.
-// Useful if a session is not desired or practical
-
-func (self *PaymentBatcher) GetNextId() string {
-	return self.next_id
-}
-func (self *PaymentBatcher) SetNextId(id string) {
-	self.next_id = id
-}
-
-type payment_list struct {
-	Payments []*Payment `json:"payments"`
-	Count    int        `json:"count"`
-	Next_id  string     `json:"next_id"`
-	*identity_error
-}
-
-/**********************
-
-Payment Object
-
-**********************/
-
-type Redirects struct {
-	Return string `json:"return_url,omitempty"`
-	Cancel string `json:"cancel_url,omitempty"`
-}
-
-type payment_request struct {
-	*connection
-
-	// Payment intent. Must be set to sale for immediate payment, authorize to
-	// authorize a payment for capture later, or order to create an order.
-	// Allowed values: sale, authorize, order.
-	Intent intentEnum `json:"intent,omitempty"`
-
-	Payer payer `json:"payer,omitempty"`
-
-	// Transactional details including the amount and item details. REQUIRED.
-	Transactions []*transaction `json:"transactions,omitempty"`
-
-	// Set of redirect URLs you provide only for PayPal-based payments. Returned
-	// only when the payment is in created state. REQUIRED for PayPal payments.
-	RedirectUrls Redirects `json:"redirect_urls,omitempty"`
-}
-
-type Payment struct {
-	payment_request
-
-	// Payment creation time as defined in RFC 3339 Section 5.6
-	// Value assigned by PayPal.
-	CreateTime dateTime `json:"create_time,omitempty"`
-
-	// The time that the resource was last updated.
-	// Value assigned by Payal.
-	UpdateTime dateTime `json:"update_time,omitempty"`
-
-	// ID of the created payment. Value assigned by PayPal.
-	Id string `json:"id,omitempty"`
-
-	// Payment state. Must be one of the following: created; approved; failed;
-	// pending; canceled; expired, or in_progress. Value assigned by PayPal.
-	State stateEnum `json:"state,omitempty"`
-
-	// Identifier for the payment experience.
-	ExperienceProfileId string `json:"experience_profile_id"`
-
-	// HATEOAS links related to this call.
-	Links links `json:"links,omitempty"`
-
-	*payment_error
-}
-
 // Used to execute the approved payment.
 type paymentExecution struct {
 	// The ID of the Payer, passed in the return_url by PayPal.
 	PayerID string `json:"payer_id,omitempty"`
 
 	// Transactional details if updating a payment. Note that this instance of
-	// the transactions object accepts only the amount object.
-	Transactions []*update_transaction `json:"transactions,omitempty"`
+	// the transactions object accepts only the Amount object.
+	Transactions []*Transaction `json:"transactions,omitempty"`
 }
 
 /**********************
@@ -286,24 +186,6 @@ type paymentExecution struct {
 	Transaction objects
 
 **********************/
-
-// Prices are assumed to use the CurrencyType passed to NewTransaction.
-func (t *transaction) AddItem(qty int, price float64, name, sku string) {
-	if qty < 1 {
-		return
-	}
-
-	if t.ItemList == nil {
-		t.ItemList = new(itemList)
-	}
-	t.ItemList.Items = append(t.ItemList.Items, &item{
-		Quantity: qty,
-		Name:     name,
-		Price:    price,
-		Currency: t.update_transaction.Amount.Currency,
-		Sku:      sku,
-	})
-}
 
 type details struct {
 	// Amount charged for shipping. 10 chars max, with support for 2 decimal places
@@ -324,72 +206,6 @@ type details struct {
 
 	// Amount being discounted for shipping fee. When `payment_method` is `paypal`
 	ShippingDiscount float64 `json:"shipping_discount,omitempty"`
-}
-
-type itemList struct {
-	Items           []*item          `json:"items,omitempty"`
-	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
-}
-
-type item struct {
-	// REQUIRED. Number of a particular item. 10 chars max.
-	Quantity int `json:"quantity,string"`
-
-	// REQUIRED. Item name. 127 chars max.
-	Name string `json:"name"`
-
-	// REQUIRED. Item cost. 10 chars max.
-	Price float64 `json:"price,string"`
-
-	// REQUIRED. 3-letter currency code.
-	Currency CurrencyTypeEnum `json:"currency"`
-
-	// Stock keeping unit corresponding (SKU) to item. 50 chars max.
-	Sku string `json:"sku,omitempty"`
-
-	// Description of the item. Only supported when the `payment_method` is `paypal`
-	// 127 characters max.
-	Description string `json:"description,omitempty"`
-
-	// Tax of the item. Only supported when `payment_method` is `paypal`.
-	Tax float64 `json:"tax,omitempty"`
-}
-
-// This is just used for the payment_execution, since it only needs an amount.
-type update_transaction struct {
-	// Amount being collected. REQUIRED.
-	Amount amount `json:"amount"`
-}
-
-const descMax = 127
-
-type transaction struct {
-	update_transaction
-
-	// Description of transaction. 127 characters max.
-	Description string `json:"description,omitempty"`
-
-	// Items and related shipping address within a transaction.
-	ItemList *itemList `json:"item_list,omitempty"`
-
-	// Financial transactions related to a payment. (Only in PayPal responses?)
-	// Sale, Authorization, Capture, or Refund objects
-	RelatedResources relatedResources `json:"related_resources,omitempty"`
-
-	// Invoice number used to track the payment. Only supported when the
-	// `payment_method` is set to `paypal`. 256 characters max.
-	InvoiceNumber string `json:"invoice_number,omitempty"`
-
-	// Free-form field for the use of clients. Only supported when the
-	// `payment_method` is set to `paypal`. 256 characters max.
-	Custom string `json:"custom,omitempty"`
-
-	// Soft descriptor used when charging this funding source. Only supported when
-	// the `payment_method` is set to `paypal`. 22 characters max.
-	SoftDescriptor string `json:"soft_descriptor,omitempty"`
-
-	// Payment options requested for this purchase unit.
-	PaymentOptions paymentOptions `json:"payment_options,omitempty"`
 }
 
 //func (self *relatedResources) MarshalJSON() ([]byte, error) {
@@ -453,9 +269,9 @@ Manages paginated requests for Payments
 
 type PaymentBatcher struct {
 	*connection
-	base_query string
-	next_id    string
-	done       bool
+	baseQuery string
+	nextId    string
+	done      bool
 }
 
 func (self *PaymentBatcher) IsDone() bool {
@@ -468,10 +284,10 @@ func (self *PaymentBatcher) Next() ([]*Payment, error) {
 		return nil, ErrNoResults
 	}
 	var pymt_list = new(payment_list)
-	var qry = self.base_query
+	var qry = self.baseQuery
 
-	if self.next_id != "" {
-		qry = fmt.Sprintf("%s&start_id=%s", qry, self.next_id)
+	if self.nextId != "" {
+		qry = fmt.Sprintf("%s&start_id=%s", qry, self.nextId)
 	}
 
 	if err := self.send(&request{
@@ -485,15 +301,69 @@ func (self *PaymentBatcher) Next() ([]*Payment, error) {
 
 	if pymt_list.Count == 0 {
 		self.done = true
-		self.next_id = ""
+		self.nextId = ""
 		return nil, ErrNoResults
 	}
 
-	self.next_id = pymt_list.Next_id
+	self.nextId = pymt_list.NextId
 
-	if self.next_id == "" {
+	if self.nextId == "" {
 		self.done = true
 	}
 
 	return pymt_list.Payments, nil
+}
+
+// Pagination
+//	Assuming `start_time`, `start_index` and `start_id` are mutually exclusive
+//	...going to treat them that way anyhow until I understand better.
+
+// I'm going to ignore `start_index` for now since I don't see its usefulness
+
+func (self *connection) GetAllPayments(
+	size int,
+	sort_by sortByEnum, sort_order sortOrderEnum, time_range ...time.Time,
+) *PaymentBatcher {
+
+	if size < 0 {
+		size = 0
+	} else if size > 20 {
+		size = 20
+	}
+
+	var qry = fmt.Sprintf("?sort_order=%s&sort_by=%s&count=%d", sort_by, sort_order, size)
+
+	if len(time_range) > 0 {
+		if time_range[0].IsZero() == false {
+			qry = fmt.Sprintf("%s&start_time=%s", qry, time_range[0].Format(time.RFC3339))
+		}
+		if len(time_range) > 1 && time_range[1].After(time_range[0]) {
+			qry = fmt.Sprintf("%s&end_time=%s", qry, time_range[1].Format(time.RFC3339))
+		}
+	}
+
+	return &PaymentBatcher{
+		connection: self,
+		baseQuery:  qry,
+		nextId:     "",
+		done:       false,
+	}
+}
+
+// These provide a way to both get and set the `next_id`.
+// This gives the ability to cache the ID, and then set it in a new Batcher.
+// Useful if a session is not desired or practical
+
+func (self *PaymentBatcher) GetNextId() string {
+	return self.nextId
+}
+func (self *PaymentBatcher) SetNextId(id string) {
+	self.nextId = id
+}
+
+type payment_list struct {
+	Payments []*Payment `json:"payments"`
+	Count    int        `json:"count"`
+	NextId   string     `json:"next_id"`
+	*identity_error
 }

@@ -15,11 +15,7 @@ import "path"
 // Implement the resource interface
 
 func (self *Authorization) getPath() string {
-	return path.Join(_authorizationPath, self.Id)
-}
-
-func (self *Authorization) getAmount() amount {
-	return self.Amount
+	return path.Join(_authorizationPath, self._shared.private.Id)
 }
 
 /*************************************************************
@@ -61,15 +57,16 @@ To use this resource, the original payment call must have the intent set to auth
 
 func (self *Authorization) Capture(amt *amount, is_final bool) (*Capture, error) {
 	var capt_req = &Capture{
-		Amount:         *amt,
 		_shared:        _shared{},
 		IsFinalCapture: is_final,
 	}
+	capt_req.private.Amount = *amt
+
 	var capt_resp = new(Capture)
 
 	if err := self.send(&request{
 		method:   method.post,
-		path:     path.Join(_authorizationPath, self.Id, _capture),
+		path:     path.Join(_authorizationPath, self._shared.private.Id, _capture),
 		body:     capt_req,
 		response: capt_resp,
 	}); err != nil {
@@ -93,7 +90,7 @@ func (self *Authorization) Void() (*Authorization, error) {
 
 	if err := self.send(&request{
 		method:   method.post,
-		path:     path.Join(_authorizationPath, self.Id, _void),
+		path:     path.Join(_authorizationPath, self._shared.private.Id, _void),
 		body:     nil,
 		response: void_resp,
 	}); err != nil {
@@ -125,15 +122,15 @@ authorized amount, not to exceed an increase of $75 USD.
 func (self *Authorization) ReauthorizeAmount(amt *amount) (*Authorization, error) {
 	var auth_req = new(Authorization)
 	if amt == nil {
-		auth_req.Amount = self.Amount
+		auth_req.private.Amount = self.private.Amount
 	} else {
-		auth_req.Amount = *amt
+		auth_req.private.Amount = *amt
 	}
 	var auth_resp = new(Authorization)
 
 	if err := self.send(&request{
 		method:   method.post,
-		path:     path.Join(_authorizationPath, self.Id, _reauthorize),
+		path:     path.Join(_authorizationPath, self._shared.private.Id, _reauthorize),
 		body:     auth_req,
 		response: auth_resp,
 	}); err != nil {
