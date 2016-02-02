@@ -33,11 +33,16 @@ func roundTwoDecimalPlaces(nn float64) float64 {
 	return nn
 }
 
+const zeroWarning = "WARNING: %q was given a 0 (zero) quantity\n"
+
 // Validate positive float, no more than 7 digits to the left of the decimal
-func checkFloat7_10(name string, n *float64) error {
+func checkFloat7_10(name string, n *float64, warnZero bool) error {
 	var nn = *n
 	if nn < 0 {
 		return fmt.Errorf("%q must not be negative number", name)
+	}
+	if nn == 0 && warnZero {
+		log.Printf(zeroWarning, name)
 	}
 	if nn > 9999999.99 {
 		return fmt.Errorf(
@@ -49,9 +54,12 @@ func checkFloat7_10(name string, n *float64) error {
 }
 
 // Validate positive int, no more than 10 digits
-func checkInt10(name string, n int64) error {
+func checkInt10(name string, n int64, warnZero bool) error {
 	if n < 0 {
 		return fmt.Errorf("%q must not be negative number", name)
+	}
+	if n == 0 && warnZero {
+		log.Printf(zeroWarning, name)
 	}
 	if n > 9999999999 {
 		return fmt.Errorf("%q permits no more than 10 digits", name)

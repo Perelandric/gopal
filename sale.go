@@ -41,7 +41,7 @@ func (self *connection) FetchSale(sale_id string) (*Sale, error) {
 	sale.connection = self
 
 	if err := self.send(&request{
-		method:   method.get,
+		method:   method.Get,
 		path:     path.Join(_salePath, sale_id),
 		body:     nil,
 		response: sale,

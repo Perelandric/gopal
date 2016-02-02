@@ -34,7 +34,7 @@ func (self *connection) FetchAuthorization(
 	auth.connection = self
 
 	if err := self.send(&request{
-		method:   method.get,
+		method:   method.Get,
 		path:     path.Join(_authorizationPath, auth_id),
 		body:     nil,
 		response: auth,
@@ -65,7 +65,7 @@ func (self *Authorization) Capture(amt *amount, is_final bool) (*Capture, error)
 	var capt_resp = new(Capture)
 
 	if err := self.send(&request{
-		method:   method.post,
+		method:   method.Post,
 		path:     path.Join(_authorizationPath, self._shared.private.Id, _capture),
 		body:     capt_req,
 		response: capt_resp,
@@ -89,7 +89,7 @@ func (self *Authorization) Void() (*Authorization, error) {
 	var void_resp = new(Authorization)
 
 	if err := self.send(&request{
-		method:   method.post,
+		method:   method.Post,
 		path:     path.Join(_authorizationPath, self._shared.private.Id, _void),
 		body:     nil,
 		response: void_resp,
@@ -129,7 +129,7 @@ func (self *Authorization) ReauthorizeAmount(amt *amount) (*Authorization, error
 	var auth_resp = new(Authorization)
 
 	if err := self.send(&request{
-		method:   method.post,
+		method:   method.Post,
 		path:     path.Join(_authorizationPath, self._shared.private.Id, _reauthorize),
 		body:     auth_req,
 		response: auth_resp,

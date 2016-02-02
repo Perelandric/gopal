@@ -45,7 +45,7 @@ func (self *connection) authenticate() error {
 
 	// (re)authenticate
 	if err = self.send(&request{
-		method:    method.post,
+		method:    method.Post,
 		path:      "/oauth2/token",
 		body:      "grant_type=client_credentials",
 		response:  &self.tokeninfo,
@@ -61,11 +61,11 @@ func (self *connection) authenticate() error {
 	return nil
 }
 
-func (ti *tokeninfo) auth_token() string {
-	return ti.TokenType + " " + ti.AccessToken
+func (self *tokeninfo) auth_token() string {
+	return self.TokenType + " " + self.AccessToken
 }
 
-func (pp *connection) send(reqData *request) error {
+func (self *connection) send(reqData *request) error {
 	var err error
 	var result []byte
 	var req *http.Request
@@ -73,8 +73,13 @@ func (pp *connection) send(reqData *request) error {
 	var body_reader io.Reader
 	var url string
 
+	// Make sure we're still authenticated. Will refresh if not.
+	if err := self.authenticate(); err != nil {
+		return err
+	}
+
 	// use sandbox url if requested
-	if pp.server == Server.Sandbox {
+	if self.server == Server.Sandbox {
 		url = path.Join("https://api.sandbox.paypal.com/v1", reqData.path)
 	} else {
 		url = path.Join("https://api.paypal.com/v1", reqData.path)
@@ -104,10 +109,10 @@ func (pp *connection) send(reqData *request) error {
 
 	if reqData.isAuthReq {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-		req.SetBasicAuth(pp.id, pp.secret)
+		req.SetBasicAuth(self.id, self.secret)
 	} else {
 		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", pp.tokeninfo.auth_token())
+		req.Header.Set("Authorization", self.tokeninfo.auth_token())
 
 		// TODO: How to include idempotent id
 		// TODO: The UUID generation needs to be improved------v
@@ -117,7 +122,7 @@ func (pp *connection) send(reqData *request) error {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Accept-Language", "en_US")
 
-	resp, err = pp.client.Do(req)
+	resp, err = self.client.Do(req)
 	if err != nil {
 		return err
 	}

@@ -37,7 +37,7 @@ func (self *connection) FetchCapture(capt_id string) (*Capture, error) {
 	capt.connection = self
 
 	if err := self.send(&request{
-		method:   method.get,
+		method:   method.Get,
 		path:     path.Join(_capturePath, capt_id),
 		body:     nil,
 		response: capt,

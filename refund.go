@@ -43,7 +43,7 @@ func (self *connection) doRefund(obj refundable, amt float64) (*Refund, error) {
 	}
 
 	if err := self.send(&request{
-		method:   method.post,
+		method:   method.Post,
 		path:     obj.getRefundPath(),
 		body:     ref,
 		response: ref,
@@ -73,7 +73,7 @@ func (self *connection) FetchRefund(refund_id string) (*Refund, error) {
 	refund.connection = self
 
 	if err := self.send(&request{
-		method:   method.get,
+		method:   method.Get,
 		path:     path.Join(_refundPath, refund_id),
 		body:     nil,
 		response: refund,

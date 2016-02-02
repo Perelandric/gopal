@@ -37,10 +37,11 @@ type enumValidator interface {
 	validate() error
 	IntValue() int
 	Namespace() string
+	IsDefault() bool
 }
 
 func validateEnum(enum enumValidator) error {
-	if enum.IntValue() == 0 {
+	if enum.IntValue() == 0 && enum.IsDefault() == false {
 		return fmt.Errorf("%q is required", enum.Namespace())
 	}
 	return nil
@@ -60,48 +61,48 @@ func validateEnum(enum enumValidator) error {
 	ASC
 
 @enum relType --json=string
-	self
-	parentPayment --string=parent_payment
-	execute
-	refund
-	approvalUrl --string=approval_url
-	suspend
-	reActivate --string=re_activate
-	cancel
-	void
-	authorization
-	capture
-	reauthorize
-	order
-	item
-	batch
-	delete
-	patch
-	first
-	last
-	update
-	resend
-	next
-	previous
-	start
-	nextPage --string=next_page
-	previousPage --string=previous_page
+	Self
+	ParentPayment --string=parent_payment
+	Execute
+	Refund
+	ApprovalUrl --string=approval_url
+	Suspend
+	ReActivate --string=re_activate
+	Cancel
+	Void
+	Authorization
+	Capture
+	Reauthorize
+	Order
+	Item
+	Batch
+	Delete
+	Patch
+	First
+	Last
+	Update
+	Resend
+	Next
+	Previous
+	Start
+	NextPage --string=next_page
+	PreviousPage --string=previous_page
 
 @enum method --json=string
-	get --string=GET
-	post --string=POST
-	redirect --string=REDIRECT
-	delete --string=DELETE
-	patch --string=PATCH
+	Get --string=GET
+	Post --string=POST
+	Redirect --string=REDIRECT
+	Delete --string=DELETE
+	Patch --string=PATCH
 
 @enum payerStatus --json=string
-	verified --string=VERIFIED
-	unverified --string=UNVERIFIED
+	Verified --string=VERIFIED
+	Unverified --string=UNVERIFIED
 
 @enum intent --json=string
-	sale
-	authorize
-	order
+	Sale
+	Authorize
+	Order
 
 @enum FailureReason --json=string
 	UnableToCompleteTransaction --string=UNABLE_TO_COMPLETE_TRANSACTION
@@ -112,40 +113,40 @@ func validateEnum(enum enumValidator) error {
 	PayeeFilterRestrictions --string=PAYEE_FILTER_RESTRICTIONS
 
 @enum fmfFilter --json=string
-	accept  --string=ACCEPT --description="An ACCEPT filter is triggered only for the TOTAL_PURCHASE_PRICE_MINIMUM filter setting and is returned only in direct credit card payments where payment is accepted."
-	pending --string=PENDING --description="Triggers a PENDING filter action where you need to explicitly accept or deny the transaction."
-	deny  --string=DENY --description="Triggers a DENY action where payment is denied automatically."
-	report --string=REPORT --description="Triggers the Flag testing mode where payment is accepted."
+	Accept  --string=ACCEPT --description="An ACCEPT filter is triggered only for the TOTAL_PURCHASE_PRICE_MINIMUM filter setting and is returned only in direct credit card payments where payment is accepted."
+	Pending --string=PENDING --description="Triggers a PENDING filter action where you need to explicitly accept or deny the transaction."
+	Deny  --string=DENY --description="Triggers a DENY action where payment is denied automatically."
+	Report --string=REPORT --description="Triggers the Flag testing mode where payment is accepted."
 
 @enum filterId
-	maximumTransactionAmount --string=MAXIMUM_TRANSACTION_AMOUNT --description="basic filter"
-	unconfirmedAddress --string=UNCONFIRMED_ADDRESS --description="basic filter"
-	countryMonitor --string=COUNTRY_MONITOR --description="basic filter"
-	avsNoMatch --string=AVS_NO_MATCH --description="Address Verification Service No Match (advanced filter)"
-	avsPartialMatch --string=AVS_PARTIAL_MATCH --description="Address Verification Service Partial Match (advanced filter)"
-	avsUnavailableOrUnsupported --string=AVS_UNAVAILABLE_OR_UNSUPPORTED --description="Address Verification Service Unavailable or Not Supported (advanced filter)"
-	cardSecurityCodeMismatch --string=CARD_SECURITY_CODE_MISMATCH --description="advanced filter"
-	billingOrShippingAddressMismatch --string=BILLING_OR_SHIPPING_ADDRESS_MISMATCH --description="advanced filter"
-	riskyZipCode --string=RISKY_ZIP_CODE --description="high risk lists filter"
-	suspectedFreightForwarderCheck --string=SUSPECTED_FREIGHT_FORWARDER_CHECK --description="high risk lists filter"
-	riskyEmailAddressDomainCheck --string=RISKY_EMAIL_ADDRESS_DOMAIN_CHECK --description="high risk lists filter"
-	riskyBankIdentificationNumberCheck --string=RISKY_BANK_IDENTIFICATION_NUMBER_CHECK --description="high risk lists filter"
-	riskyIpAddressRange --string=RISKY_IP_ADDRESS_RANGE --description="high risk lists filter"
-	largeOrderNumber --string=LARGE_ORDER_NUMBER --description="transaction data filter"
-	totalPurchasePriceMinimum --string=TOTAL_PURCHASE_PRICE_MINIMUM --description="transaction data filter"
-	ipAddressVelocity --string=IP_ADDRESS_VELOCITY --description="transaction data filter"
-	paypalFraudModel --string=PAYPAL_FRAUD_MODEL --description="transaction data filter"
+	MaximumTransactionAmount --string=MAXIMUM_TRANSACTION_AMOUNT --description="basic filter"
+	UnconfirmedAddress --string=UNCONFIRMED_ADDRESS --description="basic filter"
+	CountryMonitor --string=COUNTRY_MONITOR --description="basic filter"
+	AvsNoMatch --string=AVS_NO_MATCH --description="Address Verification Service No Match (advanced filter)"
+	AvsPartialMatch --string=AVS_PARTIAL_MATCH --description="Address Verification Service Partial Match (advanced filter)"
+	AvsUnavailableOrUnsupported --string=AVS_UNAVAILABLE_OR_UNSUPPORTED --description="Address Verification Service Unavailable or Not Supported (advanced filter)"
+	CardSecurityCodeMismatch --string=CARD_SECURITY_CODE_MISMATCH --description="advanced filter"
+	BillingOrShippingAddressMismatch --string=BILLING_OR_SHIPPING_ADDRESS_MISMATCH --description="advanced filter"
+	RiskyZipCode --string=RISKY_ZIP_CODE --description="high risk lists filter"
+	SuspectedFreightForwarderCheck --string=SUSPECTED_FREIGHT_FORWARDER_CHECK --description="high risk lists filter"
+	RiskyEmailAddressDomainCheck --string=RISKY_EMAIL_ADDRESS_DOMAIN_CHECK --description="high risk lists filter"
+	RiskyBankIdentificationNumberCheck --string=RISKY_BANK_IDENTIFICATION_NUMBER_CHECK --description="high risk lists filter"
+	RiskyIpAddressRange --string=RISKY_IP_ADDRESS_RANGE --description="high risk lists filter"
+	LargeOrderNumber --string=LARGE_ORDER_NUMBER --description="transaction data filter"
+	TotalPurchasePriceMinimum --string=TOTAL_PURCHASE_PRICE_MINIMUM --description="transaction data filter"
+	IpAddressVelocity --string=IP_ADDRESS_VELOCITY --description="transaction data filter"
+	PaypalFraudModel --string=PAYPAL_FRAUD_MODEL --description="transaction data filter"
 
 
 @enum normStatus --json=string
-	unknown --string=UNKNOWN
-	unnormalizedUserPreferred --string=UNNORMALIZED_USER_PREFERRED
-	normalized --string=NORMALIZED
-	unnormalized --string=UNNORMALIZED
+	Unknown --string=UNKNOWN
+	UnnormalizedUserPreferred --string=UNNORMALIZED_USER_PREFERRED
+	Normalized --string=NORMALIZED
+	Unnormalized --string=UNNORMALIZED
 
 @enum addressStatus --json=string
-	confirmed --string=CONFIRMED
-	unconfirmed --string=UNCONFIRMED
+	Confirmed --string=CONFIRMED
+	Unconfirmed --string=UNCONFIRMED
 
 @enum AddressType --json=string
 	Residential --string=residential
@@ -160,11 +161,16 @@ func (self AddressTypeEnum) validate() error {
 }
 
 /*
-
 @enum PaymentMethod --json=string
 	CreditCard --string=credit_card
 	PayPal --string=paypal
+*/
 
+func (self PaymentMethodEnum) validate() error {
+	return validateEnum(self)
+}
+
+/*
 @enum TaxIdType --json=string
 	BrCpf --string=BR_CPF
 	BrCnpj --string=BR_CNPJ
@@ -193,42 +199,42 @@ func (self AddressTypeEnum) validate() error {
 	Voided --string=voided
 
 @enum reasonCode --json=string
-	chargeback --string=CHARGEBACK
-	guarantee --string=GUARANTEE
-	buyerComplaint --string=BUYER_COMPLAINT
-	refundCode --string=REFUND
-	unconfirmedShippingAddress --string=UNCONFIRMED_SHIPPING_ADDRESS
-	echeckCode --string=ECHECK
-	internationalWithdrawal --string=INTERNATIONAL_WITHDRAWAL
-	receivingPreferenceMandatesManualAction --string=RECEIVING_PREFERENCE_MANDATES_MANUAL_ACTION
-	paymentReview --string=PAYMENT_REVIEW
-	regulatoryReview --string=REGULATORY_REVIEW
-	unilateral --string=UNILATERAL
-	verificationRequired --string=VERIFICATION_REQUIRED
+	Chargeback --string=CHARGEBACK
+	Guarantee --string=GUARANTEE
+	BuyerComplaint --string=BUYER_COMPLAINT
+	RefundCode --string=REFUND
+	UnconfirmedShippingAddress --string=UNCONFIRMED_SHIPPING_ADDRESS
+	EcheckCode --string=ECHECK
+	InternationalWithdrawal --string=INTERNATIONAL_WITHDRAWAL
+	ReceivingPreferenceMandatesManualAction --string=RECEIVING_PREFERENCE_MANDATES_MANUAL_ACTION
+	PaymentReview --string=PAYMENT_REVIEW
+	RegulatoryReview --string=REGULATORY_REVIEW
+	Unilateral --string=UNILATERAL
+	VerificationRequired --string=VERIFICATION_REQUIRED
 
 @enum protectionElig --json=string
-	eligible --string=ELIGIBLE --description="Merchant is protected by PayPal's Seller Protection Policy for Unauthorized. Payments and Item Not Received."
-	partiallyEligible --string=PARTIALLY_ELIGIBLE --description="Merchant is protected by PayPal's Seller Protection Policy for Item Not Received or Unauthorized Payments. Refer to protection_eligibility_type for specifics."
-	ineligibile --string=INELIGIBLE --description="Merchant is not protected under the Seller Protection Policy."
+	Eligible --string=ELIGIBLE --description="Merchant is protected by PayPal's Seller Protection Policy for Unauthorized. Payments and Item Not Received."
+	PartiallyEligible --string=PARTIALLY_ELIGIBLE --description="Merchant is protected by PayPal's Seller Protection Policy for Item Not Received or Unauthorized Payments. Refer to protection_eligibility_type for specifics."
+	Ineligibile --string=INELIGIBLE --description="Merchant is not protected under the Seller Protection Policy."
 
 @enum protectionEligType --json=string
-	itemNotReceivedEligible --string=ITEM_NOT_RECEIVED_ELIGIBLE --description="Sellers are protected against claims for items not received."
-	unauthorizedPaymentEligible --string=UNAUTHORIZED_PAYMENT_ELIGIBLE --description="Sellers are protected against claims for unauthorized payments."
+	ItemNotReceivedEligible --string=ITEM_NOT_RECEIVED_ELIGIBLE --description="Sellers are protected against claims for items not received."
+	UnauthorizedPaymentEligible --string=UNAUTHORIZED_PAYMENT_ELIGIBLE --description="Sellers are protected against claims for unauthorized payments."
 
 @enum paymentMode --json=string
-	instantTransfer --string=INSTANT_TRANSFER
-	manualBankTransfer --string=MANUAL_BANK_TRANSFER
-	delayedTransfer --string=DELAYED_TRANSFER
-	echeck --string=ECHECK
+	InstantTransfer --string=INSTANT_TRANSFER
+	ManualBankTransfer --string=MANUAL_BANK_TRANSFER
+	DelayedTransfer --string=DELAYED_TRANSFER
+	Echeck --string=ECHECK
 
 @enum pendingReason --json=string
-	payerShippingUnconfirmed --string=PAYER-SHIPPING-UNCONFIRMED
-	multiCurrency --string=MULTI-CURRENCY
-	riskReview --string=RISK-REVIEW
-	regulatoryReview --string=REGULATORY-REVIEW
-	verificationRequired --string=VERIFICATION-REQUIRED
-	orderPending --string=ORDER
-	otherPending --string=OTHER
+	PayerShippingUnconfirmed --string=PAYER-SHIPPING-UNCONFIRMED
+	MultiCurrency --string=MULTI-CURRENCY
+	RiskReview --string=RISK-REVIEW
+	RegulatoryReview --string=REGULATORY-REVIEW
+	VerificationRequired --string=VERIFICATION-REQUIRED
+	OrderPending --string=ORDER
+	OtherPending --string=OTHER
 
 @enum CurrencyType --json=string
 	AUD --string=AUD --description="Australian dollar"
@@ -255,7 +261,14 @@ func (self AddressTypeEnum) validate() error {
 	THB --string=THB --description="Thai baht"
 	TRY --string=TRY --description="Turkish lira**"
 	USD --string=USD --description="United States dollar"
+*/
 
+// This should only be invoked when the AddressType is required.
+func (self CurrencyTypeEnum) validate() error {
+	return validateEnum(self)
+}
+
+/*
 @enum CountryCode --json=string
 	AL --description="ALBANIA"
 	DZ --description="ALGERIA"

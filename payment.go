@@ -9,26 +9,35 @@ import (
 	"time"
 )
 
-func (self *connection) NewPaypalPayment(
-	payer payer, urls Redirects) (*Payment, error) {
-
-	// Make sure we're still authenticated. Will refresh if not.
-
-	// TODO: Should I really authenticate here? Seems like I should wait for the
-	// actual request to be made.
-	if err := self.authenticate(); err != nil {
-		return nil, err
-	}
+func (self *connection) NewPaypalPayment(urls Redirects) (*Payment, error) {
 
 	var pymt = Payment{
 		connection: self,
 	}
-	pymt.private.Payer = payer
-	pymt.private.Intent = intent.sale
+	pymt.private.Intent = intent.Sale
 	pymt.private.Transactions = make([]*Transaction, 0)
 	pymt.private.RedirectUrls = urls
 
+	pymt.private.Payer.private.PaymentMethod = PaymentMethod.PayPal
+	pymt.private.Payer.private.PayerInfo = nil
+
+	if err := urls.validate(); err != nil {
+		return nil, err
+	}
 	return &pymt, nil
+}
+
+func (self *Payment) AddFundingInstrument(instrs ...fundingInstrument) error {
+	for _, instr := range instrs {
+		//		err := instr.validate()
+		//		if err != nil {
+		//			return err
+		//		}
+		self.private.Payer.private.FundingInstruments = append(
+			self.private.Payer.private.FundingInstruments, &instr,
+		)
+	}
+	return nil
 }
 
 /***************************
@@ -65,10 +74,6 @@ func (t *Transaction) AddItem(item *Item) (err error) {
 		return err
 	}
 
-	if item.Price == 0 {
-		// TODO: should have some sort of non-zero flag to denote a zero amount
-	}
-
 	item.private.Currency = t.private.Amount.private.Currency
 
 	t.private.ItemList.private.Items =
@@ -88,7 +93,7 @@ func (self *Payment) Authorize() (to string, code int, err error) {
 	var pymt Payment
 
 	err = self.send(&request{
-		method:   method.post,
+		method:   method.Post,
 		path:     _paymentsPath,
 		body:     self,
 		response: &pymt,
@@ -98,7 +103,7 @@ func (self *Payment) Authorize() (to string, code int, err error) {
 		switch pymt.private.State {
 		case state.Created:
 			// Set url to redirect to PayPal site to begin approval process
-			to, _ = pymt.private.Links.get(relType.approvalUrl)
+			to, _ = pymt.private.Links.get(relType.ApprovalUrl)
 			code = 303
 		default:
 			// otherwise cancel the payment and return an error
@@ -125,7 +130,7 @@ func (self *connection) Execute(u url.URL) error {
 	var pymt Payment
 
 	if err := self.send(&request{
-		method:   method.post,
+		method:   method.Post,
 		path:     path.Join(_paymentsPath, pymtid, _execute),
 		body:     &paymentExecution{PayerID: payerid},
 		response: &pymt,
@@ -161,7 +166,7 @@ func (self *connection) FetchPayment(payment_id string) (*Payment, error) {
 	}
 
 	if err := self.send(&request{
-		method:   method.get,
+		method:   method.Get,
 		path:     path.Join(_paymentsPath, payment_id),
 		body:     nil,
 		response: pymt,
@@ -186,27 +191,6 @@ type paymentExecution struct {
 	Transaction objects
 
 **********************/
-
-type details struct {
-	// Amount charged for shipping. 10 chars max, with support for 2 decimal places
-	Shipping float64 `json:"shipping,omitempty"`
-
-	// Amount of the subtotal of the items. REQUIRED if line items are specified.
-	// 10 chars max, with support for 2 decimal places
-	Subtotal float64 `json:"subtotal,omitempty"`
-
-	// Amount charged for tax. 10 chars max, with support for 2 decimal places
-	Tax float64 `json:"tax,omitempty"`
-
-	// Amount being charged for handling fee. When `payment_method` is `paypal`
-	HandlingFee float64 `json:"handling_fee,omitempty"`
-
-	// Amount being charged for insurance fee. When `payment_method` is `paypal`
-	Insurance float64 `json:"insurance,omitempty"`
-
-	// Amount being discounted for shipping fee. When `payment_method` is `paypal`
-	ShippingDiscount float64 `json:"shipping_discount,omitempty"`
-}
 
 //func (self *relatedResources) MarshalJSON() ([]byte, error) {
 //	return []byte("[]"), nil
@@ -291,7 +275,7 @@ func (self *PaymentBatcher) Next() ([]*Payment, error) {
 	}
 
 	if err := self.send(&request{
-		method:   method.get,
+		method:   method.Get,
 		path:     path.Join(_paymentsPath, qry),
 		body:     nil,
 		response: pymt_list,

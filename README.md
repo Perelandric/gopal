@@ -22,15 +22,16 @@ func main() {
   }
 
   // Create a payment, providing type of payment method, and redirect urls
-  var pymt = conn.CreatePayment(p.PaymentMethod.PayPal,
+  var pymt = conn.CreatePaypalPayment(
+    p.Payer {...},
     p.Redirects {
       Return: "http://www.example.com/page_to_handle_success.html",
       Cancel: "http://www.example.com/page_to_handle_cancelation.html",
     })
 
   // Create a transaction for the payment. Only the CurrencyType is required.
-  var trans = pymt.AddTransaction(p.CurrencyType.USD,
-    "The description of the transaction",
+  var trans = pymt.AddTransaction(
+    p.CurrencyType.USD,
     &p.ShippingAddress {
       RecipientName: "Bob Woo",
       Type: p.AddressType.Residential,
@@ -45,12 +46,10 @@ func main() {
       },
     })
 
-    // TODO: The `AddItem` doesn't really do anything except add the item. So
-    // why not make `NewTransaction()` a variadic function that receives items?
-    // Then it will also make more sense to have it a method on the Payment.
-    // The items would then need to be a struct, which is probably better.
+    // Add optional items to the Transaction
+    trans.Description = "A description of the transaction."
 
-  // Add items to the transaction. Quantities < 1 are ignored. Price is to be
+  // Add items to the Transaction. Quantities < 1 are ignored. Price is to be
   // given according to the CurrencyType that was provided to NewTransaction().
   trans.AddItem(1, 23.45, "Roast Beast", "987654321")
 

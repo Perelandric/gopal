@@ -3,10 +3,18 @@ package gopal
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 )
 
 //go:generate Golific $GOFILE
+
+type dateTime string // TODO: How should this be done? [Un]Marshalers?
+
+// TODO: only needed until Golific acknowledges more types
+type fundingInstruments []*fundingInstrument
+type Transactions []*Transaction
+type Items []*Item
 
 type resource interface {
 	errorable
@@ -81,12 +89,22 @@ type Redirects struct {
 	Cancel string `json:"cancel_url,omitempty"`
 }
 
-type dateTime string // TODO: How should this be done? [Un]Marshalers?
+func (self *Redirects) validate() error {
+	for _, s := range [2]string{self.Return, self.Cancel} {
+		u, err := url.Parse(s)
+		if err != nil {
+			return err
+		}
 
-// TODO: only needed until Golific acknowledges more types
-type fundingInstruments []*fundingInstrument
-type Transactions []*Transaction
-type Items []*Item
+		if len(u.Scheme) == 0 {
+			return fmt.Errorf("URL Scheme is required. Found %q\n", s)
+		}
+		if len(u.Host) == 0 {
+			return fmt.Errorf("URL Host is required. Found %q\n", s)
+		}
+	}
+	return nil
+}
 
 /**********************
 
@@ -94,8 +112,8 @@ Payment Object
 
 **********************/
 
-// TODO: Add `billing_agreement_tokens`, `payment_instruction`
 /*
+// TODO: Add `billing_agreement_tokens`, `payment_instruction`
 @struct Payment
 	*connection
 	ExperienceProfileId string `json:"experience_profile_id"` --read --write
@@ -118,6 +136,7 @@ func (self *Payment) validate() (err error) {
 	if len(self.private.Transactions) == 0 {
 		return fmt.Errorf("A Payment needs at least one Transaction")
 	}
+
 	for _, t := range self.private.Transactions {
 		if err = t.validate(); err != nil {
 			return err
@@ -126,7 +145,7 @@ func (self *Payment) validate() (err error) {
 
 	// TODO: More validation
 
-	return nil
+	return self.private.Payer.validate()
 }
 
 func (self *Payment) calculateToAuthorize() {
@@ -147,38 +166,44 @@ func (self *Payment) calculateToAuthorize() {
 	PaymentOptions  paymentOptions `json:"payment_options,omitempty"` --read --write
 */
 
-func (self *Transaction) validate() error {
-	if err := self.private.ItemList.validate(); err != nil {
+func (self *Transaction) validate() (err error) {
+	if err = self.private.ItemList.validate(); err != nil {
 		return err
 	}
 
+	// These can be truncated with a warning if too long
 	checkStr("Transaction.Description", &self.Description, 127, false, false)
-	checkStr("Transaction.InvoiceNumber", &self.InvoiceNumber, 256, false, false)
 	checkStr("Transaction.Custom", &self.Custom, 256, false, false)
 	checkStr("Transaction.SoftDescriptor", &self.SoftDescriptor, 22, false, false)
 
 	// TODO: More validation... check docs
 
-	return nil
+	err = checkStr(
+		"Transaction.InvoiceNumber", &self.InvoiceNumber, 256, false, true)
+	if err != nil {
+		return err
+	}
+
+	return self.private.Amount.validate()
 }
 
 func (self *Transaction) calculateToAuthorize() {
 	// Calculate totals from itemList
 	for _, item := range self.private.ItemList.private.Items {
-		self.private.Amount.Details.Subtotal = roundTwoDecimalPlaces(
-			self.private.Amount.Details.Subtotal + (item.Price * float64(item.Quantity)))
+		self.private.Amount.Details.private.Subtotal = roundTwoDecimalPlaces(
+			self.private.Amount.Details.private.Subtotal + (item.Price * float64(item.Quantity)))
 
-		self.private.Amount.Details.Tax = roundTwoDecimalPlaces(
-			self.private.Amount.Details.Tax + (item.Tax * float64(item.Quantity)))
+		self.private.Amount.Details.private.Tax = roundTwoDecimalPlaces(
+			self.private.Amount.Details.private.Tax + (item.Tax * float64(item.Quantity)))
 	}
 
 	// Set Total, which is sum of Details
 	self.private.Amount.private.Total = roundTwoDecimalPlaces(
-		self.private.Amount.Details.Subtotal +
-			self.private.Amount.Details.Tax +
-			self.private.Amount.Details.Shipping +
-			self.private.Amount.Details.Insurance -
-			self.private.Amount.Details.ShippingDiscount)
+		self.private.Amount.Details.private.Subtotal +
+			self.private.Amount.Details.private.Tax +
+			self.private.Amount.Details.private.Shipping +
+			self.private.Amount.Details.private.Insurance -
+			self.private.Amount.Details.private.ShippingDiscount)
 }
 
 /*
@@ -194,6 +219,7 @@ func (self *itemList) validate() (err error) {
 	if len(self.private.Items) == 0 {
 		return fmt.Errorf("Transaction item list must have at least one Item")
 	}
+
 	for _, item := range self.private.Items {
 		if err = item.validate(); err != nil {
 			return err
@@ -225,10 +251,11 @@ func (self *Item) validate() (err error) {
 	}
 	_ = checkStr("Item.Description", &self.Description, 127, false, false)
 
-	if err = checkFloat7_10("Item.Price", &self.Price); err != nil {
+	if err = checkFloat7_10("Item.Price", &self.Price, true); err != nil {
 		return err
 	}
-	return checkInt10("Item.Quantity", self.Quantity)
+
+	return checkInt10("Item.Quantity", self.Quantity, true)
 }
 
 /*
@@ -247,9 +274,9 @@ func (self *_shared) FetchParentPayment() (*Payment, error) {
 	return self.FetchPayment(self.private.ParentPayment)
 }
 
+/*
 // State items are: pending, authorized, captured, partially_captured, expired,
 // 									voided
-/*
 @struct Authorization --drop_ctor
 	_shared
 	Amount 						amount `json:"amount"` --read
@@ -261,22 +288,20 @@ func (self *_shared) FetchParentPayment() (*Payment, error) {
 	ProtectionElig 		protectionEligEnum `json:"protection_eligibility"` --read
 	ProtectionEligType protectionEligTypeEnum `json:"protection_eligibility_type"` --read
 	FmfDetails 				fmfDetails `json:"fmf_details"` --read
-*/
+
 
 // State values are: pending, completed, refunded, partially_refunded
-/*
 @struct Capture
 	_shared
 	Amount 				 amount `json:"amount"` --read
 	TransactionFee currency `json:"transaction_fee"` --read --write
 	IsFinalCapture bool `json:"is_final_capture,omitempty"` --read --write
-*/
+
 
 // State values are: pending; completed; refunded; partially_refunded
 // TODO: PendingReason appears in the old docs under the general Sale object description
 // but not under the lower "sale object" definition. The new docs have it
 // marked as [DEPRECATED] in one area, but not another.
-/*
 @struct Sale
 	_shared
 	Amount 										amount `json:"amount"` --read
@@ -293,10 +318,9 @@ func (self *_shared) FetchParentPayment() (*Payment, error) {
 	ProtectionEligibilityType protectionEligTypeEnum `json:"protection_eligibility_type"` --read
 	ClearingTime 							string `json:"clearing_time"` --read
 	BillingAgreementId 				string `json:"billing_agreement_id"` --read
-*/
+
 
 // State items are: pending; completed; failed
-/*
 @struct Refund
 	_shared
 	Amount 			amount `json:"amount"` --read
@@ -304,7 +328,7 @@ func (self *_shared) FetchParentPayment() (*Payment, error) {
 	Reason 			string `json:"reason,omitempty"` --read --write
 	SaleId 			string `json:"sale_id,omitempty"` --read
 	CaptureId 	string `json:"capture_id,omitempty"` --read
-*/
+
 
 // Amount Object
 //  A`Transaction` object also may have an `ItemList`, which has dollar amounts.
@@ -312,7 +336,6 @@ func (self *_shared) FetchParentPayment() (*Payment, error) {
 //
 //	All other uses of `Amount` do have `shipping`, `shipping_discount` and
 // `subtotal` to calculate the `Total`.
-/*
 @struct amount
 	Currency CurrencyTypeEnum `json:"currency"` --read
 	Total 	 float64 					`json:"total"` --read
@@ -320,14 +343,48 @@ func (self *_shared) FetchParentPayment() (*Payment, error) {
 */
 
 func (self amount) validate() (err error) {
-	if self.private.Currency.Value() == 0 {
-		return fmt.Errorf(`"Amount.Currency" is required.`)
+	if err = self.private.Currency.validate(); err != nil {
+		return err
 	}
-	if err = checkFloat7_10("Amount.Total", &self.private.Total); err != nil {
+
+	err = checkFloat7_10("Amount.Total", &self.private.Total, false)
+	if err != nil {
 		return err
 	}
 	return nil
 }
+
+// The Details can all be read/write because the Amount object is read only,
+// so it gets a copy anyway.
+// No need to validate because its values are calculated or validated when set.
+/*
+@struct details
+	// Amount charged for shipping. 10 chars max, with support for 2 decimal places
+	Shipping float64 `json:"shipping,omitempty"` --read --write
+
+	// Amount of the subtotal of the items. REQUIRED if line items are specified.
+	// 10 chars max, with support for 2 decimal places
+	Subtotal float64 `json:"subtotal,omitempty"` --read --write
+
+	// Amount charged for tax. 10 chars max, with support for 2 decimal places
+	Tax float64 `json:"tax,omitempty"` --read --write
+
+	// Amount being charged for handling fee. When `payment_method` is `paypal`
+	HandlingFee float64 `json:"handling_fee,omitempty"` --read --write
+
+	// Amount being charged for insurance fee. When `payment_method` is `paypal`
+	Insurance float64 `json:"insurance,omitempty"` --read --write
+
+	// Amount being discounted for shipping fee. When `payment_method` is `paypal`
+	ShippingDiscount float64 `json:"shipping_discount,omitempty"` --read --write
+*/
+
+/*
+@struct link
+	Href 	 string `json:"href,omitempty"`
+	Rel 	 relTypeEnum `json:"rel,omitempty"`
+	Method string `json:"method,omitempty"`
+*/
 
 type links []link
 
@@ -341,21 +398,14 @@ func (l links) get(r relTypeEnum) (string, string) {
 }
 
 /*
-@struct link
-	Href 	 string `json:"href,omitempty"`
-	Rel 	 relTypeEnum `json:"rel,omitempty"`
-	Method string `json:"method,omitempty"`
-*/
 
 // Base object for all financial value related fields (balance, payment due, etc.)
-/*
 @struct currency
 	Currency string `json:"currency"` --read --write
 	Value 	 string `json:"value"` --read --write
-*/
+
 
 // This object represents Fraud Management Filter (FMF) details for a payment.
-/*
 @struct fmfDetails
 	FilterType 	fmfFilterEnum `json:"filter_type"` --read
 	FilterID 		filterIdEnum `json:"filter_id"` --read
@@ -363,57 +413,62 @@ func (l links) get(r relTypeEnum) (string, string) {
 	Description string `json:"description"` --read
 */
 
-// Source of the funds for this payment represented by a PayPal account or a
-// credit card.
 /*
-@struct payer
-	PaymentMethod      PaymentMethodEnum `json:"payment_method,omitempty"` --read --write
-	FundingInstruments fundingInstruments `json:"funding_instruments,omitempty"` --read --write
-	PayerInfo          *payerInfo `json:"payer_info,omitempty"` --read --write
-	Status 						 payerStatusEnum `json:"status,omitempty"` --read --write
-*/
+// TODO: This is used both for Paypal and Credit cards. In the case of Paypal,
+// many (most) of the fields may not be included in a requrest. Should we have
+// a separate `PaypalPayerInfo` object? It could be embedded into the main
+// `PayerInfo` object.
 
 // This object is pre-filled by PayPal when the payment_method is paypal.
-type payerInfo struct {
+@struct PayerInfo
 	// Email address representing the payer. 127 characters max.
-	Email string `json:"email,omitempty"`
+	Email string `json:"email,omitempty"` --read --write
 
 	// Salutation of the payer.
-	Salutation string `json:"salutation,omitempty"`
-
-	// First name of the payer. Value assigned by PayPal.
-	FirstName string `json:"first_name,omitempty"`
-
-	// Middle name of the payer. Value assigned by PayPal.
-	MiddleName string `json:"middle_name,omitempty"`
-
-	// Last name of the payer. Value assigned by PayPal.
-	LastName string `json:"last_name,omitempty"`
+	Salutation string `json:"salutation,omitempty"` --read --write
 
 	// Suffix of the payer.
-	Suffix string `json:"suffix,omitempty"`
-
-	// PayPal assigned Payer ID. Value assigned by PayPal.
-	PayerId string `json:"payer_id,omitempty"`
-
-	// Phone number representing the payer. 20 characters max.
-	Phone string `json:"phone,omitempty"`
+	Suffix string `json:"suffix,omitempty"` --read --write
 
 	// Two-letter registered country code of the payer to identify the buyer country.
-	CountryCode CountryCodeEnum `json:"country_code,omitempty"`
+	CountryCode CountryCodeEnum `json:"country_code,omitempty"` --read --write
 
-	// Shipping address of payer PayPal account. Value assigned by PayPal.
-	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
+	// Phone number representing the payer. 20 characters max.
+	Phone string `json:"phone,omitempty"` --read --write
 
 	// Payer’s tax ID type. Allowed values: BR_CPF or BR_CNPJ. Only supported when
 	// the payment_method is set to paypal.
-	TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"`
+	TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"` --read --write
 
 	// Payer’s tax ID. Only supported when the payment_method is set to paypal.
-	TaxId string `json:"tax_id,omitempty"`
+	TaxId string `json:"tax_id,omitempty"` --read --write
+
+	// First name of the payer. Value assigned by PayPal.
+	FirstName string `json:"first_name,omitempty"` --read
+
+	// Middle name of the payer. Value assigned by PayPal.
+	MiddleName string `json:"middle_name,omitempty"` --read
+
+	// Last name of the payer. Value assigned by PayPal.
+	LastName string `json:"last_name,omitempty"` --read
+
+	// PayPal assigned Payer ID. Value assigned by PayPal.
+	PayerId string `json:"payer_id,omitempty"` --read
+
+	// Shipping address of payer PayPal account. Value assigned by PayPal.
+	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"` --read
+*/
+
+func (self *PayerInfo) validate() error {
+	// TODO: Implement
+	if self == nil {
+		return nil
+	}
+
+	return nil
 }
 
-/// Address: This object is used for billing or shipping addresses.
+// Address: This object is used for billing or shipping addresses.
 type Address struct {
 	// Line 1 of the address (e.g., Number, street, etc). 100 characters max.
 	// Required.
@@ -492,6 +547,7 @@ func (self *ShippingAddress) validate() (err error) {
 	if err != nil {
 		return err
 	}
+
 	if err = self.Type.validate(); err != nil {
 		return err
 	}
