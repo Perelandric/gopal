@@ -4,65 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/url"
 	"path"
 	"time"
 )
-
-func (self *connection) NewPaypalPayment(urls Redirects) (*Payment, error) {
-
-	var pymt = Payment{
-		connection: self,
-	}
-	pymt.private.Intent = intent.Sale
-	pymt.private.Transactions = make([]*Transaction, 0)
-	pymt.private.RedirectUrls = urls
-
-	pymt.private.Payer.private.PaymentMethod = PaymentMethod.PayPal
-	pymt.private.Payer.private.PayerInfo = nil
-
-	if err := urls.validate(); err != nil {
-		return nil, err
-	}
-	return &pymt, nil
-}
-
-func (self *Payment) AddFundingInstrument(instrs ...fundingInstrument) error {
-	for _, instr := range instrs {
-		//		err := instr.validate()
-		//		if err != nil {
-		//			return err
-		//		}
-		self.private.Payer.private.FundingInstruments = append(
-			self.private.Payer.private.FundingInstruments, &instr,
-		)
-	}
-	return nil
-}
-
-/***************************
-
-	Payment object methods
-
-***************************/
-
-func (self *Payment) AddTransaction(
-	c CurrencyTypeEnum, shp *ShippingAddress) *Transaction {
-
-	var t Transaction
-	t.private.Amount = amount{}
-	t.private.ItemList = &itemList{}
-
-	t.private.Amount.private.Currency = c
-	t.private.Amount.private.Total = 0
-
-	t.private.ItemList.private.Items = make([]*Item, 0, 1)
-	t.private.ItemList.private.ShippingAddress = shp
-
-	self.private.Transactions = append(self.private.Transactions, &t)
-
-	return &t
-}
 
 // Prices are assumed to use the CurrencyType passed to NewTransaction.
 func (t *Transaction) AddItem(item *Item) (err error) {
@@ -79,101 +23,6 @@ func (t *Transaction) AddItem(item *Item) (err error) {
 	t.private.ItemList.private.Items =
 		append(t.private.ItemList.private.Items, item)
 	return nil
-}
-
-// TODO: Should send a query string parameter `token=[some token]`
-func (self *Payment) Authorize() (to string, code int, err error) {
-	if err = self.validate(); err != nil {
-		return "", 0, err
-	}
-
-	self.calculateToAuthorize()
-
-	// Create Totals
-	var pymt Payment
-
-	err = self.send(&request{
-		method:   method.Post,
-		path:     _paymentsPath,
-		body:     self,
-		response: &pymt,
-	})
-
-	if err == nil {
-		switch pymt.private.State {
-		case state.Created:
-			// Set url to redirect to PayPal site to begin approval process
-			to, _ = pymt.private.Links.get(relType.ApprovalUrl)
-			code = 303
-		default:
-			// otherwise cancel the payment and return an error
-			err = UnexpectedResponse
-		}
-	}
-
-	return to, code, err
-}
-
-func (self *connection) Execute(u url.URL) error {
-	var query = u.Query()
-
-	var payerid = query.Get("PayerID")
-	if payerid == "" {
-		return fmt.Errorf("PayerID is missing\n")
-	}
-
-	var pymtid = query.Get("paymentId")
-	if pymtid == "" {
-		return fmt.Errorf("paymentId is missing\n")
-	}
-
-	var pymt Payment
-
-	if err := self.send(&request{
-		method:   method.Post,
-		path:     path.Join(_paymentsPath, pymtid, _execute),
-		body:     &paymentExecution{PayerID: payerid},
-		response: &pymt,
-	}); err != nil {
-		return err
-	}
-
-	if pymt.private.State != state.Approved {
-		return fmt.Errorf(
-			"Payment with ID %q for payer %q was not approved\n", pymtid, payerid)
-	}
-
-	return nil
-}
-
-// TODO: I'm returning a list of Sale objects because every payment can have multiple transactions.
-//		I need to find out why a payment can have multiple transactions, and see if I should eliminate that in the API
-func (self *Payment) FetchSale() []*Sale {
-	var sales = []*Sale{}
-	for _, trans := range self.private.Transactions {
-		for _, related_resource := range trans.private.RelatedResources {
-			if s, ok := related_resource.(*Sale); ok {
-				sales = append(sales, s)
-			}
-		}
-	}
-	return sales
-}
-
-func (self *connection) FetchPayment(payment_id string) (*Payment, error) {
-	var pymt = &Payment{
-		connection: self,
-	}
-
-	if err := self.send(&request{
-		method:   method.Get,
-		path:     path.Join(_paymentsPath, payment_id),
-		body:     nil,
-		response: pymt,
-	}); err != nil {
-		return nil, err
-	}
-	return pymt, nil
 }
 
 // Used to execute the approved payment.

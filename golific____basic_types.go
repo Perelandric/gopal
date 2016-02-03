@@ -13,93 +13,38 @@ import (
 
 /*****************************
 
-Payment struct
+PaymentBase struct
 
 ******************************/
-func NewPayment() *Payment {
-	return &Payment{
-		private: private_18ddwobzobasi{},
+func NewPaymentBase() *PaymentBase {
+	return &PaymentBase{
+		private: private_ntt6a1bgeej7{},
 	}
 }
 
-// TODO: Add `billing_agreement_tokens`, `payment_instruction`
-type Payment struct {
-	private private_18ddwobzobasi
-	*connection
-	ExperienceProfileId string `json:"experience_profile_id"`
-	*payment_error
+type PaymentBase struct {
+	private private_ntt6a1bgeej7
 }
 
-type private_18ddwobzobasi struct {
-	Intent        intentEnum        `json:"intent,omitempty"`
-	Payer         payer             `json:"payer,omitempty"`
-	Transactions  Transactions      `json:"transactions,omitempty"`
-	RedirectUrls  Redirects         `json:"redirect_urls,omitempty"`
-	State         stateEnum         `json:"state,omitempty"`
-	Id            string            `json:"id,omitempty"`
-	FailureReason FailureReasonEnum `json:"failure_reason,omitempty"`
-	CreateTime    dateTime          `json:"create_time,omitempty"`
-	UpdateTime    dateTime          `json:"update_time,omitempty"`
-	Links         links             `json:"links,omitempty"`
+type private_ntt6a1bgeej7 struct {
+	Transactions Transactions `json:"transactions,omitempty"`
 }
 
-type json_18ddwobzobasi struct {
-	*private_18ddwobzobasi
-	*connection
-	ExperienceProfileId string `json:"experience_profile_id"`
-	*payment_error
+type json_ntt6a1bgeej7 struct {
+	*private_ntt6a1bgeej7
 }
 
-func (self *Payment) Intent() intentEnum {
-	return self.private.Intent
-}
-
-func (self *Payment) Payer() payer {
-	return self.private.Payer
-}
-
-func (self *Payment) Transactions() Transactions {
+func (self *PaymentBase) Transactions() Transactions {
 	return self.private.Transactions
 }
 
-func (self *Payment) RedirectUrls() Redirects {
-	return self.private.RedirectUrls
-}
-
-func (self *Payment) State() stateEnum {
-	return self.private.State
-}
-
-func (self *Payment) Id() string {
-	return self.private.Id
-}
-
-func (self *Payment) FailureReason() FailureReasonEnum {
-	return self.private.FailureReason
-}
-
-func (self *Payment) CreateTime() dateTime {
-	return self.private.CreateTime
-}
-
-func (self *Payment) UpdateTime() dateTime {
-	return self.private.UpdateTime
-}
-
-func (self *Payment) Links() links {
-	return self.private.Links
-}
-
-func (self *Payment) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_18ddwobzobasi{
+func (self *PaymentBase) MarshalJSON() ([]byte, error) {
+	return json.Marshal(json_ntt6a1bgeej7{
 		&self.private,
-		self.connection,
-		self.ExperienceProfileId,
-		self.payment_error,
 	})
 }
 
-func (self *Payment) UnmarshalJSON(j []byte) error {
+func (self *PaymentBase) UnmarshalJSON(j []byte) error {
 	if len(j) == 4 && string(j) == "null" {
 		return nil
 	}
@@ -115,28 +60,8 @@ func (self *Payment) UnmarshalJSON(j []byte) error {
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
 		switch key {
-		case "experience_profile_id":
-			err = json.Unmarshal(rawMsg, &self.ExperienceProfileId)
-		case "intent":
-			err = json.Unmarshal(rawMsg, &self.private.Intent)
-		case "payer":
-			err = json.Unmarshal(rawMsg, &self.private.Payer)
 		case "transactions":
 			err = json.Unmarshal(rawMsg, &self.private.Transactions)
-		case "redirect_urls":
-			err = json.Unmarshal(rawMsg, &self.private.RedirectUrls)
-		case "state":
-			err = json.Unmarshal(rawMsg, &self.private.State)
-		case "id":
-			err = json.Unmarshal(rawMsg, &self.private.Id)
-		case "failure_reason":
-			err = json.Unmarshal(rawMsg, &self.private.FailureReason)
-		case "create_time":
-			err = json.Unmarshal(rawMsg, &self.private.CreateTime)
-		case "update_time":
-			err = json.Unmarshal(rawMsg, &self.private.UpdateTime)
-		case "links":
-			err = json.Unmarshal(rawMsg, &self.private.Links)
 		default:
 			// Ignoring unknown property
 		}
@@ -155,12 +80,12 @@ Transaction struct
 ******************************/
 func NewTransaction() *Transaction {
 	return &Transaction{
-		private: private_1r1ip1dr1az4u{},
+		private: private_717h1k3tzcon{},
 	}
 }
 
 type Transaction struct {
-	private        private_1r1ip1dr1az4u
+	private        private_717h1k3tzcon
 	Description    string         `json:"description,omitempty"`
 	InvoiceNumber  string         `json:"invoice_number,omitempty"`
 	Custom         string         `json:"custom,omitempty"`
@@ -168,14 +93,14 @@ type Transaction struct {
 	PaymentOptions paymentOptions `json:"payment_options,omitempty"`
 }
 
-type private_1r1ip1dr1az4u struct {
+type private_717h1k3tzcon struct {
 	ItemList         *itemList        `json:"item_list,omitempty"`
 	Amount           amount           `json:"amount"`
 	RelatedResources relatedResources `json:"related_resources,omitempty"`
 }
 
-type json_1r1ip1dr1az4u struct {
-	*private_1r1ip1dr1az4u
+type json_717h1k3tzcon struct {
+	*private_717h1k3tzcon
 	Description    string         `json:"description,omitempty"`
 	InvoiceNumber  string         `json:"invoice_number,omitempty"`
 	Custom         string         `json:"custom,omitempty"`
@@ -196,7 +121,7 @@ func (self *Transaction) RelatedResources() relatedResources {
 }
 
 func (self *Transaction) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1r1ip1dr1az4u{
+	return json.Marshal(json_717h1k3tzcon{
 		&self.private,
 		self.Description,
 		self.InvoiceNumber,
@@ -256,21 +181,21 @@ itemList struct
 ******************************/
 func NewItemList() *itemList {
 	return &itemList{
-		private: private_1ooercgh7cr5y{},
+		private: private_zl7m0s78icme{},
 	}
 }
 
 type itemList struct {
-	private private_1ooercgh7cr5y
+	private private_zl7m0s78icme
 }
 
-type private_1ooercgh7cr5y struct {
+type private_zl7m0s78icme struct {
 	Items           Items            `json:"items,omitempty"`
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
-type json_1ooercgh7cr5y struct {
-	*private_1ooercgh7cr5y
+type json_zl7m0s78icme struct {
+	*private_zl7m0s78icme
 }
 
 func (self *itemList) Items() Items {
@@ -282,7 +207,7 @@ func (self *itemList) ShippingAddress() *ShippingAddress {
 }
 
 func (self *itemList) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1ooercgh7cr5y{
+	return json.Marshal(json_zl7m0s78icme{
 		&self.private,
 	})
 }
@@ -325,12 +250,12 @@ Item struct
 ******************************/
 func NewItem() *Item {
 	return &Item{
-		private: private_3tmzaz57qcq5{},
+		private: private_lwls8sbux5f1{},
 	}
 }
 
 type Item struct {
-	private     private_3tmzaz57qcq5
+	private     private_lwls8sbux5f1
 	Quantity    int64   `json:"quantity,string"`
 	Name        string  `json:"name"`
 	Price       float64 `json:"price,string"`
@@ -339,12 +264,12 @@ type Item struct {
 	Description string  `json:"description,omitempty"`
 }
 
-type private_3tmzaz57qcq5 struct {
+type private_lwls8sbux5f1 struct {
 	Currency CurrencyTypeEnum `json:"currency"`
 }
 
-type json_3tmzaz57qcq5 struct {
-	*private_3tmzaz57qcq5
+type json_lwls8sbux5f1 struct {
+	*private_lwls8sbux5f1
 	Quantity    int64   `json:"quantity,string"`
 	Name        string  `json:"name"`
 	Price       float64 `json:"price,string"`
@@ -358,7 +283,7 @@ func (self *Item) Currency() CurrencyTypeEnum {
 }
 
 func (self *Item) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_3tmzaz57qcq5{
+	return json.Marshal(json_lwls8sbux5f1{
 		&self.private,
 		self.Quantity,
 		self.Name,
@@ -417,12 +342,12 @@ _shared struct
 ******************************/
 
 type _shared struct {
-	private private_13eeqv072lmtm
+	private private_pbcsdimqz4r2
 	*connection
 	*identity_error
 }
 
-type private_13eeqv072lmtm struct {
+type private_pbcsdimqz4r2 struct {
 	Id            string    `json:"id,omitempty"`
 	CreateTime    dateTime  `json:"create_time,omitempty"`
 	UpdateTime    dateTime  `json:"update_time,omitempty"`
@@ -431,8 +356,8 @@ type private_13eeqv072lmtm struct {
 	Links         links     `json:"links,omitempty"`
 }
 
-type json_13eeqv072lmtm struct {
-	*private_13eeqv072lmtm
+type json_pbcsdimqz4r2 struct {
+	*private_pbcsdimqz4r2
 	*connection
 	*identity_error
 }
@@ -458,7 +383,7 @@ func (self *_shared) ParentPayment() string {
 }
 
 func (self *_shared) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_13eeqv072lmtm{
+	return json.Marshal(json_pbcsdimqz4r2{
 		&self.private,
 		self.connection,
 		self.identity_error,
@@ -513,11 +438,11 @@ Authorization struct
 // State items are: pending, authorized, captured, partially_captured, expired,
 // voided
 type Authorization struct {
-	private private_1pm2mnwlff92d
+	private private_nxj6uv7st58i
 	_shared
 }
 
-type private_1pm2mnwlff92d struct {
+type private_nxj6uv7st58i struct {
 	Amount             amount                 `json:"amount"`
 	BillingAgreementId string                 `json:"billing_agreement_id"`
 	PaymentMode        paymentModeEnum        `json:"payment_mode"`
@@ -529,8 +454,8 @@ type private_1pm2mnwlff92d struct {
 	FmfDetails         fmfDetails             `json:"fmf_details"`
 }
 
-type json_1pm2mnwlff92d struct {
-	*private_1pm2mnwlff92d
+type json_nxj6uv7st58i struct {
+	*private_nxj6uv7st58i
 	_shared
 }
 
@@ -571,7 +496,7 @@ func (self *Authorization) FmfDetails() fmfDetails {
 }
 
 func (self *Authorization) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1pm2mnwlff92d{
+	return json.Marshal(json_nxj6uv7st58i{
 		&self.private,
 		self._shared,
 	})
@@ -629,24 +554,24 @@ Capture struct
 ******************************/
 func NewCapture() *Capture {
 	return &Capture{
-		private: private_3yw2okw113nm{},
+		private: private_14ks3oagdwk96{},
 	}
 }
 
 // State values are: pending, completed, refunded, partially_refunded
 type Capture struct {
-	private private_3yw2okw113nm
+	private private_14ks3oagdwk96
 	_shared
 	TransactionFee currency `json:"transaction_fee"`
 	IsFinalCapture bool     `json:"is_final_capture,omitempty"`
 }
 
-type private_3yw2okw113nm struct {
+type private_14ks3oagdwk96 struct {
 	Amount amount `json:"amount"`
 }
 
-type json_3yw2okw113nm struct {
-	*private_3yw2okw113nm
+type json_14ks3oagdwk96 struct {
+	*private_14ks3oagdwk96
 	_shared
 	TransactionFee currency `json:"transaction_fee"`
 	IsFinalCapture bool     `json:"is_final_capture,omitempty"`
@@ -657,7 +582,7 @@ func (self *Capture) Amount() amount {
 }
 
 func (self *Capture) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_3yw2okw113nm{
+	return json.Marshal(json_14ks3oagdwk96{
 		&self.private,
 		self._shared,
 		self.TransactionFee,
@@ -705,7 +630,7 @@ Sale struct
 ******************************/
 func NewSale() *Sale {
 	return &Sale{
-		private: private_15n21swciwfwr{},
+		private: private_12gy2l60gqndg{},
 	}
 }
 
@@ -714,14 +639,14 @@ func NewSale() *Sale {
 // but not under the lower "sale object" definition. The new docs have it
 // marked as [DEPRECATED] in one area, but not another.
 type Sale struct {
-	private private_15n21swciwfwr
+	private private_12gy2l60gqndg
 	_shared
 	Description      string   `json:"description,omitempty"`
 	TransactionFee   currency `json:"transaction_fee"`
 	ReceivableAmount currency `json:"receivable_amount"`
 }
 
-type private_15n21swciwfwr struct {
+type private_12gy2l60gqndg struct {
 	Amount                    amount                 `json:"amount"`
 	PendingReason             pendingReasonEnum      `json:"pending_reason"`
 	PaymentMode               paymentModeEnum        `json:"payment_mode"`
@@ -735,8 +660,8 @@ type private_15n21swciwfwr struct {
 	BillingAgreementId        string                 `json:"billing_agreement_id"`
 }
 
-type json_15n21swciwfwr struct {
-	*private_15n21swciwfwr
+type json_12gy2l60gqndg struct {
+	*private_12gy2l60gqndg
 	_shared
 	Description      string   `json:"description,omitempty"`
 	TransactionFee   currency `json:"transaction_fee"`
@@ -788,7 +713,7 @@ func (self *Sale) BillingAgreementId() string {
 }
 
 func (self *Sale) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_15n21swciwfwr{
+	return json.Marshal(json_12gy2l60gqndg{
 		&self.private,
 		self._shared,
 		self.Description,
@@ -859,26 +784,26 @@ Refund struct
 ******************************/
 func NewRefund() *Refund {
 	return &Refund{
-		private: private_1ldds0vs1j21f{},
+		private: private_vt3hxky28ej5{},
 	}
 }
 
 // State items are: pending; completed; failed
 type Refund struct {
-	private private_1ldds0vs1j21f
+	private private_vt3hxky28ej5
 	_shared
 	Description string `json:"description,omitempty"`
 	Reason      string `json:"reason,omitempty"`
 }
 
-type private_1ldds0vs1j21f struct {
+type private_vt3hxky28ej5 struct {
 	Amount    amount `json:"amount"`
 	SaleId    string `json:"sale_id,omitempty"`
 	CaptureId string `json:"capture_id,omitempty"`
 }
 
-type json_1ldds0vs1j21f struct {
-	*private_1ldds0vs1j21f
+type json_vt3hxky28ej5 struct {
+	*private_vt3hxky28ej5
 	_shared
 	Description string `json:"description,omitempty"`
 	Reason      string `json:"reason,omitempty"`
@@ -897,7 +822,7 @@ func (self *Refund) CaptureId() string {
 }
 
 func (self *Refund) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1ldds0vs1j21f{
+	return json.Marshal(json_vt3hxky28ej5{
 		&self.private,
 		self._shared,
 		self.Description,
@@ -949,7 +874,7 @@ amount struct
 ******************************/
 func NewAmount() *amount {
 	return &amount{
-		private: private_ldo1a2xgbw98{},
+		private: private_o3fqoh6n0ly7{},
 	}
 }
 
@@ -960,17 +885,17 @@ func NewAmount() *amount {
 // All other uses of `Amount` do have `shipping`, `shipping_discount` and
 // `subtotal` to calculate the `Total`.
 type amount struct {
-	private private_ldo1a2xgbw98
+	private private_o3fqoh6n0ly7
 	Details *details `json:"details,omitempty"`
 }
 
-type private_ldo1a2xgbw98 struct {
+type private_o3fqoh6n0ly7 struct {
 	Currency CurrencyTypeEnum `json:"currency"`
 	Total    float64          `json:"total"`
 }
 
-type json_ldo1a2xgbw98 struct {
-	*private_ldo1a2xgbw98
+type json_o3fqoh6n0ly7 struct {
+	*private_o3fqoh6n0ly7
 	Details *details `json:"details,omitempty"`
 }
 
@@ -983,7 +908,7 @@ func (self *amount) Total() float64 {
 }
 
 func (self *amount) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_ldo1a2xgbw98{
+	return json.Marshal(json_o3fqoh6n0ly7{
 		&self.private,
 		self.Details,
 	})
@@ -1029,19 +954,14 @@ details struct
 ******************************/
 func NewDetails() *details {
 	return &details{
-		private: private_o1w0p2cfookq{},
+		private: private_7nxd4jhifx3p{},
 	}
 }
 
 type details struct {
-	private private_o1w0p2cfookq
+	private private_7nxd4jhifx3p
 	// Amount charged for shipping. 10 chars max, with support for 2 decimal places
 	Shipping float64 `json:"shipping,omitempty"`
-	// Amount of the subtotal of the items. REQUIRED if line items are specified.
-	// 10 chars max, with support for 2 decimal places
-	Subtotal float64 `json:"subtotal,omitempty"`
-	// Amount charged for tax. 10 chars max, with support for 2 decimal places
-	Tax float64 `json:"tax,omitempty"`
 	// Amount being charged for handling fee. When `payment_method` is `paypal`
 	HandlingFee float64 `json:"handling_fee,omitempty"`
 	// Amount being charged for insurance fee. When `payment_method` is `paypal`
@@ -1050,24 +970,34 @@ type details struct {
 	ShippingDiscount float64 `json:"shipping_discount,omitempty"`
 }
 
-type private_o1w0p2cfookq struct{}
+type private_7nxd4jhifx3p struct {
+	// Amount of the subtotal of the items. REQUIRED if line items are specified.
+	// 10 chars max, with support for 2 decimal places
+	Subtotal float64 `json:"subtotal,omitempty"`
+	// Amount charged for tax. 10 chars max, with support for 2 decimal places
+	Tax float64 `json:"tax,omitempty"`
+}
 
-type json_o1w0p2cfookq struct {
-	*private_o1w0p2cfookq
+type json_7nxd4jhifx3p struct {
+	*private_7nxd4jhifx3p
 	Shipping         float64 `json:"shipping,omitempty"`
-	Subtotal         float64 `json:"subtotal,omitempty"`
-	Tax              float64 `json:"tax,omitempty"`
 	HandlingFee      float64 `json:"handling_fee,omitempty"`
 	Insurance        float64 `json:"insurance,omitempty"`
 	ShippingDiscount float64 `json:"shipping_discount,omitempty"`
 }
 
+func (self *details) Subtotal() float64 {
+	return self.private.Subtotal
+}
+
+func (self *details) Tax() float64 {
+	return self.private.Tax
+}
+
 func (self *details) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_o1w0p2cfookq{
+	return json.Marshal(json_7nxd4jhifx3p{
 		&self.private,
 		self.Shipping,
-		self.Subtotal,
-		self.Tax,
 		self.HandlingFee,
 		self.Insurance,
 		self.ShippingDiscount,
@@ -1090,12 +1020,12 @@ func (self *details) UnmarshalJSON(j []byte) error {
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
 		switch key {
+		case "subtotal":
+			err = json.Unmarshal(rawMsg, &self.private.Subtotal)
+		case "tax":
+			err = json.Unmarshal(rawMsg, &self.private.Tax)
 		case "shipping":
 			err = json.Unmarshal(rawMsg, &self.Shipping)
-		case "subtotal":
-			err = json.Unmarshal(rawMsg, &self.Subtotal)
-		case "tax":
-			err = json.Unmarshal(rawMsg, &self.Tax)
 		case "handling_fee":
 			err = json.Unmarshal(rawMsg, &self.HandlingFee)
 		case "insurance":
@@ -1120,26 +1050,26 @@ link struct
 ******************************/
 func NewLink() *link {
 	return &link{
-		private: private_168qtqwobuvz6{},
+		private: private_19j7jdunq6sn1{},
 	}
 }
 
 type link struct {
-	private private_168qtqwobuvz6
+	private private_19j7jdunq6sn1
 }
 
-type private_168qtqwobuvz6 struct {
+type private_19j7jdunq6sn1 struct {
 	Href   string      `json:"href,omitempty"`
 	Rel    relTypeEnum `json:"rel,omitempty"`
 	Method string      `json:"method,omitempty"`
 }
 
-type json_168qtqwobuvz6 struct {
-	*private_168qtqwobuvz6
+type json_19j7jdunq6sn1 struct {
+	*private_19j7jdunq6sn1
 }
 
 func (self *link) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_168qtqwobuvz6{
+	return json.Marshal(json_19j7jdunq6sn1{
 		&self.private,
 	})
 }
@@ -1184,27 +1114,27 @@ currency struct
 ******************************/
 func NewCurrency() *currency {
 	return &currency{
-		private: private_c08gnrfs6odz{},
+		private: private_14hzmfb2eukjp{},
 	}
 }
 
 // Base object for all financial value related fields (balance, payment due, etc.)
 type currency struct {
-	private  private_c08gnrfs6odz
+	private  private_14hzmfb2eukjp
 	Currency string `json:"currency"`
 	Value    string `json:"value"`
 }
 
-type private_c08gnrfs6odz struct{}
+type private_14hzmfb2eukjp struct{}
 
-type json_c08gnrfs6odz struct {
-	*private_c08gnrfs6odz
+type json_14hzmfb2eukjp struct {
+	*private_14hzmfb2eukjp
 	Currency string `json:"currency"`
 	Value    string `json:"value"`
 }
 
 func (self *currency) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_c08gnrfs6odz{
+	return json.Marshal(json_14hzmfb2eukjp{
 		&self.private,
 		self.Currency,
 		self.Value,
@@ -1249,24 +1179,24 @@ fmfDetails struct
 ******************************/
 func NewFmfDetails() *fmfDetails {
 	return &fmfDetails{
-		private: private_1gcgcxu7k0krt{},
+		private: private_72ufamyhluzc{},
 	}
 }
 
 // This object represents Fraud Management Filter (FMF) details for a payment.
 type fmfDetails struct {
-	private private_1gcgcxu7k0krt
+	private private_72ufamyhluzc
 }
 
-type private_1gcgcxu7k0krt struct {
+type private_72ufamyhluzc struct {
 	FilterType  fmfFilterEnum `json:"filter_type"`
 	FilterID    filterIdEnum  `json:"filter_id"`
 	Name        string        `json:"name"`
 	Description string        `json:"description"`
 }
 
-type json_1gcgcxu7k0krt struct {
-	*private_1gcgcxu7k0krt
+type json_72ufamyhluzc struct {
+	*private_72ufamyhluzc
 }
 
 func (self *fmfDetails) FilterType() fmfFilterEnum {
@@ -1286,7 +1216,7 @@ func (self *fmfDetails) Description() string {
 }
 
 func (self *fmfDetails) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1gcgcxu7k0krt{
+	return json.Marshal(json_72ufamyhluzc{
 		&self.private,
 	})
 }

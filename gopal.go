@@ -134,6 +134,8 @@ func (self *connection) send(reqData *request) error {
 		return err
 	}
 
+	reqData.responseData = result
+
 	/*
 		fmt.Println("RESPONSE:",string(result))
 	*/

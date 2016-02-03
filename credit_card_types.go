@@ -1,5 +1,7 @@
 package gopal
 
+import "fmt"
+
 //go:generate Golific $GOFILE
 
 /*
@@ -7,6 +9,101 @@ This file contains types that are specific to creating credit card payments.
 Several types are used for both Paypal and credit cards, yet have restrictions
 for one or the other.
 */
+
+func (self *connection) NewCreditCardPayment() *CreditCardPayment {
+	var pymt = CreditCardPayment{
+		connection: self,
+	}
+	pymt.private.Intent = intent.Sale
+	pymt.PaymentBase.private.Transactions = make([]*Transaction, 0)
+
+	pymt.private.Payer.private.PaymentMethod = PaymentMethod.PayPal
+	pymt.private.Payer.private.PayerInfo = nil
+
+	return &pymt
+}
+
+/*
+// TODO: Add `billing_agreement_tokens`, `payment_instruction`
+@struct CreditCardPayment
+	*connection
+  PaymentBase
+	ExperienceProfileId string `json:"experience_profile_id"` --read --write
+	Payer 							creditCardPayer `json:"payer,omitempty"` --read
+	State 							stateEnum `json:"state,omitempty"` --read
+	Id 									string `json:"id,omitempty"` --read
+	FailureReason				FailureReasonEnum `json:"failure_reason,omitempty"` --read
+	CreateTime 					dateTime `json:"create_time,omitempty"` --read
+	UpdateTime 					dateTime `json:"update_time,omitempty"` --read
+	Links 							links `json:"links,omitempty"` --read
+	*payment_error
+*/
+
+// TODO: Needs to validate some sub-properties that are valid only when
+// Payer.PaymentMethod is "paypal"
+func (self *CreditCardPayment) validate() (err error) {
+	if len(self.PaymentBase.private.Transactions) == 0 {
+		return fmt.Errorf("A Payment needs at least one Transaction")
+	}
+
+	for _, t := range self.PaymentBase.private.Transactions {
+		if err = t.validate(); err != nil {
+			return err
+		}
+	}
+
+	// TODO: More validation
+
+	return self.private.Payer.validate()
+}
+
+// TODO: Finish implementation
+func (self *CreditCardPayment) AddFundingInstrument(instrs ...fundingInstrument) error {
+	for _, instr := range instrs {
+		//		err := instr.validate()
+		//		if err != nil {
+		//			return err
+		//		}
+		self.private.Payer.private.FundingInstruments = append(
+			self.private.Payer.private.FundingInstruments, &instr,
+		)
+	}
+	return nil
+}
+
+// TODO: Should send a query string parameter `token=[some token]`
+// TODO: Right now this is set up for Paypal Payments. Need to change for CCards
+func (self *CreditCardPayment) Authorize() (to string, code int, err error) {
+	if err = self.validate(); err != nil {
+		return "", 0, err
+	}
+
+	self.calculateToAuthorize()
+
+	// Create Totals
+	var pymt CreditCardPayment
+
+	err = self.send(&request{
+		method:   method.Post,
+		path:     _paymentsPath,
+		body:     self,
+		response: &pymt,
+	})
+
+	if err == nil {
+		switch pymt.private.State {
+		case state.Created:
+			// Set url to redirect to PayPal site to begin approval process
+			to, _ = pymt.private.Links.get(relType.ApprovalUrl)
+			code = 303
+		default:
+			// otherwise cancel the payment and return an error
+			err = UnexpectedResponse
+		}
+	}
+
+	return to, code, err
+}
 
 /*
 // Source of the funds for this payment represented by a credit card.
@@ -66,3 +163,12 @@ func (self *creditCardPayer) validate() error {
 	// Shipping address of payer PayPal account. Value assigned by PayPal.
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"` --read
 */
+
+func (self *PayerInfo) validate() error {
+	// TODO: Implement
+	if self == nil {
+		return nil
+	}
+
+	return nil
+}

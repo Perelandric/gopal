@@ -1,9 +1,11 @@
 package gopal
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+	"path"
 	"time"
 )
 
@@ -24,17 +26,22 @@ type resource interface {
 
 type relatedResources []resource
 
+type Payment interface {
+	calculateToAuthorize()
+}
+
 type refundable interface {
 	resource
 	getRefundPath() string
 }
 
 type request struct {
-	method    methodEnum
-	path      string
-	body      interface{}
-	response  errorable
-	isAuthReq bool
+	method       methodEnum
+	path         string
+	body         interface{}
+	response     errorable
+	responseData []byte
+	isAuthReq    bool
 }
 
 type connection struct {
@@ -106,52 +113,91 @@ func (self *Redirects) validate() error {
 	return nil
 }
 
-/**********************
+func (self *connection) FetchPayment(payment_id string) (Payment, error) {
 
-Payment Object
-
-**********************/
-
-/*
-// TODO: Add `billing_agreement_tokens`, `payment_instruction`
-@struct Payment
-	*connection
-	ExperienceProfileId string `json:"experience_profile_id"` --read --write
-	Intent							intentEnum `json:"intent,omitempty"` --read
-	Payer 							payer `json:"payer,omitempty"` --read
-	Transactions				Transactions `json:"transactions,omitempty"` --read
-	RedirectUrls				Redirects `json:"redirect_urls,omitempty"` --read
-	State 							stateEnum `json:"state,omitempty"` --read
-	Id 									string `json:"id,omitempty"` --read
-	FailureReason				FailureReasonEnum `json:"failure_reason,omitempty"` --read
-	CreateTime 					dateTime `json:"create_time,omitempty"` --read
-	UpdateTime 					dateTime `json:"update_time,omitempty"` --read
-	Links 							links `json:"links,omitempty"` --read
-	*payment_error
-*/
-
-// TODO: Needs to validate some sub-properties that are valid only when
-// Payer.PaymentMethod is "paypal"
-func (self *Payment) validate() (err error) {
-	if len(self.private.Transactions) == 0 {
-		return fmt.Errorf("A Payment needs at least one Transaction")
-	}
-
-	for _, t := range self.private.Transactions {
-		if err = t.validate(); err != nil {
-			return err
+	type paymentFetch struct {
+		Payer struct {
+			PaymentMethod PaymentMethodEnum
 		}
+		*payment_error
 	}
 
-	// TODO: More validation
+	var f = &paymentFetch{}
 
-	return self.private.Payer.validate()
+	var req = &request{
+		method:   method.Get,
+		path:     path.Join(_paymentsPath, payment_id),
+		body:     nil,
+		response: f,
+	}
+
+	if err := self.send(req); err != nil {
+		return nil, err
+	}
+
+	var pymt Payment
+
+	switch f.Payer.PaymentMethod {
+	case PaymentMethod.PayPal:
+		pymt = &PaypalPayment{}
+
+	case PaymentMethod.CreditCard:
+		pymt = &CreditCardPayment{}
+
+	default:
+		return nil, fmt.Errorf("Unknown payment method %q while unmarshaling",
+			f.Payer.PaymentMethod)
+	}
+
+	if err := json.Unmarshal(req.responseData, pymt); err != nil {
+		return nil, err
+	}
+
+	return pymt, nil
 }
 
-func (self *Payment) calculateToAuthorize() {
+/*
+@struct PaymentBase
+	Intent				intentEnum 		`json:"intent,omitempty"` --read
+	Transactions	Transactions 	`json:"transactions,omitempty"` --read
+*/
+
+func (self *PaymentBase) AddTransaction(
+	c CurrencyTypeEnum, shp *ShippingAddress) *Transaction {
+
+	var t Transaction
+	t.private.Amount = amount{}
+	t.private.ItemList = &itemList{}
+
+	t.private.Amount.private.Currency = c
+	t.private.Amount.private.Total = 0
+
+	t.private.ItemList.private.Items = make([]*Item, 0, 1)
+	t.private.ItemList.private.ShippingAddress = shp
+
+	self.private.Transactions = append(self.private.Transactions, &t)
+
+	return &t
+}
+
+func (self *PaymentBase) calculateToAuthorize() {
 	for _, t := range self.private.Transactions {
 		t.calculateToAuthorize()
 	}
+}
+
+// TODO: I'm returning a list of Sale objects because every payment can have multiple transactions.
+//		I need to find out why a payment can have multiple transactions, and see if I should eliminate that in the API
+func (self *PaymentBase) FetchSale() []*Sale {
+	var sales = []*Sale{}
+	for _, trans := range self.private.Transactions {
+		for _, related_resource := range trans.private.RelatedResources {
+			if s, ok := related_resource.(*Sale); ok {
+				sales = append(sales, s)
+			}
+		}
+	}
+	return sales
 }
 
 /*
@@ -201,9 +247,9 @@ func (self *Transaction) calculateToAuthorize() {
 	self.private.Amount.private.Total = roundTwoDecimalPlaces(
 		self.private.Amount.Details.private.Subtotal +
 			self.private.Amount.Details.private.Tax +
-			self.private.Amount.Details.private.Shipping +
-			self.private.Amount.Details.private.Insurance -
-			self.private.Amount.Details.private.ShippingDiscount)
+			self.private.Amount.Details.Shipping +
+			self.private.Amount.Details.Insurance -
+			self.private.Amount.Details.ShippingDiscount)
 }
 
 /*
@@ -270,7 +316,7 @@ func (self *Item) validate() (err error) {
 	*identity_error
 */
 
-func (self *_shared) FetchParentPayment() (*Payment, error) {
+func (self *_shared) FetchParentPayment() (Payment, error) {
 	return self.FetchPayment(self.private.ParentPayment)
 }
 
@@ -359,15 +405,15 @@ func (self amount) validate() (err error) {
 // No need to validate because its values are calculated or validated when set.
 /*
 @struct details
-	// Amount charged for shipping. 10 chars max, with support for 2 decimal places
-	Shipping float64 `json:"shipping,omitempty"` --read --write
-
 	// Amount of the subtotal of the items. REQUIRED if line items are specified.
 	// 10 chars max, with support for 2 decimal places
-	Subtotal float64 `json:"subtotal,omitempty"` --read --write
+	Subtotal float64 `json:"subtotal,omitempty"` --read
 
 	// Amount charged for tax. 10 chars max, with support for 2 decimal places
-	Tax float64 `json:"tax,omitempty"` --read --write
+	Tax float64 `json:"tax,omitempty"` --read
+
+	// Amount charged for shipping. 10 chars max, with support for 2 decimal places
+	Shipping float64 `json:"shipping,omitempty"` --read --write
 
 	// Amount being charged for handling fee. When `payment_method` is `paypal`
 	HandlingFee float64 `json:"handling_fee,omitempty"` --read --write
@@ -412,15 +458,6 @@ func (l links) get(r relTypeEnum) (string, string) {
 	Name 				string `json:"name"` --read
 	Description string `json:"description"` --read
 */
-
-func (self *PayerInfo) validate() error {
-	// TODO: Implement
-	if self == nil {
-		return nil
-	}
-
-	return nil
-}
 
 // Address: This object is used for billing or shipping addresses.
 type Address struct {

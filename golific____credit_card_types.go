@@ -13,29 +13,162 @@ import (
 
 /*****************************
 
+CreditCardPayment struct
+
+******************************/
+func NewCreditCardPayment() *CreditCardPayment {
+	return &CreditCardPayment{
+		private: private_r7ursfl4o4rf{},
+	}
+}
+
+// TODO: Add `billing_agreement_tokens`, `payment_instruction`
+type CreditCardPayment struct {
+	private private_r7ursfl4o4rf
+	*connection
+	PaymentBase
+	ExperienceProfileId string `json:"experience_profile_id"`
+	*payment_error
+}
+
+type private_r7ursfl4o4rf struct {
+	Intent        intentEnum        `json:"intent,omitempty"`
+	Payer         creditCardPayer   `json:"payer,omitempty"`
+	RedirectUrls  Redirects         `json:"redirect_urls,omitempty"`
+	State         stateEnum         `json:"state,omitempty"`
+	Id            string            `json:"id,omitempty"`
+	FailureReason FailureReasonEnum `json:"failure_reason,omitempty"`
+	CreateTime    dateTime          `json:"create_time,omitempty"`
+	UpdateTime    dateTime          `json:"update_time,omitempty"`
+	Links         links             `json:"links,omitempty"`
+}
+
+type json_r7ursfl4o4rf struct {
+	*private_r7ursfl4o4rf
+	*connection
+	PaymentBase
+	ExperienceProfileId string `json:"experience_profile_id"`
+	*payment_error
+}
+
+func (self *CreditCardPayment) Intent() intentEnum {
+	return self.private.Intent
+}
+
+func (self *CreditCardPayment) Payer() creditCardPayer {
+	return self.private.Payer
+}
+
+func (self *CreditCardPayment) RedirectUrls() Redirects {
+	return self.private.RedirectUrls
+}
+
+func (self *CreditCardPayment) State() stateEnum {
+	return self.private.State
+}
+
+func (self *CreditCardPayment) Id() string {
+	return self.private.Id
+}
+
+func (self *CreditCardPayment) FailureReason() FailureReasonEnum {
+	return self.private.FailureReason
+}
+
+func (self *CreditCardPayment) CreateTime() dateTime {
+	return self.private.CreateTime
+}
+
+func (self *CreditCardPayment) UpdateTime() dateTime {
+	return self.private.UpdateTime
+}
+
+func (self *CreditCardPayment) Links() links {
+	return self.private.Links
+}
+
+func (self *CreditCardPayment) MarshalJSON() ([]byte, error) {
+	return json.Marshal(json_r7ursfl4o4rf{
+		&self.private,
+		self.connection,
+		self.PaymentBase,
+		self.ExperienceProfileId,
+		self.payment_error,
+	})
+}
+
+func (self *CreditCardPayment) UnmarshalJSON(j []byte) error {
+	if len(j) == 4 && string(j) == "null" {
+		return nil
+	}
+
+	m := make(map[string]json.RawMessage)
+
+	err := json.Unmarshal(j, &m)
+	if err != nil {
+		return err
+	}
+
+	// For every property found, perform a separate UnmarshalJSON operation. This
+	// prevents overwrite of values in 'self' where properties are absent.
+	for key, rawMsg := range m {
+		switch key {
+		case "experience_profile_id":
+			err = json.Unmarshal(rawMsg, &self.ExperienceProfileId)
+		case "intent":
+			err = json.Unmarshal(rawMsg, &self.private.Intent)
+		case "payer":
+			err = json.Unmarshal(rawMsg, &self.private.Payer)
+		case "redirect_urls":
+			err = json.Unmarshal(rawMsg, &self.private.RedirectUrls)
+		case "state":
+			err = json.Unmarshal(rawMsg, &self.private.State)
+		case "id":
+			err = json.Unmarshal(rawMsg, &self.private.Id)
+		case "failure_reason":
+			err = json.Unmarshal(rawMsg, &self.private.FailureReason)
+		case "create_time":
+			err = json.Unmarshal(rawMsg, &self.private.CreateTime)
+		case "update_time":
+			err = json.Unmarshal(rawMsg, &self.private.UpdateTime)
+		case "links":
+			err = json.Unmarshal(rawMsg, &self.private.Links)
+		default:
+			// Ignoring unknown property
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+/*****************************
+
 creditCardPayer struct
 
 ******************************/
 func NewCreditCardPayer() *creditCardPayer {
 	return &creditCardPayer{
-		private: private_m1nehthhe0rl{},
+		private: private_1qwarwc5gckfy{},
 	}
 }
 
 // Source of the funds for this payment represented by a credit card.
 type creditCardPayer struct {
-	private private_m1nehthhe0rl
+	private private_1qwarwc5gckfy
 }
 
-type private_m1nehthhe0rl struct {
+type private_1qwarwc5gckfy struct {
 	// Must be PaymentMethod.CreditCard
 	PaymentMethod      PaymentMethodEnum  `json:"payment_method,omitempty"`
 	FundingInstruments fundingInstruments `json:"funding_instruments,omitempty"`
 	PayerInfo          *PayerInfo         `json:"payer_info,omitempty"`
 }
 
-type json_m1nehthhe0rl struct {
-	*private_m1nehthhe0rl
+type json_1qwarwc5gckfy struct {
+	*private_1qwarwc5gckfy
 }
 
 func (self *creditCardPayer) PaymentMethod() PaymentMethodEnum {
@@ -51,7 +184,7 @@ func (self *creditCardPayer) PayerInfo() *PayerInfo {
 }
 
 func (self *creditCardPayer) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_m1nehthhe0rl{
+	return json.Marshal(json_1qwarwc5gckfy{
 		&self.private,
 	})
 }
@@ -96,12 +229,12 @@ PayerInfo struct
 ******************************/
 func NewPayerInfo() *PayerInfo {
 	return &PayerInfo{
-		private: private_7ivcnr1eujdu{},
+		private: private_1j704pmy8dq7k{},
 	}
 }
 
 type PayerInfo struct {
-	private private_7ivcnr1eujdu
+	private private_1j704pmy8dq7k
 	// Email address representing the payer. 127 characters max.
 	Email string `json:"email,omitempty"`
 	// Salutation of the payer.
@@ -119,7 +252,7 @@ type PayerInfo struct {
 	TaxId string `json:"tax_id,omitempty"`
 }
 
-type private_7ivcnr1eujdu struct {
+type private_1j704pmy8dq7k struct {
 	// First name of the payer. Value assigned by PayPal.
 	FirstName string `json:"first_name,omitempty"`
 	// Middle name of the payer. Value assigned by PayPal.
@@ -132,8 +265,8 @@ type private_7ivcnr1eujdu struct {
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
-type json_7ivcnr1eujdu struct {
-	*private_7ivcnr1eujdu
+type json_1j704pmy8dq7k struct {
+	*private_1j704pmy8dq7k
 	Email       string          `json:"email,omitempty"`
 	Salutation  string          `json:"salutation,omitempty"`
 	Suffix      string          `json:"suffix,omitempty"`
@@ -164,7 +297,7 @@ func (self *PayerInfo) ShippingAddress() *ShippingAddress {
 }
 
 func (self *PayerInfo) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_7ivcnr1eujdu{
+	return json.Marshal(json_1j704pmy8dq7k{
 		&self.private,
 		self.Email,
 		self.Salutation,
