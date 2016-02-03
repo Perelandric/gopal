@@ -1,9 +1,11 @@
-package main
+package gopal
 
 //go:generate Golific $GOFILE
 
 /*
-  This file contains the counterparts to the types in `paypal_types.go`.
+This file contains types that are specific to creating credit card payments.
+Several types are used for both Paypal and credit cards, yet have restrictions
+for one or the other.
 */
 
 /*
@@ -11,7 +13,9 @@ package main
 @struct creditCardPayer
   // Must be PaymentMethod.CreditCard
 	PaymentMethod      PaymentMethodEnum `json:"payment_method,omitempty"` --read
+
 	FundingInstruments fundingInstruments `json:"funding_instruments,omitempty"` --read
+
 	PayerInfo          *PayerInfo `json:"payer_info,omitempty"` --read
 */
 

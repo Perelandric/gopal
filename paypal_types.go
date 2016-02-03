@@ -1,4 +1,4 @@
-package main
+package gopal
 
 //go:generate Golific $GOFILE
 
@@ -6,9 +6,6 @@ package main
 This file contains types that are specific to creating Paypal payments. Several
 types are used for both Paypal and credit cards, yet have restrictions for one
 or the other.
-
-Instead of trying to manage the restrictions using a single object, I've broken
-them up into separate objects. This helps guarantee the correct data is sent.
 */
 
 /*
@@ -20,12 +17,10 @@ them up into separate objects. This helps guarantee the correct data is sent.
   // Status of the payer’s PayPal account. Allowed values: VERIFIED or UNVERIFIED.
 	Status 						 payerStatusEnum `json:"status,omitempty"` --read
 
-	FundingInstruments fundingInstruments `json:"funding_instruments,omitempty"` --read
-
-	PayerInfo          *PaypalPayerInfo `json:"payer_info,omitempty"` --read
+	PaypalPayerInfo    *PaypalPayerInfo `json:"payer_info,omitempty"` --read
 */
 
-func (self *creditCardPayer) validate() error {
+func (self *paypalPayer) validate() error {
 	err := self.private.PaymentMethod.validate()
 	if err != nil {
 		return err
@@ -35,7 +30,7 @@ func (self *creditCardPayer) validate() error {
 
 /*
 // This object is pre-filled by PayPal when the payment_method is paypal.
-@struct PayerInfo
+@struct PaypalPayerInfo
 	// Email address representing the payer. 127 characters max.
 	Email string `json:"email,omitempty"` --read --write
 
