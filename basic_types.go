@@ -3,8 +3,8 @@ package gopal
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
-	"net/url"
 	"path"
 	"time"
 )
@@ -15,8 +15,6 @@ type dateTime string // TODO: How should this be done? [Un]Marshalers?
 
 // TODO: only needed until Golific acknowledges more types
 type fundingInstruments []*fundingInstrument
-type Transactions []*Transaction
-type Items []*Item
 
 type resource interface {
 	errorable
@@ -24,9 +22,12 @@ type resource interface {
 	Amount() amount
 }
 
-type relatedResources []resource
-
 type Payment interface {
+	calculateToAuthorize()
+}
+
+type Transaction interface {
+	validate() error
 	calculateToAuthorize()
 }
 
@@ -91,44 +92,64 @@ type tokeninfo struct {
 	*identity_error
 }
 
-type Redirects struct {
-	Return string `json:"return_url,omitempty"`
-	Cancel string `json:"cancel_url,omitempty"`
-}
+type relatedResources []resource
 
-func (self *Redirects) validate() error {
-	for _, s := range [2]string{self.Return, self.Cancel} {
-		u, err := url.Parse(s)
-		if err != nil {
-			return err
-		}
+//func (self *relatedResources) MarshalJSON() ([]byte, error) {
+//	return []byte("[]"), nil
+//}
 
-		if len(u.Scheme) == 0 {
-			return fmt.Errorf("URL Scheme is required. Found %q\n", s)
-		}
-		if len(u.Host) == 0 {
-			return fmt.Errorf("URL Host is required. Found %q\n", s)
+func (self *relatedResources) UnmarshalJSON(b []byte) error {
+	if self == nil || len(*self) == 0 {
+		return nil
+	}
+
+	var a = []map[string]json.RawMessage{}
+	err := json.Unmarshal(b, &a)
+	if err != nil {
+		return err
+	}
+
+	for _, m := range a {
+		for name, rawMesg := range m {
+			var t resource // for unmarshaling the current item
+
+			switch name {
+			case SaleType:
+				t = new(Sale)
+			case AuthorizationType:
+				t = new(Authorization)
+			case CaptureType:
+				t = new(Capture)
+			case RefundType:
+				t = new(Refund)
+			default:
+				log.Printf("Unexpected resource type: %s\n", name)
+				continue
+			}
+			if err = json.Unmarshal(rawMesg, t); err != nil {
+				return err
+			}
+
+			*self = append(*self, t) // Add unmarshaled item
 		}
 	}
 	return nil
 }
 
 func (self *connection) FetchPayment(payment_id string) (Payment, error) {
-
-	type paymentFetch struct {
+	// For determining Paypal or CreditCard payment
+	var f struct {
 		Payer struct {
 			PaymentMethod PaymentMethodEnum
 		}
 		*payment_error
 	}
 
-	var f = &paymentFetch{}
-
 	var req = &request{
 		method:   method.Get,
 		path:     path.Join(_paymentsPath, payment_id),
 		body:     nil,
-		response: f,
+		response: &f,
 	}
 
 	if err := self.send(req); err != nil {
@@ -154,154 +175,6 @@ func (self *connection) FetchPayment(payment_id string) (Payment, error) {
 	}
 
 	return pymt, nil
-}
-
-/*
-@struct PaymentBase
-	Intent				intentEnum 		`json:"intent,omitempty"` --read
-	Transactions	Transactions 	`json:"transactions,omitempty"` --read
-*/
-
-func (self *PaymentBase) AddTransaction(
-	c CurrencyTypeEnum, shp *ShippingAddress) *Transaction {
-
-	var t Transaction
-	t.private.Amount = amount{}
-	t.private.ItemList = &itemList{}
-
-	t.private.Amount.private.Currency = c
-	t.private.Amount.private.Total = 0
-
-	t.private.ItemList.private.Items = make([]*Item, 0, 1)
-	t.private.ItemList.private.ShippingAddress = shp
-
-	self.private.Transactions = append(self.private.Transactions, &t)
-
-	return &t
-}
-
-func (self *PaymentBase) calculateToAuthorize() {
-	for _, t := range self.private.Transactions {
-		t.calculateToAuthorize()
-	}
-}
-
-// TODO: I'm returning a list of Sale objects because every payment can have multiple transactions.
-//		I need to find out why a payment can have multiple transactions, and see if I should eliminate that in the API
-func (self *PaymentBase) FetchSale() []*Sale {
-	var sales = []*Sale{}
-	for _, trans := range self.private.Transactions {
-		for _, related_resource := range trans.private.RelatedResources {
-			if s, ok := related_resource.(*Sale); ok {
-				sales = append(sales, s)
-			}
-		}
-	}
-	return sales
-}
-
-/*
-@struct Transaction
-	ItemList 				*itemList `json:"item_list,omitempty"` --read
-	Amount 					amount `json:"amount"` --read
-	RelatedResources relatedResources `json:"related_resources,omitempty"` --read
-	Description 		string `json:"description,omitempty"` --read --write
-	InvoiceNumber 	string `json:"invoice_number,omitempty"` --read --write
-	Custom 					string `json:"custom,omitempty"` --read --write
-	SoftDescriptor 	string `json:"soft_descriptor,omitempty"` --read --write
-	PaymentOptions  paymentOptions `json:"payment_options,omitempty"` --read --write
-*/
-
-func (self *Transaction) validate() (err error) {
-	if err = self.private.ItemList.validate(); err != nil {
-		return err
-	}
-
-	// These can be truncated with a warning if too long
-	checkStr("Transaction.Description", &self.Description, 127, false, false)
-	checkStr("Transaction.Custom", &self.Custom, 256, false, false)
-	checkStr("Transaction.SoftDescriptor", &self.SoftDescriptor, 22, false, false)
-
-	// TODO: More validation... check docs
-
-	err = checkStr(
-		"Transaction.InvoiceNumber", &self.InvoiceNumber, 256, false, true)
-	if err != nil {
-		return err
-	}
-
-	return self.private.Amount.validate()
-}
-
-func (self *Transaction) calculateToAuthorize() {
-	// Calculate totals from itemList
-	for _, item := range self.private.ItemList.private.Items {
-		self.private.Amount.Details.private.Subtotal = roundTwoDecimalPlaces(
-			self.private.Amount.Details.private.Subtotal + (item.Price * float64(item.Quantity)))
-
-		self.private.Amount.Details.private.Tax = roundTwoDecimalPlaces(
-			self.private.Amount.Details.private.Tax + (item.Tax * float64(item.Quantity)))
-	}
-
-	// Set Total, which is sum of Details
-	self.private.Amount.private.Total = roundTwoDecimalPlaces(
-		self.private.Amount.Details.private.Subtotal +
-			self.private.Amount.Details.private.Tax +
-			self.private.Amount.Details.Shipping +
-			self.private.Amount.Details.Insurance -
-			self.private.Amount.Details.ShippingDiscount)
-}
-
-/*
-@struct itemList
-	Items           Items          	 `json:"items,omitempty"` --read
-	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"` --read
-*/
-
-func (self *itemList) validate() (err error) {
-	if self == nil {
-		return nil
-	}
-	if len(self.private.Items) == 0 {
-		return fmt.Errorf("Transaction item list must have at least one Item")
-	}
-
-	for _, item := range self.private.Items {
-		if err = item.validate(); err != nil {
-			return err
-		}
-	}
-	return self.private.ShippingAddress.validate()
-}
-
-/*
-@struct Item
-	Currency 		CurrencyTypeEnum 	`json:"currency"` --read
-	Quantity 		int64 			`json:"quantity,string"` --read --write
-	Name 				string 			`json:"name"` --read --write
-	Price 			float64 		`json:"price,string"` --read --write
-	Tax 				float64 		`json:"tax,omitempty"` --read --write
-	Sku 				string 			`json:"sku,omitempty"` --read --write
-	Description string 			`json:"description,omitempty"` --read --write
-*/
-
-func (self *Item) validate() (err error) {
-	if self.Tax < 0 { // TODO: No other validation here???
-		return fmt.Errorf("%q must not be a negative number", "Item.Tax")
-	}
-	if err = checkStr("Item.Name", &self.Name, 127, true, true); err != nil {
-		return err
-	}
-	if err = checkStr("Item.Sku", &self.Sku, 50, false, true); err != nil {
-		return err
-	}
-	_ = checkStr("Item.Description", &self.Description, 127, false, false)
-
-	if err = checkFloat7_10("Item.Price", &self.Price, true); err != nil {
-		return err
-	}
-
-	return checkInt10("Item.Quantity", self.Quantity, true)
 }
 
 /*
@@ -444,13 +317,13 @@ func (l links) get(r relTypeEnum) (string, string) {
 }
 
 /*
-
 // Base object for all financial value related fields (balance, payment due, etc.)
 @struct currency
 	Currency string `json:"currency"` --read --write
 	Value 	 string `json:"value"` --read --write
+*/
 
-
+/*
 // This object represents Fraud Management Filter (FMF) details for a payment.
 @struct fmfDetails
 	FilterType 	fmfFilterEnum `json:"filter_type"` --read
@@ -522,7 +395,36 @@ func (self *Address) validate() (err error) {
 }
 
 type ShippingAddress struct {
-	Address
+	// Line 1 of the address (e.g., Number, street, etc). 100 characters max.
+	// Required.
+	Line1 string `json:"line1,omitempty"`
+
+	// Line 2 of the address (e.g., Suite, apt #, etc). 100 characters max.
+	Line2 string `json:"line2,omitempty"`
+
+	// City name. 50 characters max. Required.
+	City string `json:"city,omitempty"`
+
+	// 2-letter country code. 2 characters max. Required.
+	CountryCode CountryCodeEnum `json:"country_code,omitempty"`
+
+	// Zip code or equivalent is usually required for countries that have them.
+	// 20 characters max. Required in certain countries.
+	PostalCode string `json:"postal_code,omitempty"`
+
+	// 2-letter code for US states, and the equivalent for other countries.
+	// 100 characters max.
+	State string `json:"state,omitempty"`
+
+	// Phone number in E.123 format. 50 characters max.
+	Phone string `json:"phone,omitempty"`
+
+	// Address normalization status, returned only for payers from Brazil. Allowed
+	// values: UNKNOWN, UNNORMALIZED_USER_PREFERRED, NORMALIZED, UNNORMALIZED
+	NormalizationStatus normStatusEnum `json:"normalization_status,omitempty"`
+
+	// Address status. Allowed values: CONFIRMED, UNCONFIRMED
+	Status addressStatusEnum `json:"status,omitempty"`
 
 	// Name of the recipient at this address. 50 characters max. Required
 	RecipientName string `json:"recipient_name,omitempty"`
@@ -542,7 +444,13 @@ func (self *ShippingAddress) validate() (err error) {
 	if err = self.Type.validate(); err != nil {
 		return err
 	}
-	return self.Address.validate()
+
+	// Borrow the `.vaildate()` method of Address for now.
+	var a = Address{
+		self.Line1, self.Line2, self.City, self.CountryCode, self.PostalCode,
+		self.State, self.Phone, self.NormalizationStatus, self.Status,
+	}
+	return a.validate()
 }
 
 type identityAddress struct {
@@ -604,4 +512,122 @@ type credit_card_token struct {
 	CreditCardId string `json:"credit_card_id,omitempty"`
 	Last4        string `json:"last4,omitempty"`
 	_cc_details
+}
+
+//This object includes payment options requested for the purchase unit.
+type paymentOptions struct {
+	// Optional payment method type. If specified, the transaction will go through
+	// for only instant payment. Allowed values: `INSTANT_FUNDING_SOURCE`. Only for
+	// use with the `paypal` payment_method, not relevant for the `credit_card`
+	// payment_method.
+	AllowedPaymentMethod string `json:"allowed_payment_method,omitempty"`
+}
+
+/****************************************
+
+	PaymentBatcher
+
+Manages paginated requests for Payments
+
+*****************************************/
+
+type PaymentBatcher struct {
+	*connection
+	baseQuery string
+	nextId    string
+	done      bool
+}
+
+func (self *PaymentBatcher) IsDone() bool {
+	return self.done
+}
+
+// TODO: Should `.Next()` take an optional filter function?
+func (self *PaymentBatcher) Next() ([]*Payment, error) {
+	if self.done {
+		return nil, ErrNoResults
+	}
+	var pymt_list = new(payment_list)
+	var qry = self.baseQuery
+
+	if self.nextId != "" {
+		qry = fmt.Sprintf("%s&start_id=%s", qry, self.nextId)
+	}
+
+	if err := self.send(&request{
+		method:   method.Get,
+		path:     path.Join(_paymentsPath, qry),
+		body:     nil,
+		response: pymt_list,
+	}); err != nil {
+		return nil, err
+	}
+
+	if pymt_list.Count == 0 {
+		self.done = true
+		self.nextId = ""
+		return nil, ErrNoResults
+	}
+
+	self.nextId = pymt_list.NextId
+
+	if self.nextId == "" {
+		self.done = true
+	}
+
+	return pymt_list.Payments, nil
+}
+
+// Pagination
+//	Assuming `start_time`, `start_index` and `start_id` are mutually exclusive
+//	...going to treat them that way anyhow until I understand better.
+
+// I'm going to ignore `start_index` for now since I don't see its usefulness
+
+func (self *connection) GetAllPayments(
+	size int,
+	sort_by sortByEnum, sort_order sortOrderEnum, time_range ...time.Time,
+) *PaymentBatcher {
+
+	if size < 0 {
+		size = 0
+	} else if size > 20 {
+		size = 20
+	}
+
+	var qry = fmt.Sprintf("?sort_order=%s&sort_by=%s&count=%d", sort_by, sort_order, size)
+
+	if len(time_range) > 0 {
+		if time_range[0].IsZero() == false {
+			qry = fmt.Sprintf("%s&start_time=%s", qry, time_range[0].Format(time.RFC3339))
+		}
+		if len(time_range) > 1 && time_range[1].After(time_range[0]) {
+			qry = fmt.Sprintf("%s&end_time=%s", qry, time_range[1].Format(time.RFC3339))
+		}
+	}
+
+	return &PaymentBatcher{
+		connection: self,
+		baseQuery:  qry,
+		nextId:     "",
+		done:       false,
+	}
+}
+
+// These provide a way to both get and set the `next_id`.
+// This gives the ability to cache the ID, and then set it in a new Batcher.
+// Useful if a session is not desired or practical
+
+func (self *PaymentBatcher) GetNextId() string {
+	return self.nextId
+}
+func (self *PaymentBatcher) SetNextId(id string) {
+	self.nextId = id
+}
+
+type payment_list struct {
+	Payments []*Payment `json:"payments"`
+	Count    int        `json:"count"`
+	NextId   string     `json:"next_id"`
+	*identity_error
 }

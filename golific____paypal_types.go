@@ -18,49 +18,40 @@ PaypalPayment struct
 ******************************/
 func NewPaypalPayment() *PaypalPayment {
 	return &PaypalPayment{
-		private: private_1qb81for0cii{},
+		private: private_1n3kdogt0jw7g{},
 	}
 }
 
 // TODO: Add `billing_agreement_tokens`, `payment_instruction`
 type PaypalPayment struct {
-	private private_1qb81for0cii
+	private private_1n3kdogt0jw7g
 	*connection
-	PaymentBase
 	ExperienceProfileId string `json:"experience_profile_id"`
 	*payment_error
 }
 
-type private_1qb81for0cii struct {
-	Intent        intentEnum        `json:"intent,omitempty"`
-	Payer         paypalPayer       `json:"payer,omitempty"`
-	RedirectUrls  Redirects         `json:"redirect_urls,omitempty"`
-	State         stateEnum         `json:"state,omitempty"`
-	Id            string            `json:"id,omitempty"`
-	FailureReason FailureReasonEnum `json:"failure_reason,omitempty"`
-	CreateTime    dateTime          `json:"create_time,omitempty"`
-	UpdateTime    dateTime          `json:"update_time,omitempty"`
-	Links         links             `json:"links,omitempty"`
+type private_1n3kdogt0jw7g struct {
+	Intent        intentEnum         `json:"intent,omitempty"`
+	State         stateEnum          `json:"state,omitempty"`
+	Id            string             `json:"id,omitempty"`
+	FailureReason FailureReasonEnum  `json:"failure_reason,omitempty"`
+	CreateTime    dateTime           `json:"create_time,omitempty"`
+	UpdateTime    dateTime           `json:"update_time,omitempty"`
+	Links         links              `json:"links,omitempty"`
+	Transactions  PaypalTransactions `json:"transactions,omitempty"`
+	Payer         paypalPayer        `json:"payer,omitempty"`
+	RedirectUrls  Redirects          `json:"redirect_urls,omitempty"`
 }
 
-type json_1qb81for0cii struct {
-	*private_1qb81for0cii
+type json_1n3kdogt0jw7g struct {
+	*private_1n3kdogt0jw7g
 	*connection
-	PaymentBase
 	ExperienceProfileId string `json:"experience_profile_id"`
 	*payment_error
 }
 
 func (self *PaypalPayment) Intent() intentEnum {
 	return self.private.Intent
-}
-
-func (self *PaypalPayment) Payer() paypalPayer {
-	return self.private.Payer
-}
-
-func (self *PaypalPayment) RedirectUrls() Redirects {
-	return self.private.RedirectUrls
 }
 
 func (self *PaypalPayment) State() stateEnum {
@@ -87,11 +78,22 @@ func (self *PaypalPayment) Links() links {
 	return self.private.Links
 }
 
+func (self *PaypalPayment) Transactions() PaypalTransactions {
+	return self.private.Transactions
+}
+
+func (self *PaypalPayment) Payer() paypalPayer {
+	return self.private.Payer
+}
+
+func (self *PaypalPayment) RedirectUrls() Redirects {
+	return self.private.RedirectUrls
+}
+
 func (self *PaypalPayment) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1qb81for0cii{
+	return json.Marshal(json_1n3kdogt0jw7g{
 		&self.private,
 		self.connection,
-		self.PaymentBase,
 		self.ExperienceProfileId,
 		self.payment_error,
 	})
@@ -113,14 +115,8 @@ func (self *PaypalPayment) UnmarshalJSON(j []byte) error {
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
 		switch key {
-		case "experience_profile_id":
-			err = json.Unmarshal(rawMsg, &self.ExperienceProfileId)
 		case "intent":
 			err = json.Unmarshal(rawMsg, &self.private.Intent)
-		case "payer":
-			err = json.Unmarshal(rawMsg, &self.private.Payer)
-		case "redirect_urls":
-			err = json.Unmarshal(rawMsg, &self.private.RedirectUrls)
 		case "state":
 			err = json.Unmarshal(rawMsg, &self.private.State)
 		case "id":
@@ -133,6 +129,276 @@ func (self *PaypalPayment) UnmarshalJSON(j []byte) error {
 			err = json.Unmarshal(rawMsg, &self.private.UpdateTime)
 		case "links":
 			err = json.Unmarshal(rawMsg, &self.private.Links)
+		case "transactions":
+			err = json.Unmarshal(rawMsg, &self.private.Transactions)
+		case "payer":
+			err = json.Unmarshal(rawMsg, &self.private.Payer)
+		case "redirect_urls":
+			err = json.Unmarshal(rawMsg, &self.private.RedirectUrls)
+		case "experience_profile_id":
+			err = json.Unmarshal(rawMsg, &self.ExperienceProfileId)
+		default:
+			// Ignoring unknown property
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+/*****************************
+
+PaypalTransaction struct
+
+******************************/
+func NewPaypalTransaction() *PaypalTransaction {
+	return &PaypalTransaction{
+		private: private_12x80iaigeb0z{},
+	}
+}
+
+type PaypalTransaction struct {
+	private        private_12x80iaigeb0z
+	Description    string         `json:"description,omitempty"`
+	PaymentOptions paymentOptions `json:"payment_options,omitempty"`
+	InvoiceNumber  string         `json:"invoice_number,omitempty"`
+	Custom         string         `json:"custom,omitempty"`
+	SoftDescriptor string         `json:"soft_descriptor,omitempty"`
+}
+
+type private_12x80iaigeb0z struct {
+	ItemList         *paypalItemList  `json:"item_list,omitempty"`
+	Amount           amount           `json:"amount"`
+	RelatedResources relatedResources `json:"related_resources,omitempty"`
+}
+
+type json_12x80iaigeb0z struct {
+	*private_12x80iaigeb0z
+	Description    string         `json:"description,omitempty"`
+	PaymentOptions paymentOptions `json:"payment_options,omitempty"`
+	InvoiceNumber  string         `json:"invoice_number,omitempty"`
+	Custom         string         `json:"custom,omitempty"`
+	SoftDescriptor string         `json:"soft_descriptor,omitempty"`
+}
+
+func (self *PaypalTransaction) ItemList() *paypalItemList {
+	return self.private.ItemList
+}
+
+func (self *PaypalTransaction) Amount() amount {
+	return self.private.Amount
+}
+
+func (self *PaypalTransaction) RelatedResources() relatedResources {
+	return self.private.RelatedResources
+}
+
+func (self *PaypalTransaction) MarshalJSON() ([]byte, error) {
+	return json.Marshal(json_12x80iaigeb0z{
+		&self.private,
+		self.Description,
+		self.PaymentOptions,
+		self.InvoiceNumber,
+		self.Custom,
+		self.SoftDescriptor,
+	})
+}
+
+func (self *PaypalTransaction) UnmarshalJSON(j []byte) error {
+	if len(j) == 4 && string(j) == "null" {
+		return nil
+	}
+
+	m := make(map[string]json.RawMessage)
+
+	err := json.Unmarshal(j, &m)
+	if err != nil {
+		return err
+	}
+
+	// For every property found, perform a separate UnmarshalJSON operation. This
+	// prevents overwrite of values in 'self' where properties are absent.
+	for key, rawMsg := range m {
+		switch key {
+		case "item_list":
+			err = json.Unmarshal(rawMsg, &self.private.ItemList)
+		case "amount":
+			err = json.Unmarshal(rawMsg, &self.private.Amount)
+		case "related_resources":
+			err = json.Unmarshal(rawMsg, &self.private.RelatedResources)
+		case "description":
+			err = json.Unmarshal(rawMsg, &self.Description)
+		case "payment_options":
+			err = json.Unmarshal(rawMsg, &self.PaymentOptions)
+		case "invoice_number":
+			err = json.Unmarshal(rawMsg, &self.InvoiceNumber)
+		case "custom":
+			err = json.Unmarshal(rawMsg, &self.Custom)
+		case "soft_descriptor":
+			err = json.Unmarshal(rawMsg, &self.SoftDescriptor)
+		default:
+			// Ignoring unknown property
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+/*****************************
+
+paypalItemList struct
+
+******************************/
+func NewPaypalItemList() *paypalItemList {
+	return &paypalItemList{
+		private: private_1qbuqvqs1wk3o{},
+	}
+}
+
+type paypalItemList struct {
+	private private_1qbuqvqs1wk3o
+}
+
+type private_1qbuqvqs1wk3o struct {
+	Items           PaypalItems      `json:"items,omitempty"`
+	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
+}
+
+type json_1qbuqvqs1wk3o struct {
+	*private_1qbuqvqs1wk3o
+}
+
+func (self *paypalItemList) Items() PaypalItems {
+	return self.private.Items
+}
+
+func (self *paypalItemList) ShippingAddress() *ShippingAddress {
+	return self.private.ShippingAddress
+}
+
+func (self *paypalItemList) MarshalJSON() ([]byte, error) {
+	return json.Marshal(json_1qbuqvqs1wk3o{
+		&self.private,
+	})
+}
+
+func (self *paypalItemList) UnmarshalJSON(j []byte) error {
+	if len(j) == 4 && string(j) == "null" {
+		return nil
+	}
+
+	m := make(map[string]json.RawMessage)
+
+	err := json.Unmarshal(j, &m)
+	if err != nil {
+		return err
+	}
+
+	// For every property found, perform a separate UnmarshalJSON operation. This
+	// prevents overwrite of values in 'self' where properties are absent.
+	for key, rawMsg := range m {
+		switch key {
+		case "items":
+			err = json.Unmarshal(rawMsg, &self.private.Items)
+		case "shipping_address":
+			err = json.Unmarshal(rawMsg, &self.private.ShippingAddress)
+		default:
+			// Ignoring unknown property
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+/*****************************
+
+PaypalItem struct
+
+******************************/
+func NewPaypalItem() *PaypalItem {
+	return &PaypalItem{
+		private: private_xcerrdasm5jx{},
+	}
+}
+
+type PaypalItem struct {
+	private     private_xcerrdasm5jx
+	Quantity    int64   `json:"quantity,string"`
+	Name        string  `json:"name"`
+	Price       float64 `json:"price,string"`
+	Tax         float64 `json:"tax,omitempty"`
+	Sku         string  `json:"sku,omitempty"`
+	Description string  `json:"description,omitempty"`
+}
+
+type private_xcerrdasm5jx struct {
+	Currency CurrencyTypeEnum `json:"currency"`
+}
+
+type json_xcerrdasm5jx struct {
+	*private_xcerrdasm5jx
+	Quantity    int64   `json:"quantity,string"`
+	Name        string  `json:"name"`
+	Price       float64 `json:"price,string"`
+	Tax         float64 `json:"tax,omitempty"`
+	Sku         string  `json:"sku,omitempty"`
+	Description string  `json:"description,omitempty"`
+}
+
+func (self *PaypalItem) Currency() CurrencyTypeEnum {
+	return self.private.Currency
+}
+
+func (self *PaypalItem) MarshalJSON() ([]byte, error) {
+	return json.Marshal(json_xcerrdasm5jx{
+		&self.private,
+		self.Quantity,
+		self.Name,
+		self.Price,
+		self.Tax,
+		self.Sku,
+		self.Description,
+	})
+}
+
+func (self *PaypalItem) UnmarshalJSON(j []byte) error {
+	if len(j) == 4 && string(j) == "null" {
+		return nil
+	}
+
+	m := make(map[string]json.RawMessage)
+
+	err := json.Unmarshal(j, &m)
+	if err != nil {
+		return err
+	}
+
+	// For every property found, perform a separate UnmarshalJSON operation. This
+	// prevents overwrite of values in 'self' where properties are absent.
+	for key, rawMsg := range m {
+		switch key {
+		case "currency":
+			err = json.Unmarshal(rawMsg, &self.private.Currency)
+		case "quantity":
+			err = json.Unmarshal(rawMsg, &self.Quantity)
+		case "name":
+			err = json.Unmarshal(rawMsg, &self.Name)
+		case "price":
+			err = json.Unmarshal(rawMsg, &self.Price)
+		case "tax":
+			err = json.Unmarshal(rawMsg, &self.Tax)
+		case "sku":
+			err = json.Unmarshal(rawMsg, &self.Sku)
+		case "description":
+			err = json.Unmarshal(rawMsg, &self.Description)
 		default:
 			// Ignoring unknown property
 		}
@@ -151,16 +417,16 @@ paypalPayer struct
 ******************************/
 func NewPaypalPayer() *paypalPayer {
 	return &paypalPayer{
-		private: private_w4e6pvena9pb{},
+		private: private_1c4dw6ao2p3pu{},
 	}
 }
 
 // Source of the funds for this payment represented by a PayPal account.
 type paypalPayer struct {
-	private private_w4e6pvena9pb
+	private private_1c4dw6ao2p3pu
 }
 
-type private_w4e6pvena9pb struct {
+type private_1c4dw6ao2p3pu struct {
 	// Must be PaymentMethod.Paypal
 	PaymentMethod PaymentMethodEnum `json:"payment_method,omitempty"`
 	// Status of the payer’s PayPal account. Allowed values: VERIFIED or UNVERIFIED.
@@ -168,8 +434,8 @@ type private_w4e6pvena9pb struct {
 	PaypalPayerInfo *PaypalPayerInfo `json:"payer_info,omitempty"`
 }
 
-type json_w4e6pvena9pb struct {
-	*private_w4e6pvena9pb
+type json_1c4dw6ao2p3pu struct {
+	*private_1c4dw6ao2p3pu
 }
 
 func (self *paypalPayer) Status() payerStatusEnum {
@@ -181,7 +447,7 @@ func (self *paypalPayer) PaypalPayerInfo() *PaypalPayerInfo {
 }
 
 func (self *paypalPayer) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_w4e6pvena9pb{
+	return json.Marshal(json_1c4dw6ao2p3pu{
 		&self.private,
 	})
 }
@@ -226,13 +492,21 @@ PaypalPayerInfo struct
 ******************************/
 func NewPaypalPayerInfo() *PaypalPayerInfo {
 	return &PaypalPayerInfo{
-		private: private_1j3id5kaqtm5n{},
+		private: private_aj5mctdrmnb1{},
 	}
 }
 
 // This object is pre-filled by PayPal when the payment_method is paypal.
 type PaypalPayerInfo struct {
-	private private_1j3id5kaqtm5n
+	private private_aj5mctdrmnb1
+	// Payer’s tax ID type. Allowed values: BR_CPF or BR_C`NPJ. Only supported when
+	// the payment_method is set to paypal.
+	TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"`
+	// Payer’s tax ID. Only supported when the payment_method is set to paypal.
+	TaxId string `json:"tax_id,omitempty"`
+}
+
+type private_aj5mctdrmnb1 struct {
 	// Email address representing the payer. 127 characters max.
 	Email string `json:"email,omitempty"`
 	// Salutation of the payer.
@@ -243,14 +517,6 @@ type PaypalPayerInfo struct {
 	CountryCode CountryCodeEnum `json:"country_code,omitempty"`
 	// Phone number representing the payer. 20 characters max.
 	Phone string `json:"phone,omitempty"`
-	// Payer’s tax ID type. Allowed values: BR_CPF or BR_CNPJ. Only supported when
-	// the payment_method is set to paypal.
-	TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"`
-	// Payer’s tax ID. Only supported when the payment_method is set to paypal.
-	TaxId string `json:"tax_id,omitempty"`
-}
-
-type private_1j3id5kaqtm5n struct {
 	// First name of the payer. Value assigned by PayPal.
 	FirstName string `json:"first_name,omitempty"`
 	// Middle name of the payer. Value assigned by PayPal.
@@ -263,15 +529,30 @@ type private_1j3id5kaqtm5n struct {
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
-type json_1j3id5kaqtm5n struct {
-	*private_1j3id5kaqtm5n
-	Email       string          `json:"email,omitempty"`
-	Salutation  string          `json:"salutation,omitempty"`
-	Suffix      string          `json:"suffix,omitempty"`
-	CountryCode CountryCodeEnum `json:"country_code,omitempty"`
-	Phone       string          `json:"phone,omitempty"`
-	TaxIdType   TaxIdTypeEnum   `json:"tax_id_type,omitempty"`
-	TaxId       string          `json:"tax_id,omitempty"`
+type json_aj5mctdrmnb1 struct {
+	*private_aj5mctdrmnb1
+	TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"`
+	TaxId     string        `json:"tax_id,omitempty"`
+}
+
+func (self *PaypalPayerInfo) Email() string {
+	return self.private.Email
+}
+
+func (self *PaypalPayerInfo) Salutation() string {
+	return self.private.Salutation
+}
+
+func (self *PaypalPayerInfo) Suffix() string {
+	return self.private.Suffix
+}
+
+func (self *PaypalPayerInfo) CountryCode() CountryCodeEnum {
+	return self.private.CountryCode
+}
+
+func (self *PaypalPayerInfo) Phone() string {
+	return self.private.Phone
 }
 
 func (self *PaypalPayerInfo) FirstName() string {
@@ -295,13 +576,8 @@ func (self *PaypalPayerInfo) ShippingAddress() *ShippingAddress {
 }
 
 func (self *PaypalPayerInfo) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1j3id5kaqtm5n{
+	return json.Marshal(json_aj5mctdrmnb1{
 		&self.private,
-		self.Email,
-		self.Salutation,
-		self.Suffix,
-		self.CountryCode,
-		self.Phone,
 		self.TaxIdType,
 		self.TaxId,
 	})
@@ -323,20 +599,20 @@ func (self *PaypalPayerInfo) UnmarshalJSON(j []byte) error {
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
 		switch key {
-		case "email":
-			err = json.Unmarshal(rawMsg, &self.Email)
-		case "salutation":
-			err = json.Unmarshal(rawMsg, &self.Salutation)
-		case "suffix":
-			err = json.Unmarshal(rawMsg, &self.Suffix)
-		case "country_code":
-			err = json.Unmarshal(rawMsg, &self.CountryCode)
-		case "phone":
-			err = json.Unmarshal(rawMsg, &self.Phone)
 		case "tax_id_type":
 			err = json.Unmarshal(rawMsg, &self.TaxIdType)
 		case "tax_id":
 			err = json.Unmarshal(rawMsg, &self.TaxId)
+		case "email":
+			err = json.Unmarshal(rawMsg, &self.private.Email)
+		case "salutation":
+			err = json.Unmarshal(rawMsg, &self.private.Salutation)
+		case "suffix":
+			err = json.Unmarshal(rawMsg, &self.private.Suffix)
+		case "country_code":
+			err = json.Unmarshal(rawMsg, &self.private.CountryCode)
+		case "phone":
+			err = json.Unmarshal(rawMsg, &self.private.Phone)
 		case "first_name":
 			err = json.Unmarshal(rawMsg, &self.private.FirstName)
 		case "middle_name":

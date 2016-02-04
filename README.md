@@ -22,12 +22,12 @@ func main() {
   }
 
   // Create a payment, providing type of payment method, and redirect urls
-  var pymt = conn.CreatePaypalPayment(
-    p.Payer {...},
+  var pymt = conn.NewPaypalPayment(
     p.Redirects {
       Return: "http://www.example.com/page_to_handle_success.html",
       Cancel: "http://www.example.com/page_to_handle_cancelation.html",
-    })
+    },
+    p.Payer {...})
 
   // Create a transaction for the payment. Only the CurrencyType is required.
   var trans = pymt.AddTransaction(
@@ -35,19 +35,17 @@ func main() {
     &p.ShippingAddress {
       RecipientName: "Bob Woo",
       Type: p.AddressType.Residential,
-      Address: Address {
-      	Line1: "12345 67th Place",
-        Line2: "Apt #890",
-        City: "Whoville",
-        State: "CA",
-        PostalCode: "90210",
-        CountryCode: CountryCode.US,
-        Phone: "555-555-5555",
-      },
+      Line1: "12345 67th Place",
+      Line2: "Apt #890",
+      City: "Whoville",
+      State: "CA",
+      PostalCode: "90210",
+      CountryCode: CountryCode.US,
+      Phone: "555-555-5555",
     })
 
-    // Add optional items to the Transaction
-    trans.Description = "A description of the transaction."
+  // Add optional items to the Transaction
+  trans.Description = "A description of the transaction."
 
   // Add items to the Transaction. Quantities < 1 are ignored. Price is to be
   // given according to the CurrencyType that was provided to NewTransaction().

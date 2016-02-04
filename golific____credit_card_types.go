@@ -18,49 +18,40 @@ CreditCardPayment struct
 ******************************/
 func NewCreditCardPayment() *CreditCardPayment {
 	return &CreditCardPayment{
-		private: private_r7ursfl4o4rf{},
+		private: private_x61xnc3t4szz{},
 	}
 }
 
 // TODO: Add `billing_agreement_tokens`, `payment_instruction`
 type CreditCardPayment struct {
-	private private_r7ursfl4o4rf
+	private private_x61xnc3t4szz
 	*connection
-	PaymentBase
 	ExperienceProfileId string `json:"experience_profile_id"`
 	*payment_error
 }
 
-type private_r7ursfl4o4rf struct {
-	Intent        intentEnum        `json:"intent,omitempty"`
-	Payer         creditCardPayer   `json:"payer,omitempty"`
-	RedirectUrls  Redirects         `json:"redirect_urls,omitempty"`
-	State         stateEnum         `json:"state,omitempty"`
-	Id            string            `json:"id,omitempty"`
-	FailureReason FailureReasonEnum `json:"failure_reason,omitempty"`
-	CreateTime    dateTime          `json:"create_time,omitempty"`
-	UpdateTime    dateTime          `json:"update_time,omitempty"`
-	Links         links             `json:"links,omitempty"`
+type private_x61xnc3t4szz struct {
+	Intent        intentEnum             `json:"intent,omitempty"`
+	State         stateEnum              `json:"state,omitempty"`
+	Id            string                 `json:"id,omitempty"`
+	FailureReason FailureReasonEnum      `json:"failure_reason,omitempty"`
+	CreateTime    dateTime               `json:"create_time,omitempty"`
+	UpdateTime    dateTime               `json:"update_time,omitempty"`
+	Links         links                  `json:"links,omitempty"`
+	Transactions  CreditCardTransactions `json:"transactions,omitempty"`
+	Payer         creditCardPayer        `json:"payer,omitempty"`
+	RedirectUrls  Redirects              `json:"redirect_urls,omitempty"`
 }
 
-type json_r7ursfl4o4rf struct {
-	*private_r7ursfl4o4rf
+type json_x61xnc3t4szz struct {
+	*private_x61xnc3t4szz
 	*connection
-	PaymentBase
 	ExperienceProfileId string `json:"experience_profile_id"`
 	*payment_error
 }
 
 func (self *CreditCardPayment) Intent() intentEnum {
 	return self.private.Intent
-}
-
-func (self *CreditCardPayment) Payer() creditCardPayer {
-	return self.private.Payer
-}
-
-func (self *CreditCardPayment) RedirectUrls() Redirects {
-	return self.private.RedirectUrls
 }
 
 func (self *CreditCardPayment) State() stateEnum {
@@ -87,11 +78,22 @@ func (self *CreditCardPayment) Links() links {
 	return self.private.Links
 }
 
+func (self *CreditCardPayment) Transactions() CreditCardTransactions {
+	return self.private.Transactions
+}
+
+func (self *CreditCardPayment) Payer() creditCardPayer {
+	return self.private.Payer
+}
+
+func (self *CreditCardPayment) RedirectUrls() Redirects {
+	return self.private.RedirectUrls
+}
+
 func (self *CreditCardPayment) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_r7ursfl4o4rf{
+	return json.Marshal(json_x61xnc3t4szz{
 		&self.private,
 		self.connection,
-		self.PaymentBase,
 		self.ExperienceProfileId,
 		self.payment_error,
 	})
@@ -113,14 +115,8 @@ func (self *CreditCardPayment) UnmarshalJSON(j []byte) error {
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
 		switch key {
-		case "experience_profile_id":
-			err = json.Unmarshal(rawMsg, &self.ExperienceProfileId)
 		case "intent":
 			err = json.Unmarshal(rawMsg, &self.private.Intent)
-		case "payer":
-			err = json.Unmarshal(rawMsg, &self.private.Payer)
-		case "redirect_urls":
-			err = json.Unmarshal(rawMsg, &self.private.RedirectUrls)
 		case "state":
 			err = json.Unmarshal(rawMsg, &self.private.State)
 		case "id":
@@ -133,6 +129,266 @@ func (self *CreditCardPayment) UnmarshalJSON(j []byte) error {
 			err = json.Unmarshal(rawMsg, &self.private.UpdateTime)
 		case "links":
 			err = json.Unmarshal(rawMsg, &self.private.Links)
+		case "transactions":
+			err = json.Unmarshal(rawMsg, &self.private.Transactions)
+		case "experience_profile_id":
+			err = json.Unmarshal(rawMsg, &self.ExperienceProfileId)
+		case "payer":
+			err = json.Unmarshal(rawMsg, &self.private.Payer)
+		case "redirect_urls":
+			err = json.Unmarshal(rawMsg, &self.private.RedirectUrls)
+		default:
+			// Ignoring unknown property
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+/*****************************
+
+CreditCardTransaction struct
+
+******************************/
+func NewCreditCardTransaction() *CreditCardTransaction {
+	return &CreditCardTransaction{
+		private: private_s7vau0kduwpa{},
+	}
+}
+
+type CreditCardTransaction struct {
+	private        private_s7vau0kduwpa
+	Description    string         `json:"description,omitempty"`
+	PaymentOptions paymentOptions `json:"payment_options,omitempty"`
+	InvoiceNumber  string         `json:"invoice_number,omitempty"`
+	Custom         string         `json:"custom,omitempty"`
+	SoftDescriptor string         `json:"soft_descriptor,omitempty"`
+}
+
+type private_s7vau0kduwpa struct {
+	ItemList         *creditCardItemList `json:"item_list,omitempty"`
+	Amount           amount              `json:"amount"`
+	RelatedResources relatedResources    `json:"related_resources,omitempty"`
+}
+
+type json_s7vau0kduwpa struct {
+	*private_s7vau0kduwpa
+	Description    string         `json:"description,omitempty"`
+	PaymentOptions paymentOptions `json:"payment_options,omitempty"`
+	InvoiceNumber  string         `json:"invoice_number,omitempty"`
+	Custom         string         `json:"custom,omitempty"`
+	SoftDescriptor string         `json:"soft_descriptor,omitempty"`
+}
+
+func (self *CreditCardTransaction) ItemList() *creditCardItemList {
+	return self.private.ItemList
+}
+
+func (self *CreditCardTransaction) Amount() amount {
+	return self.private.Amount
+}
+
+func (self *CreditCardTransaction) RelatedResources() relatedResources {
+	return self.private.RelatedResources
+}
+
+func (self *CreditCardTransaction) MarshalJSON() ([]byte, error) {
+	return json.Marshal(json_s7vau0kduwpa{
+		&self.private,
+		self.Description,
+		self.PaymentOptions,
+		self.InvoiceNumber,
+		self.Custom,
+		self.SoftDescriptor,
+	})
+}
+
+func (self *CreditCardTransaction) UnmarshalJSON(j []byte) error {
+	if len(j) == 4 && string(j) == "null" {
+		return nil
+	}
+
+	m := make(map[string]json.RawMessage)
+
+	err := json.Unmarshal(j, &m)
+	if err != nil {
+		return err
+	}
+
+	// For every property found, perform a separate UnmarshalJSON operation. This
+	// prevents overwrite of values in 'self' where properties are absent.
+	for key, rawMsg := range m {
+		switch key {
+		case "item_list":
+			err = json.Unmarshal(rawMsg, &self.private.ItemList)
+		case "amount":
+			err = json.Unmarshal(rawMsg, &self.private.Amount)
+		case "related_resources":
+			err = json.Unmarshal(rawMsg, &self.private.RelatedResources)
+		case "description":
+			err = json.Unmarshal(rawMsg, &self.Description)
+		case "payment_options":
+			err = json.Unmarshal(rawMsg, &self.PaymentOptions)
+		case "invoice_number":
+			err = json.Unmarshal(rawMsg, &self.InvoiceNumber)
+		case "custom":
+			err = json.Unmarshal(rawMsg, &self.Custom)
+		case "soft_descriptor":
+			err = json.Unmarshal(rawMsg, &self.SoftDescriptor)
+		default:
+			// Ignoring unknown property
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+/*****************************
+
+creditCardItemList struct
+
+******************************/
+func NewCreditCardItemList() *creditCardItemList {
+	return &creditCardItemList{
+		private: private_14dyrawerh111{},
+	}
+}
+
+type creditCardItemList struct {
+	private private_14dyrawerh111
+}
+
+type private_14dyrawerh111 struct {
+	Items           CreditCardItems  `json:"items,omitempty"`
+	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
+}
+
+type json_14dyrawerh111 struct {
+	*private_14dyrawerh111
+}
+
+func (self *creditCardItemList) Items() CreditCardItems {
+	return self.private.Items
+}
+
+func (self *creditCardItemList) ShippingAddress() *ShippingAddress {
+	return self.private.ShippingAddress
+}
+
+func (self *creditCardItemList) MarshalJSON() ([]byte, error) {
+	return json.Marshal(json_14dyrawerh111{
+		&self.private,
+	})
+}
+
+func (self *creditCardItemList) UnmarshalJSON(j []byte) error {
+	if len(j) == 4 && string(j) == "null" {
+		return nil
+	}
+
+	m := make(map[string]json.RawMessage)
+
+	err := json.Unmarshal(j, &m)
+	if err != nil {
+		return err
+	}
+
+	// For every property found, perform a separate UnmarshalJSON operation. This
+	// prevents overwrite of values in 'self' where properties are absent.
+	for key, rawMsg := range m {
+		switch key {
+		case "items":
+			err = json.Unmarshal(rawMsg, &self.private.Items)
+		case "shipping_address":
+			err = json.Unmarshal(rawMsg, &self.private.ShippingAddress)
+		default:
+			// Ignoring unknown property
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+/*****************************
+
+CreditCardItem struct
+
+******************************/
+func NewCreditCardItem() *CreditCardItem {
+	return &CreditCardItem{
+		private: private_1k16ftoumjda{},
+	}
+}
+
+type CreditCardItem struct {
+	private  private_1k16ftoumjda
+	Quantity int64   `json:"quantity,string"`
+	Name     string  `json:"name"`
+	Price    float64 `json:"price,string"`
+	Sku      string  `json:"sku,omitempty"`
+}
+
+type private_1k16ftoumjda struct {
+	Currency CurrencyTypeEnum `json:"currency"`
+}
+
+type json_1k16ftoumjda struct {
+	*private_1k16ftoumjda
+	Quantity int64   `json:"quantity,string"`
+	Name     string  `json:"name"`
+	Price    float64 `json:"price,string"`
+	Sku      string  `json:"sku,omitempty"`
+}
+
+func (self *CreditCardItem) Currency() CurrencyTypeEnum {
+	return self.private.Currency
+}
+
+func (self *CreditCardItem) MarshalJSON() ([]byte, error) {
+	return json.Marshal(json_1k16ftoumjda{
+		&self.private,
+		self.Quantity,
+		self.Name,
+		self.Price,
+		self.Sku,
+	})
+}
+
+func (self *CreditCardItem) UnmarshalJSON(j []byte) error {
+	if len(j) == 4 && string(j) == "null" {
+		return nil
+	}
+
+	m := make(map[string]json.RawMessage)
+
+	err := json.Unmarshal(j, &m)
+	if err != nil {
+		return err
+	}
+
+	// For every property found, perform a separate UnmarshalJSON operation. This
+	// prevents overwrite of values in 'self' where properties are absent.
+	for key, rawMsg := range m {
+		switch key {
+		case "currency":
+			err = json.Unmarshal(rawMsg, &self.private.Currency)
+		case "quantity":
+			err = json.Unmarshal(rawMsg, &self.Quantity)
+		case "name":
+			err = json.Unmarshal(rawMsg, &self.Name)
+		case "price":
+			err = json.Unmarshal(rawMsg, &self.Price)
+		case "sku":
+			err = json.Unmarshal(rawMsg, &self.Sku)
 		default:
 			// Ignoring unknown property
 		}
@@ -151,24 +407,24 @@ creditCardPayer struct
 ******************************/
 func NewCreditCardPayer() *creditCardPayer {
 	return &creditCardPayer{
-		private: private_1qwarwc5gckfy{},
+		private: private_1j496btvwg04v{},
 	}
 }
 
 // Source of the funds for this payment represented by a credit card.
 type creditCardPayer struct {
-	private private_1qwarwc5gckfy
+	private private_1j496btvwg04v
 }
 
-type private_1qwarwc5gckfy struct {
+type private_1j496btvwg04v struct {
 	// Must be PaymentMethod.CreditCard
 	PaymentMethod      PaymentMethodEnum  `json:"payment_method,omitempty"`
 	FundingInstruments fundingInstruments `json:"funding_instruments,omitempty"`
 	PayerInfo          *PayerInfo         `json:"payer_info,omitempty"`
 }
 
-type json_1qwarwc5gckfy struct {
-	*private_1qwarwc5gckfy
+type json_1j496btvwg04v struct {
+	*private_1j496btvwg04v
 }
 
 func (self *creditCardPayer) PaymentMethod() PaymentMethodEnum {
@@ -184,7 +440,7 @@ func (self *creditCardPayer) PayerInfo() *PayerInfo {
 }
 
 func (self *creditCardPayer) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1qwarwc5gckfy{
+	return json.Marshal(json_1j496btvwg04v{
 		&self.private,
 	})
 }
@@ -229,12 +485,12 @@ PayerInfo struct
 ******************************/
 func NewPayerInfo() *PayerInfo {
 	return &PayerInfo{
-		private: private_1j704pmy8dq7k{},
+		private: private_r0398uk0kg3g{},
 	}
 }
 
 type PayerInfo struct {
-	private private_1j704pmy8dq7k
+	private private_r0398uk0kg3g
 	// Email address representing the payer. 127 characters max.
 	Email string `json:"email,omitempty"`
 	// Salutation of the payer.
@@ -245,14 +501,6 @@ type PayerInfo struct {
 	CountryCode CountryCodeEnum `json:"country_code,omitempty"`
 	// Phone number representing the payer. 20 characters max.
 	Phone string `json:"phone,omitempty"`
-	// Payer’s tax ID type. Allowed values: BR_CPF or BR_CNPJ. Only supported when
-	// the payment_method is set to paypal.
-	TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"`
-	// Payer’s tax ID. Only supported when the payment_method is set to paypal.
-	TaxId string `json:"tax_id,omitempty"`
-}
-
-type private_1j704pmy8dq7k struct {
 	// First name of the payer. Value assigned by PayPal.
 	FirstName string `json:"first_name,omitempty"`
 	// Middle name of the payer. Value assigned by PayPal.
@@ -265,47 +513,35 @@ type private_1j704pmy8dq7k struct {
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
-type json_1j704pmy8dq7k struct {
-	*private_1j704pmy8dq7k
-	Email       string          `json:"email,omitempty"`
-	Salutation  string          `json:"salutation,omitempty"`
-	Suffix      string          `json:"suffix,omitempty"`
-	CountryCode CountryCodeEnum `json:"country_code,omitempty"`
-	Phone       string          `json:"phone,omitempty"`
-	TaxIdType   TaxIdTypeEnum   `json:"tax_id_type,omitempty"`
-	TaxId       string          `json:"tax_id,omitempty"`
-}
+type private_r0398uk0kg3g struct{}
 
-func (self *PayerInfo) FirstName() string {
-	return self.private.FirstName
-}
-
-func (self *PayerInfo) MiddleName() string {
-	return self.private.MiddleName
-}
-
-func (self *PayerInfo) LastName() string {
-	return self.private.LastName
-}
-
-func (self *PayerInfo) PayerId() string {
-	return self.private.PayerId
-}
-
-func (self *PayerInfo) ShippingAddress() *ShippingAddress {
-	return self.private.ShippingAddress
+type json_r0398uk0kg3g struct {
+	*private_r0398uk0kg3g
+	Email           string           `json:"email,omitempty"`
+	Salutation      string           `json:"salutation,omitempty"`
+	Suffix          string           `json:"suffix,omitempty"`
+	CountryCode     CountryCodeEnum  `json:"country_code,omitempty"`
+	Phone           string           `json:"phone,omitempty"`
+	FirstName       string           `json:"first_name,omitempty"`
+	MiddleName      string           `json:"middle_name,omitempty"`
+	LastName        string           `json:"last_name,omitempty"`
+	PayerId         string           `json:"payer_id,omitempty"`
+	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
 func (self *PayerInfo) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1j704pmy8dq7k{
+	return json.Marshal(json_r0398uk0kg3g{
 		&self.private,
 		self.Email,
 		self.Salutation,
 		self.Suffix,
 		self.CountryCode,
 		self.Phone,
-		self.TaxIdType,
-		self.TaxId,
+		self.FirstName,
+		self.MiddleName,
+		self.LastName,
+		self.PayerId,
+		self.ShippingAddress,
 	})
 }
 
@@ -335,20 +571,16 @@ func (self *PayerInfo) UnmarshalJSON(j []byte) error {
 			err = json.Unmarshal(rawMsg, &self.CountryCode)
 		case "phone":
 			err = json.Unmarshal(rawMsg, &self.Phone)
-		case "tax_id_type":
-			err = json.Unmarshal(rawMsg, &self.TaxIdType)
-		case "tax_id":
-			err = json.Unmarshal(rawMsg, &self.TaxId)
 		case "first_name":
-			err = json.Unmarshal(rawMsg, &self.private.FirstName)
+			err = json.Unmarshal(rawMsg, &self.FirstName)
 		case "middle_name":
-			err = json.Unmarshal(rawMsg, &self.private.MiddleName)
+			err = json.Unmarshal(rawMsg, &self.MiddleName)
 		case "last_name":
-			err = json.Unmarshal(rawMsg, &self.private.LastName)
+			err = json.Unmarshal(rawMsg, &self.LastName)
 		case "payer_id":
-			err = json.Unmarshal(rawMsg, &self.private.PayerId)
+			err = json.Unmarshal(rawMsg, &self.PayerId)
 		case "shipping_address":
-			err = json.Unmarshal(rawMsg, &self.private.ShippingAddress)
+			err = json.Unmarshal(rawMsg, &self.ShippingAddress)
 		default:
 			// Ignoring unknown property
 		}
