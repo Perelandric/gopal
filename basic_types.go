@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"path"
 	"time"
 )
@@ -50,6 +51,21 @@ type connection struct {
 	id, secret string
 	tokeninfo  tokeninfo
 	client     http.Client
+}
+
+type Connection interface {
+	FetchPayment(string) (Payment, error)
+	GetAllPayments(int, sortByEnum, sortOrderEnum, ...time.Time)
+	FetchAuthorization(string) (*Authorization, error)
+	FetchCapture(string) (*Capture, error)
+	NewCreditCardPayment() *CreditCardPayment
+	NewPaypalPayment(Redirects, *PaypalPayerInfo) (*PaypalPayment, error)
+	Execute(url.URL) error
+	FetchRefund(string) (*Refund, error)
+	FetchSale(string) (*Sale, error)
+
+	authenticate() error
+	send(*request) error
 }
 
 // Authorization response
