@@ -315,7 +315,7 @@ func (self *paypalItemList) validate() (err error) {
 	Quantity 		int64 			`json:"quantity,string"` --read --write
 	Name 				string 			`json:"name"` --read --write
 	Price 			float64 		`json:"price,string"` --read --write
-	Tax 				float64 		`json:"tax,omitempty"` --read --write
+	Tax 				float64 		`json:"tax,string,omitempty"` --read --write
 	Sku 				string 			`json:"sku,omitempty"` --read --write
 	Description string 			`json:"description,omitempty"` --read --write
 */

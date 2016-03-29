@@ -273,7 +273,7 @@ func (self *_shared) FetchParentPayment() (Payment, error) {
 // `subtotal` to calculate the `Total`.
 @struct amount
 	Currency CurrencyTypeEnum `json:"currency"` --read
-	Total 	 float64 					`json:"total"` --read
+	Total 	 float64 					`json:"total,string"` --read
 	Details *details 					`json:"details,omitempty"` --read --write
 */
 
@@ -296,22 +296,22 @@ func (self amount) validate() (err error) {
 @struct details
 	// Amount of the subtotal of the items. REQUIRED if line items are specified.
 	// 10 chars max, with support for 2 decimal places
-	Subtotal float64 `json:"subtotal,omitempty"` --read
+	Subtotal float64 `json:"subtotal,string,omitempty"` --read
 
 	// Amount charged for tax. 10 chars max, with support for 2 decimal places
-	Tax float64 `json:"tax,omitempty"` --read
+	Tax float64 `json:"tax,string,omitempty"` --read
 
 	// Amount charged for shipping. 10 chars max, with support for 2 decimal places
-	Shipping float64 `json:"shipping,omitempty"` --read --write
+	Shipping float64 `json:"shipping,string,omitempty"` --read --write
 
 	// Amount being charged for handling fee. When `payment_method` is `paypal`
-	HandlingFee float64 `json:"handling_fee,omitempty"` --read --write
+	HandlingFee float64 `json:"handling_fee,string,omitempty"` --read --write
 
 	// Amount being charged for insurance fee. When `payment_method` is `paypal`
-	Insurance float64 `json:"insurance,omitempty"` --read --write
+	Insurance float64 `json:"insurance,string,omitempty"` --read --write
 
 	// Amount being discounted for shipping fee. When `payment_method` is `paypal`
-	ShippingDiscount float64 `json:"shipping_discount,omitempty"` --read --write
+	ShippingDiscount float64 `json:"shipping_discount,string,omitempty"` --read --write
 */
 
 /*
