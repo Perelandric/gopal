@@ -23,7 +23,8 @@ func (self *identity_error) IsError() bool {
 }
 func (ie *identity_error) to_error() error {
 	if ie.IsError() {
-		return fmt.Errorf("PayPal error response:%q, Description:%q", ie.Error, ie.Error_description)
+		return fmt.Errorf("PayPal error response:%q, Description:%q",
+			ie.Error, ie.Error_description)
 	}
 	return nil
 }
@@ -39,7 +40,8 @@ func (self *http_status_error) IsError() bool {
 }
 func (hse *http_status_error) to_error() error {
 	if hse.IsError() {
-		return fmt.Errorf("Http status error: %q, Message: %q, Info link: %q", hse.Name, hse.Message, hse.Information_link)
+		return fmt.Errorf("Http status error: %q, Message: %q, Info link: %q",
+			hse.Name, hse.Message, hse.Information_link)
 	}
 	return nil
 }
@@ -55,7 +57,8 @@ func (self *payment_error) IsError() bool {
 }
 func (pe *payment_error) to_error() error {
 	if pe.IsError() {
-		return fmt.Errorf("Payment error response: %q, Message: %q", pe.Name, pe.Message)
+		return fmt.Errorf(
+			"Payment error response: %q, Message: %q", pe.Name, pe.Message)
 	}
 	return nil
 }

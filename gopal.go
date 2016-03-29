@@ -2,7 +2,12 @@ package gopal
 
 // http://play.golang.org/p/zUgqXPsjjg // Idea for generated enums
 
-import "bytes"
+import (
+	"bytes"
+	"fmt"
+	"log"
+)
+
 import "encoding/json"
 import "io"
 import "io/ioutil"
@@ -20,6 +25,8 @@ func NewConnection(s ServerEnum, id, secret string) (c *connection, err error) {
 		id:     id,
 		secret: secret,
 	}
+
+	fmt.Printf("Creating Paypal %q connection.\n", s)
 
 	if err = c.authenticate(); err != nil {
 		return nil, err
@@ -54,6 +61,8 @@ func (self *connection) authenticate() error {
 		return err
 	}
 
+	fmt.Printf("%#v\n", self.tokeninfo)
+
 	// Set the duration to expire 3 minutes early to avoid expiration during a request cycle
 	duration = time.Duration(self.tokeninfo.ExpiresIn)*time.Second - 3*time.Minute
 	self.tokeninfo.expiration = time.Now().Add(duration)
@@ -71,18 +80,23 @@ func (self *connection) send(reqData *request) error {
 	var req *http.Request
 	var resp *http.Response
 	var body_reader io.Reader
-	var url string
+	var url = "https://" // can't include this when doing the `.Join()` below
 
 	// Make sure we're still authenticated. Will refresh if not.
-	if err := self.authenticate(); err != nil {
-		return err
+	/* TODO: How do I know if the authentication is still valid before sending?
+
+	if !reqData.isAuthReq {
+		if err := self.authenticate(); err != nil {
+			return err
+		}
 	}
+	*/
 
 	// use sandbox url if requested
 	if self.server == Server.Sandbox {
-		url = path.Join("https://api.sandbox.paypal.com/v1", reqData.path)
+		url += path.Join("api.sandbox.paypal.com/v1", reqData.path)
 	} else {
-		url = path.Join("https://api.paypal.com/v1", reqData.path)
+		url += path.Join("api.paypal.com/v1", reqData.path)
 	}
 
 	switch val := reqData.body.(type) {
@@ -96,6 +110,7 @@ func (self *connection) send(reqData *request) error {
 		if result, err := json.Marshal(val); err != nil {
 			return err
 		} else {
+			fmt.Println("sending...", string(result))
 			body_reader = bytes.NewReader(result)
 		}
 	}
@@ -110,6 +125,7 @@ func (self *connection) send(reqData *request) error {
 	if reqData.isAuthReq {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		req.SetBasicAuth(self.id, self.secret)
+
 	} else {
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Authorization", self.tokeninfo.auth_token())
@@ -130,15 +146,14 @@ func (self *connection) send(reqData *request) error {
 
 	result, err = ioutil.ReadAll(resp.Body)
 
+	fmt.Println("received...", string(result))
+
 	if err != nil {
+		fmt.Println("Ready Body error")
 		return err
 	}
 
 	reqData.responseData = result
-
-	/*
-		fmt.Println("RESPONSE:",string(result))
-	*/
 
 	// If there was no Body, we can return
 	if len(bytes.TrimSpace(result)) == 0 || reqData.response == nil {
@@ -146,8 +161,16 @@ func (self *connection) send(reqData *request) error {
 	}
 
 	if err = json.Unmarshal(result, reqData.response); err != nil {
+		fmt.Println("Unmarshaling error")
 		return err
 	}
 
-	return reqData.response.to_error()
+	var e = reqData.response.to_error()
+	if err != nil {
+		log.Printf("Paypal response error: %q\n", e.Error())
+	} else {
+		fmt.Println("was nil")
+	}
+
+	return e
 }

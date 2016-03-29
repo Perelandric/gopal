@@ -100,9 +100,9 @@ func validateEnum(enum enumValidator) error {
 	Unverified --string=UNVERIFIED
 
 @enum intent --json=string
-	Sale
-	Authorize
-	Order
+	Sale --string=sale
+	Authorize --string=authorize
+	Order --string=order
 
 @enum FailureReason --json=string
 	UnableToCompleteTransaction --string=UNABLE_TO_COMPLETE_TRANSACTION

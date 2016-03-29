@@ -18,23 +18,23 @@ PaypalPayment struct
 ******************************/
 func NewPaypalPayment() *PaypalPayment {
 	return &PaypalPayment{
-		private: private_1n3kdogt0jw7g{},
+		private: private_fg9ic0pru0qp{},
 	}
 }
 
 // TODO: Add `billing_agreement_tokens`, `payment_instruction`
 type PaypalPayment struct {
-	private private_1n3kdogt0jw7g
+	private private_fg9ic0pru0qp
 	*connection
-	ExperienceProfileId string `json:"experience_profile_id"`
+	ExperienceProfileId string `json:"experience_profile_id,omitempty"`
 	*payment_error
 }
 
-type private_1n3kdogt0jw7g struct {
+type private_fg9ic0pru0qp struct {
 	Intent        intentEnum         `json:"intent,omitempty"`
-	State         stateEnum          `json:"state,omitempty"`
+	State         *stateEnum         `json:"state,omitempty"`
 	Id            string             `json:"id,omitempty"`
-	FailureReason FailureReasonEnum  `json:"failure_reason,omitempty"`
+	FailureReason *FailureReasonEnum `json:"failure_reason,omitempty"`
 	CreateTime    dateTime           `json:"create_time,omitempty"`
 	UpdateTime    dateTime           `json:"update_time,omitempty"`
 	Links         links              `json:"links,omitempty"`
@@ -43,10 +43,10 @@ type private_1n3kdogt0jw7g struct {
 	RedirectUrls  Redirects          `json:"redirect_urls,omitempty"`
 }
 
-type json_1n3kdogt0jw7g struct {
-	*private_1n3kdogt0jw7g
+type json_fg9ic0pru0qp struct {
+	*private_fg9ic0pru0qp
 	*connection
-	ExperienceProfileId string `json:"experience_profile_id"`
+	ExperienceProfileId string `json:"experience_profile_id,omitempty"`
 	*payment_error
 }
 
@@ -54,7 +54,7 @@ func (self *PaypalPayment) Intent() intentEnum {
 	return self.private.Intent
 }
 
-func (self *PaypalPayment) State() stateEnum {
+func (self *PaypalPayment) State() *stateEnum {
 	return self.private.State
 }
 
@@ -62,7 +62,7 @@ func (self *PaypalPayment) Id() string {
 	return self.private.Id
 }
 
-func (self *PaypalPayment) FailureReason() FailureReasonEnum {
+func (self *PaypalPayment) FailureReason() *FailureReasonEnum {
 	return self.private.FailureReason
 }
 
@@ -91,7 +91,7 @@ func (self *PaypalPayment) RedirectUrls() Redirects {
 }
 
 func (self *PaypalPayment) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1n3kdogt0jw7g{
+	return json.Marshal(json_fg9ic0pru0qp{
 		&self.private,
 		self.connection,
 		self.ExperienceProfileId,
@@ -155,32 +155,32 @@ PaypalTransaction struct
 ******************************/
 func NewPaypalTransaction() *PaypalTransaction {
 	return &PaypalTransaction{
-		private: private_12x80iaigeb0z{},
+		private: private_40913pqrmgku{},
 	}
 }
 
 type PaypalTransaction struct {
-	private        private_12x80iaigeb0z
-	Description    string         `json:"description,omitempty"`
-	PaymentOptions paymentOptions `json:"payment_options,omitempty"`
-	InvoiceNumber  string         `json:"invoice_number,omitempty"`
-	Custom         string         `json:"custom,omitempty"`
-	SoftDescriptor string         `json:"soft_descriptor,omitempty"`
+	private        private_40913pqrmgku
+	Description    string          `json:"description,omitempty"`
+	PaymentOptions *paymentOptions `json:"payment_options,omitempty"`
+	InvoiceNumber  string          `json:"invoice_number,omitempty"`
+	Custom         string          `json:"custom,omitempty"`
+	SoftDescriptor string          `json:"soft_descriptor,omitempty"`
 }
 
-type private_12x80iaigeb0z struct {
+type private_40913pqrmgku struct {
 	ItemList         *paypalItemList  `json:"item_list,omitempty"`
 	Amount           amount           `json:"amount"`
 	RelatedResources relatedResources `json:"related_resources,omitempty"`
 }
 
-type json_12x80iaigeb0z struct {
-	*private_12x80iaigeb0z
-	Description    string         `json:"description,omitempty"`
-	PaymentOptions paymentOptions `json:"payment_options,omitempty"`
-	InvoiceNumber  string         `json:"invoice_number,omitempty"`
-	Custom         string         `json:"custom,omitempty"`
-	SoftDescriptor string         `json:"soft_descriptor,omitempty"`
+type json_40913pqrmgku struct {
+	*private_40913pqrmgku
+	Description    string          `json:"description,omitempty"`
+	PaymentOptions *paymentOptions `json:"payment_options,omitempty"`
+	InvoiceNumber  string          `json:"invoice_number,omitempty"`
+	Custom         string          `json:"custom,omitempty"`
+	SoftDescriptor string          `json:"soft_descriptor,omitempty"`
 }
 
 func (self *PaypalTransaction) ItemList() *paypalItemList {
@@ -196,7 +196,7 @@ func (self *PaypalTransaction) RelatedResources() relatedResources {
 }
 
 func (self *PaypalTransaction) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_12x80iaigeb0z{
+	return json.Marshal(json_40913pqrmgku{
 		&self.private,
 		self.Description,
 		self.PaymentOptions,
@@ -256,21 +256,21 @@ paypalItemList struct
 ******************************/
 func NewPaypalItemList() *paypalItemList {
 	return &paypalItemList{
-		private: private_1qbuqvqs1wk3o{},
+		private: private_a86cw1xf8j5n{},
 	}
 }
 
 type paypalItemList struct {
-	private private_1qbuqvqs1wk3o
+	private private_a86cw1xf8j5n
 }
 
-type private_1qbuqvqs1wk3o struct {
+type private_a86cw1xf8j5n struct {
 	Items           PaypalItems      `json:"items,omitempty"`
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
-type json_1qbuqvqs1wk3o struct {
-	*private_1qbuqvqs1wk3o
+type json_a86cw1xf8j5n struct {
+	*private_a86cw1xf8j5n
 }
 
 func (self *paypalItemList) Items() PaypalItems {
@@ -282,7 +282,7 @@ func (self *paypalItemList) ShippingAddress() *ShippingAddress {
 }
 
 func (self *paypalItemList) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1qbuqvqs1wk3o{
+	return json.Marshal(json_a86cw1xf8j5n{
 		&self.private,
 	})
 }
@@ -325,12 +325,12 @@ PaypalItem struct
 ******************************/
 func NewPaypalItem() *PaypalItem {
 	return &PaypalItem{
-		private: private_xcerrdasm5jx{},
+		private: private_kxqnl4d878u7{},
 	}
 }
 
 type PaypalItem struct {
-	private     private_xcerrdasm5jx
+	private     private_kxqnl4d878u7
 	Quantity    int64   `json:"quantity,string"`
 	Name        string  `json:"name"`
 	Price       float64 `json:"price,string"`
@@ -339,12 +339,12 @@ type PaypalItem struct {
 	Description string  `json:"description,omitempty"`
 }
 
-type private_xcerrdasm5jx struct {
+type private_kxqnl4d878u7 struct {
 	Currency CurrencyTypeEnum `json:"currency"`
 }
 
-type json_xcerrdasm5jx struct {
-	*private_xcerrdasm5jx
+type json_kxqnl4d878u7 struct {
+	*private_kxqnl4d878u7
 	Quantity    int64   `json:"quantity,string"`
 	Name        string  `json:"name"`
 	Price       float64 `json:"price,string"`
@@ -358,7 +358,7 @@ func (self *PaypalItem) Currency() CurrencyTypeEnum {
 }
 
 func (self *PaypalItem) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_xcerrdasm5jx{
+	return json.Marshal(json_kxqnl4d878u7{
 		&self.private,
 		self.Quantity,
 		self.Name,
@@ -417,28 +417,28 @@ paypalPayer struct
 ******************************/
 func NewPaypalPayer() *paypalPayer {
 	return &paypalPayer{
-		private: private_1c4dw6ao2p3pu{},
+		private: private_1ia947xwngmrr{},
 	}
 }
 
 // Source of the funds for this payment represented by a PayPal account.
 type paypalPayer struct {
-	private private_1c4dw6ao2p3pu
+	private private_1ia947xwngmrr
 }
 
-type private_1c4dw6ao2p3pu struct {
+type private_1ia947xwngmrr struct {
 	// Must be PaymentMethod.Paypal
 	PaymentMethod PaymentMethodEnum `json:"payment_method,omitempty"`
 	// Status of the payer’s PayPal account. Allowed values: VERIFIED or UNVERIFIED.
-	Status          payerStatusEnum  `json:"status,omitempty"`
+	Status          *payerStatusEnum `json:"status,omitempty"`
 	PaypalPayerInfo *PaypalPayerInfo `json:"payer_info,omitempty"`
 }
 
-type json_1c4dw6ao2p3pu struct {
-	*private_1c4dw6ao2p3pu
+type json_1ia947xwngmrr struct {
+	*private_1ia947xwngmrr
 }
 
-func (self *paypalPayer) Status() payerStatusEnum {
+func (self *paypalPayer) Status() *payerStatusEnum {
 	return self.private.Status
 }
 
@@ -447,7 +447,7 @@ func (self *paypalPayer) PaypalPayerInfo() *PaypalPayerInfo {
 }
 
 func (self *paypalPayer) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1c4dw6ao2p3pu{
+	return json.Marshal(json_1ia947xwngmrr{
 		&self.private,
 	})
 }
@@ -492,13 +492,13 @@ PaypalPayerInfo struct
 ******************************/
 func NewPaypalPayerInfo() *PaypalPayerInfo {
 	return &PaypalPayerInfo{
-		private: private_aj5mctdrmnb1{},
+		private: private_p3zaxv9b3fb5{},
 	}
 }
 
 // This object is pre-filled by PayPal when the payment_method is paypal.
 type PaypalPayerInfo struct {
-	private private_aj5mctdrmnb1
+	private private_p3zaxv9b3fb5
 	// Payer’s tax ID type. Allowed values: BR_CPF or BR_C`NPJ. Only supported when
 	// the payment_method is set to paypal.
 	TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"`
@@ -506,7 +506,7 @@ type PaypalPayerInfo struct {
 	TaxId string `json:"tax_id,omitempty"`
 }
 
-type private_aj5mctdrmnb1 struct {
+type private_p3zaxv9b3fb5 struct {
 	// Email address representing the payer. 127 characters max.
 	Email string `json:"email,omitempty"`
 	// Salutation of the payer.
@@ -529,8 +529,8 @@ type private_aj5mctdrmnb1 struct {
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
-type json_aj5mctdrmnb1 struct {
-	*private_aj5mctdrmnb1
+type json_p3zaxv9b3fb5 struct {
+	*private_p3zaxv9b3fb5
 	TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"`
 	TaxId     string        `json:"tax_id,omitempty"`
 }
@@ -576,7 +576,7 @@ func (self *PaypalPayerInfo) ShippingAddress() *ShippingAddress {
 }
 
 func (self *PaypalPayerInfo) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_aj5mctdrmnb1{
+	return json.Marshal(json_p3zaxv9b3fb5{
 		&self.private,
 		self.TaxIdType,
 		self.TaxId,

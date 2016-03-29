@@ -18,19 +18,19 @@ CreditCardPayment struct
 ******************************/
 func NewCreditCardPayment() *CreditCardPayment {
 	return &CreditCardPayment{
-		private: private_x61xnc3t4szz{},
+		private: private_13gx281ig5egq{},
 	}
 }
 
 // TODO: Add `billing_agreement_tokens`, `payment_instruction`
 type CreditCardPayment struct {
-	private private_x61xnc3t4szz
+	private private_13gx281ig5egq
 	*connection
 	ExperienceProfileId string `json:"experience_profile_id"`
 	*payment_error
 }
 
-type private_x61xnc3t4szz struct {
+type private_13gx281ig5egq struct {
 	Intent        intentEnum             `json:"intent,omitempty"`
 	State         stateEnum              `json:"state,omitempty"`
 	Id            string                 `json:"id,omitempty"`
@@ -43,8 +43,8 @@ type private_x61xnc3t4szz struct {
 	RedirectUrls  Redirects              `json:"redirect_urls,omitempty"`
 }
 
-type json_x61xnc3t4szz struct {
-	*private_x61xnc3t4szz
+type json_13gx281ig5egq struct {
+	*private_13gx281ig5egq
 	*connection
 	ExperienceProfileId string `json:"experience_profile_id"`
 	*payment_error
@@ -91,7 +91,7 @@ func (self *CreditCardPayment) RedirectUrls() Redirects {
 }
 
 func (self *CreditCardPayment) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_x61xnc3t4szz{
+	return json.Marshal(json_13gx281ig5egq{
 		&self.private,
 		self.connection,
 		self.ExperienceProfileId,
@@ -155,12 +155,12 @@ CreditCardTransaction struct
 ******************************/
 func NewCreditCardTransaction() *CreditCardTransaction {
 	return &CreditCardTransaction{
-		private: private_s7vau0kduwpa{},
+		private: private_1h4lccq9qqjay{},
 	}
 }
 
 type CreditCardTransaction struct {
-	private        private_s7vau0kduwpa
+	private        private_1h4lccq9qqjay
 	Description    string         `json:"description,omitempty"`
 	PaymentOptions paymentOptions `json:"payment_options,omitempty"`
 	InvoiceNumber  string         `json:"invoice_number,omitempty"`
@@ -168,14 +168,14 @@ type CreditCardTransaction struct {
 	SoftDescriptor string         `json:"soft_descriptor,omitempty"`
 }
 
-type private_s7vau0kduwpa struct {
+type private_1h4lccq9qqjay struct {
 	ItemList         *creditCardItemList `json:"item_list,omitempty"`
 	Amount           amount              `json:"amount"`
 	RelatedResources relatedResources    `json:"related_resources,omitempty"`
 }
 
-type json_s7vau0kduwpa struct {
-	*private_s7vau0kduwpa
+type json_1h4lccq9qqjay struct {
+	*private_1h4lccq9qqjay
 	Description    string         `json:"description,omitempty"`
 	PaymentOptions paymentOptions `json:"payment_options,omitempty"`
 	InvoiceNumber  string         `json:"invoice_number,omitempty"`
@@ -196,7 +196,7 @@ func (self *CreditCardTransaction) RelatedResources() relatedResources {
 }
 
 func (self *CreditCardTransaction) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_s7vau0kduwpa{
+	return json.Marshal(json_1h4lccq9qqjay{
 		&self.private,
 		self.Description,
 		self.PaymentOptions,
@@ -256,21 +256,21 @@ creditCardItemList struct
 ******************************/
 func NewCreditCardItemList() *creditCardItemList {
 	return &creditCardItemList{
-		private: private_14dyrawerh111{},
+		private: private_19oaog89ph3ob{},
 	}
 }
 
 type creditCardItemList struct {
-	private private_14dyrawerh111
+	private private_19oaog89ph3ob
 }
 
-type private_14dyrawerh111 struct {
+type private_19oaog89ph3ob struct {
 	Items           CreditCardItems  `json:"items,omitempty"`
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
-type json_14dyrawerh111 struct {
-	*private_14dyrawerh111
+type json_19oaog89ph3ob struct {
+	*private_19oaog89ph3ob
 }
 
 func (self *creditCardItemList) Items() CreditCardItems {
@@ -282,7 +282,7 @@ func (self *creditCardItemList) ShippingAddress() *ShippingAddress {
 }
 
 func (self *creditCardItemList) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_14dyrawerh111{
+	return json.Marshal(json_19oaog89ph3ob{
 		&self.private,
 	})
 }
@@ -325,24 +325,24 @@ CreditCardItem struct
 ******************************/
 func NewCreditCardItem() *CreditCardItem {
 	return &CreditCardItem{
-		private: private_1k16ftoumjda{},
+		private: private_icc4n95cnzdv{},
 	}
 }
 
 type CreditCardItem struct {
-	private  private_1k16ftoumjda
+	private  private_icc4n95cnzdv
 	Quantity int64   `json:"quantity,string"`
 	Name     string  `json:"name"`
 	Price    float64 `json:"price,string"`
 	Sku      string  `json:"sku,omitempty"`
 }
 
-type private_1k16ftoumjda struct {
+type private_icc4n95cnzdv struct {
 	Currency CurrencyTypeEnum `json:"currency"`
 }
 
-type json_1k16ftoumjda struct {
-	*private_1k16ftoumjda
+type json_icc4n95cnzdv struct {
+	*private_icc4n95cnzdv
 	Quantity int64   `json:"quantity,string"`
 	Name     string  `json:"name"`
 	Price    float64 `json:"price,string"`
@@ -354,7 +354,7 @@ func (self *CreditCardItem) Currency() CurrencyTypeEnum {
 }
 
 func (self *CreditCardItem) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1k16ftoumjda{
+	return json.Marshal(json_icc4n95cnzdv{
 		&self.private,
 		self.Quantity,
 		self.Name,
@@ -407,24 +407,24 @@ creditCardPayer struct
 ******************************/
 func NewCreditCardPayer() *creditCardPayer {
 	return &creditCardPayer{
-		private: private_1j496btvwg04v{},
+		private: private_xxp8uo31pq99{},
 	}
 }
 
 // Source of the funds for this payment represented by a credit card.
 type creditCardPayer struct {
-	private private_1j496btvwg04v
+	private private_xxp8uo31pq99
 }
 
-type private_1j496btvwg04v struct {
+type private_xxp8uo31pq99 struct {
 	// Must be PaymentMethod.CreditCard
 	PaymentMethod      PaymentMethodEnum  `json:"payment_method,omitempty"`
 	FundingInstruments fundingInstruments `json:"funding_instruments,omitempty"`
 	PayerInfo          *PayerInfo         `json:"payer_info,omitempty"`
 }
 
-type json_1j496btvwg04v struct {
-	*private_1j496btvwg04v
+type json_xxp8uo31pq99 struct {
+	*private_xxp8uo31pq99
 }
 
 func (self *creditCardPayer) PaymentMethod() PaymentMethodEnum {
@@ -440,7 +440,7 @@ func (self *creditCardPayer) PayerInfo() *PayerInfo {
 }
 
 func (self *creditCardPayer) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1j496btvwg04v{
+	return json.Marshal(json_xxp8uo31pq99{
 		&self.private,
 	})
 }
@@ -485,12 +485,12 @@ PayerInfo struct
 ******************************/
 func NewPayerInfo() *PayerInfo {
 	return &PayerInfo{
-		private: private_r0398uk0kg3g{},
+		private: private_wluxqrjsvp64{},
 	}
 }
 
 type PayerInfo struct {
-	private private_r0398uk0kg3g
+	private private_wluxqrjsvp64
 	// Email address representing the payer. 127 characters max.
 	Email string `json:"email,omitempty"`
 	// Salutation of the payer.
@@ -513,10 +513,10 @@ type PayerInfo struct {
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
-type private_r0398uk0kg3g struct{}
+type private_wluxqrjsvp64 struct{}
 
-type json_r0398uk0kg3g struct {
-	*private_r0398uk0kg3g
+type json_wluxqrjsvp64 struct {
+	*private_wluxqrjsvp64
 	Email           string           `json:"email,omitempty"`
 	Salutation      string           `json:"salutation,omitempty"`
 	Suffix          string           `json:"suffix,omitempty"`
@@ -530,7 +530,7 @@ type json_r0398uk0kg3g struct {
 }
 
 func (self *PayerInfo) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_r0398uk0kg3g{
+	return json.Marshal(json_wluxqrjsvp64{
 		&self.private,
 		self.Email,
 		self.Salutation,

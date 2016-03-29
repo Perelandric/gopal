@@ -55,12 +55,12 @@ type connection struct {
 
 type Connection interface {
 	FetchPayment(string) (Payment, error)
-	GetAllPayments(int, sortByEnum, sortOrderEnum, ...time.Time)
+	GetAllPayments(int, sortByEnum, sortOrderEnum, ...time.Time) *PaymentBatcher
 	FetchAuthorization(string) (*Authorization, error)
 	FetchCapture(string) (*Capture, error)
 	NewCreditCardPayment() *CreditCardPayment
 	NewPaypalPayment(Redirects, *PaypalPayerInfo) (*PaypalPayment, error)
-	Execute(url.URL) error
+	Execute(*url.URL) error
 	FetchRefund(string) (*Refund, error)
 	FetchSale(string) (*Sale, error)
 
@@ -451,6 +451,10 @@ type ShippingAddress struct {
 }
 
 func (self *ShippingAddress) validate() (err error) {
+	if self == nil {
+		return nil
+	}
+
 	err = checkStr(
 		"ShippingAddress.RecipientName", &self.RecipientName, 50, true, true)
 	if err != nil {
