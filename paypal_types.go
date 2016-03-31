@@ -66,14 +66,14 @@ type PaypalTransactions []*PaypalTransaction
 // TODO: Add `billing_agreement_tokens`, `payment_instruction`
 @struct PaypalPayment
   *connection
-  Intent				intentEnum 		`json:"intent,omitempty"` --read
-  State 							*stateEnum `json:"state,omitempty"` --read
+  Intent							intentEnum 		`json:"intent,omitempty"` --read
+  State 							*StateEnum `json:"state,omitempty"` --read
   Id 									string `json:"id,omitempty"` --read
   FailureReason				*FailureReasonEnum `json:"failure_reason,omitempty"` --read
   CreateTime 					dateTime `json:"create_time,omitempty"` --read
   UpdateTime 					dateTime `json:"update_time,omitempty"` --read
   Links 							links `json:"links,omitempty"` --read
-  Transactions	PaypalTransactions 	`json:"transactions,omitempty"` --read
+  Transactions				PaypalTransactions 	`json:"transactions,omitempty"` --read
 	Payer 							paypalPayer `json:"payer,omitempty"` --read
 	RedirectUrls				Redirects `json:"redirect_urls,omitempty"` --read
 	ExperienceProfileId string `json:"experience_profile_id,omitempty"` --read --write
@@ -146,7 +146,7 @@ func (self *PaypalPayment) Authorize() (to string, code int, err error) {
 
 		} else {
 			switch *pymt.private.State {
-			case state.Created:
+			case State.Created:
 				// Set url to redirect to PayPal site to begin approval process
 				to, _ = pymt.private.Links.get(relType.ApprovalUrl)
 				code = 303
@@ -194,7 +194,7 @@ func (self *connection) Execute(u *url.URL) error {
 		return err
 	}
 
-	if pymt.private.State == nil || *pymt.private.State != state.Approved {
+	if pymt.private.State == nil || *pymt.private.State != State.Approved {
 		return fmt.Errorf(
 			"Payment with ID %q for payer %q was not approved", pymtid, payerid)
 	}
@@ -312,7 +312,7 @@ func (self *paypalItemList) validate() (err error) {
 /*
 @struct PaypalItem
 	Currency 		CurrencyTypeEnum 	`json:"currency"` --read
-	Quantity 		int64 			`json:"quantity,string"` --read --write
+	Quantity 		int64 			`json:"quantity"` --read --write
 	Name 				string 			`json:"name"` --read --write
 	Price 			float64 		`json:"price,string"` --read --write
 	Tax 				float64 		`json:"tax,string,omitempty"` --read --write

@@ -18,22 +18,22 @@ _shared struct
 ******************************/
 
 type _shared struct {
-	private private_1ozjzyet9a814
+	private private_bqmm7d5xpizm
 	*connection
 	*identity_error
 }
 
-type private_1ozjzyet9a814 struct {
+type private_bqmm7d5xpizm struct {
 	Id            string    `json:"id,omitempty"`
 	CreateTime    dateTime  `json:"create_time,omitempty"`
 	UpdateTime    dateTime  `json:"update_time,omitempty"`
-	State         stateEnum `json:"state,omitempty"`
+	State         StateEnum `json:"state,omitempty"`
 	ParentPayment string    `json:"parent_payment,omitempty"`
 	Links         links     `json:"links,omitempty"`
 }
 
-type json_1ozjzyet9a814 struct {
-	*private_1ozjzyet9a814
+type json_bqmm7d5xpizm struct {
+	*private_bqmm7d5xpizm
 	*connection
 	*identity_error
 }
@@ -50,7 +50,7 @@ func (self *_shared) UpdateTime() dateTime {
 	return self.private.UpdateTime
 }
 
-func (self *_shared) State() stateEnum {
+func (self *_shared) State() StateEnum {
 	return self.private.State
 }
 
@@ -59,7 +59,7 @@ func (self *_shared) ParentPayment() string {
 }
 
 func (self *_shared) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1ozjzyet9a814{
+	return json.Marshal(json_bqmm7d5xpizm{
 		&self.private,
 		self.connection,
 		self.identity_error,
@@ -81,63 +81,89 @@ func (self *_shared) UnmarshalJSON(j []byte) error {
 	// For every property found, perform a separate UnmarshalJSON operation. This
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
-		switch key { // The anon structs in each case are needed for field tags
+		// The anon structs in each case are needed for field tags
+
+		switch key {
 		case "id":
 
-			var x = struct {
+			var x struct {
 				F string `json:"id,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.Id = x.F
 		case "create_time":
 
-			var x = struct {
+			var x struct {
 				F dateTime `json:"create_time,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.CreateTime = x.F
 		case "update_time":
 
-			var x = struct {
+			var x struct {
 				F dateTime `json:"update_time,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.UpdateTime = x.F
 		case "state":
 
-			var x = struct {
-				F stateEnum `json:"state,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			var x struct {
+				F StateEnum `json:"state,omitempty"`
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.State = x.F
 		case "parent_payment":
 
-			var x = struct {
+			var x struct {
 				F string `json:"parent_payment,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.ParentPayment = x.F
 		case "links":
 
-			var x = struct {
+			var x struct {
 				F links `json:"links,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -158,11 +184,11 @@ Authorization struct
 // State items are: pending, authorized, captured, partially_captured, expired,
 // voided
 type Authorization struct {
-	private private_ejsvahd95er6
+	private private_ph2ovsxgja60
 	_shared
 }
 
-type private_ejsvahd95er6 struct {
+type private_ph2ovsxgja60 struct {
 	Amount             amount                 `json:"amount"`
 	BillingAgreementId string                 `json:"billing_agreement_id"`
 	PaymentMode        paymentModeEnum        `json:"payment_mode"`
@@ -174,8 +200,8 @@ type private_ejsvahd95er6 struct {
 	FmfDetails         fmfDetails             `json:"fmf_details"`
 }
 
-type json_ejsvahd95er6 struct {
-	*private_ejsvahd95er6
+type json_ph2ovsxgja60 struct {
+	*private_ph2ovsxgja60
 	_shared
 }
 
@@ -216,7 +242,7 @@ func (self *Authorization) FmfDetails() fmfDetails {
 }
 
 func (self *Authorization) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_ejsvahd95er6{
+	return json.Marshal(json_ph2ovsxgja60{
 		&self.private,
 		self._shared,
 	})
@@ -237,93 +263,131 @@ func (self *Authorization) UnmarshalJSON(j []byte) error {
 	// For every property found, perform a separate UnmarshalJSON operation. This
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
-		switch key { // The anon structs in each case are needed for field tags
+		// The anon structs in each case are needed for field tags
+
+		switch key {
 		case "amount":
 
-			var x = struct {
+			var x struct {
 				F amount `json:"amount"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.Amount = x.F
 		case "billing_agreement_id":
 
-			var x = struct {
+			var x struct {
 				F string `json:"billing_agreement_id"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.BillingAgreementId = x.F
 		case "payment_mode":
 
-			var x = struct {
+			var x struct {
 				F paymentModeEnum `json:"payment_mode"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.PaymentMode = x.F
 		case "reason_code":
 
-			var x = struct {
+			var x struct {
 				F reasonCodeEnum `json:"reason_code"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.ReasonCode = x.F
 		case "valid_until":
 
-			var x = struct {
+			var x struct {
 				F dateTime `json:"valid_until"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.ValidUntil = x.F
 		case "clearing_time":
 
-			var x = struct {
+			var x struct {
 				F string `json:"clearing_time"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.ClearingTime = x.F
 		case "protection_eligibility":
 
-			var x = struct {
+			var x struct {
 				F protectionEligEnum `json:"protection_eligibility"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.ProtectionElig = x.F
 		case "protection_eligibility_type":
 
-			var x = struct {
+			var x struct {
 				F protectionEligTypeEnum `json:"protection_eligibility_type"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.ProtectionEligType = x.F
 		case "fmf_details":
 
-			var x = struct {
+			var x struct {
 				F fmfDetails `json:"fmf_details"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -342,24 +406,24 @@ Capture struct
 ******************************/
 func NewCapture() *Capture {
 	return &Capture{
-		private: private_lu427gmurksj{},
+		private: private_14luxywpo2i7z{},
 	}
 }
 
 // State values are: pending, completed, refunded, partially_refunded
 type Capture struct {
-	private private_lu427gmurksj
+	private private_14luxywpo2i7z
 	_shared
 	TransactionFee currency `json:"transaction_fee"`
 	IsFinalCapture bool     `json:"is_final_capture,omitempty"`
 }
 
-type private_lu427gmurksj struct {
+type private_14luxywpo2i7z struct {
 	Amount amount `json:"amount"`
 }
 
-type json_lu427gmurksj struct {
-	*private_lu427gmurksj
+type json_14luxywpo2i7z struct {
+	*private_14luxywpo2i7z
 	_shared
 	TransactionFee currency `json:"transaction_fee"`
 	IsFinalCapture bool     `json:"is_final_capture,omitempty"`
@@ -370,7 +434,7 @@ func (self *Capture) Amount() amount {
 }
 
 func (self *Capture) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_lu427gmurksj{
+	return json.Marshal(json_14luxywpo2i7z{
 		&self.private,
 		self._shared,
 		self.TransactionFee,
@@ -393,23 +457,33 @@ func (self *Capture) UnmarshalJSON(j []byte) error {
 	// For every property found, perform a separate UnmarshalJSON operation. This
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
-		switch key { // The anon structs in each case are needed for field tags
+		// The anon structs in each case are needed for field tags
+
+		switch key {
 		case "amount":
 
-			var x = struct {
+			var x struct {
 				F amount `json:"amount"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.Amount = x.F
 		case "transaction_fee":
 
-			var x = struct {
+			var x struct {
 				F currency `json:"transaction_fee"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -417,10 +491,14 @@ func (self *Capture) UnmarshalJSON(j []byte) error {
 
 		case "is_final_capture":
 
-			var x = struct {
+			var x struct {
 				F bool `json:"is_final_capture,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -440,7 +518,7 @@ Sale struct
 ******************************/
 func NewSale() *Sale {
 	return &Sale{
-		private: private_tgw5ty4u4aj1{},
+		private: private_gw12g16gjwvf{},
 	}
 }
 
@@ -449,14 +527,14 @@ func NewSale() *Sale {
 // but not under the lower "sale object" definition. The new docs have it
 // marked as [DEPRECATED] in one area, but not another.
 type Sale struct {
-	private private_tgw5ty4u4aj1
+	private private_gw12g16gjwvf
 	_shared
 	Description      string   `json:"description,omitempty"`
 	TransactionFee   currency `json:"transaction_fee"`
 	ReceivableAmount currency `json:"receivable_amount"`
 }
 
-type private_tgw5ty4u4aj1 struct {
+type private_gw12g16gjwvf struct {
 	Amount                    amount                 `json:"amount"`
 	PendingReason             pendingReasonEnum      `json:"pending_reason"`
 	PaymentMode               paymentModeEnum        `json:"payment_mode"`
@@ -470,8 +548,8 @@ type private_tgw5ty4u4aj1 struct {
 	BillingAgreementId        string                 `json:"billing_agreement_id"`
 }
 
-type json_tgw5ty4u4aj1 struct {
-	*private_tgw5ty4u4aj1
+type json_gw12g16gjwvf struct {
+	*private_gw12g16gjwvf
 	_shared
 	Description      string   `json:"description,omitempty"`
 	TransactionFee   currency `json:"transaction_fee"`
@@ -523,7 +601,7 @@ func (self *Sale) BillingAgreementId() string {
 }
 
 func (self *Sale) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_tgw5ty4u4aj1{
+	return json.Marshal(json_gw12g16gjwvf{
 		&self.private,
 		self._shared,
 		self.Description,
@@ -547,23 +625,33 @@ func (self *Sale) UnmarshalJSON(j []byte) error {
 	// For every property found, perform a separate UnmarshalJSON operation. This
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
-		switch key { // The anon structs in each case are needed for field tags
+		// The anon structs in each case are needed for field tags
+
+		switch key {
 		case "amount":
 
-			var x = struct {
+			var x struct {
 				F amount `json:"amount"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.Amount = x.F
 		case "description":
 
-			var x = struct {
+			var x struct {
 				F string `json:"description,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -571,10 +659,14 @@ func (self *Sale) UnmarshalJSON(j []byte) error {
 
 		case "transaction_fee":
 
-			var x = struct {
+			var x struct {
 				F currency `json:"transaction_fee"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -582,10 +674,14 @@ func (self *Sale) UnmarshalJSON(j []byte) error {
 
 		case "receivable_amount":
 
-			var x = struct {
+			var x struct {
 				F currency `json:"receivable_amount"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -593,100 +689,140 @@ func (self *Sale) UnmarshalJSON(j []byte) error {
 
 		case "pending_reason":
 
-			var x = struct {
+			var x struct {
 				F pendingReasonEnum `json:"pending_reason"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.PendingReason = x.F
 		case "payment_mode":
 
-			var x = struct {
+			var x struct {
 				F paymentModeEnum `json:"payment_mode"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.PaymentMode = x.F
 		case "exchange_rate":
 
-			var x = struct {
+			var x struct {
 				F string `json:"exchange_rate"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.ExchangeRate = x.F
 		case "fmf_details":
 
-			var x = struct {
+			var x struct {
 				F fmfDetails `json:"fmf_details"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.FmfDetails = x.F
 		case "receipt_id":
 
-			var x = struct {
+			var x struct {
 				F string `json:"receipt_id"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.ReceiptId = x.F
 		case "reason_code":
 
-			var x = struct {
+			var x struct {
 				F reasonCodeEnum `json:"reason_code"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.ReasonCode = x.F
 		case "protection_eligibility":
 
-			var x = struct {
+			var x struct {
 				F protectionEligEnum `json:"protection_eligibility"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.ProtectionEligibility = x.F
 		case "protection_eligibility_type":
 
-			var x = struct {
+			var x struct {
 				F protectionEligTypeEnum `json:"protection_eligibility_type"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.ProtectionEligibilityType = x.F
 		case "clearing_time":
 
-			var x = struct {
+			var x struct {
 				F string `json:"clearing_time"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.ClearingTime = x.F
 		case "billing_agreement_id":
 
-			var x = struct {
+			var x struct {
 				F string `json:"billing_agreement_id"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -705,26 +841,26 @@ Refund struct
 ******************************/
 func NewRefund() *Refund {
 	return &Refund{
-		private: private_ymjd4jixmu34{},
+		private: private_ne29r7kd8wog{},
 	}
 }
 
 // State items are: pending; completed; failed
 type Refund struct {
-	private private_ymjd4jixmu34
+	private private_ne29r7kd8wog
 	_shared
 	Description string `json:"description,omitempty"`
 	Reason      string `json:"reason,omitempty"`
 }
 
-type private_ymjd4jixmu34 struct {
+type private_ne29r7kd8wog struct {
 	Amount    amount `json:"amount"`
 	SaleId    string `json:"sale_id,omitempty"`
 	CaptureId string `json:"capture_id,omitempty"`
 }
 
-type json_ymjd4jixmu34 struct {
-	*private_ymjd4jixmu34
+type json_ne29r7kd8wog struct {
+	*private_ne29r7kd8wog
 	_shared
 	Description string `json:"description,omitempty"`
 	Reason      string `json:"reason,omitempty"`
@@ -743,7 +879,7 @@ func (self *Refund) CaptureId() string {
 }
 
 func (self *Refund) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_ymjd4jixmu34{
+	return json.Marshal(json_ne29r7kd8wog{
 		&self.private,
 		self._shared,
 		self.Description,
@@ -766,23 +902,33 @@ func (self *Refund) UnmarshalJSON(j []byte) error {
 	// For every property found, perform a separate UnmarshalJSON operation. This
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
-		switch key { // The anon structs in each case are needed for field tags
+		// The anon structs in each case are needed for field tags
+
+		switch key {
 		case "amount":
 
-			var x = struct {
+			var x struct {
 				F amount `json:"amount"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.Amount = x.F
 		case "description":
 
-			var x = struct {
+			var x struct {
 				F string `json:"description,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -790,10 +936,14 @@ func (self *Refund) UnmarshalJSON(j []byte) error {
 
 		case "reason":
 
-			var x = struct {
+			var x struct {
 				F string `json:"reason,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -801,20 +951,28 @@ func (self *Refund) UnmarshalJSON(j []byte) error {
 
 		case "sale_id":
 
-			var x = struct {
+			var x struct {
 				F string `json:"sale_id,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.SaleId = x.F
 		case "capture_id":
 
-			var x = struct {
+			var x struct {
 				F string `json:"capture_id,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -833,7 +991,7 @@ amount struct
 ******************************/
 func NewAmount() *amount {
 	return &amount{
-		private: private_1apv825w0qyar{},
+		private: private_p6lzdx9ziub7{},
 	}
 }
 
@@ -844,17 +1002,17 @@ func NewAmount() *amount {
 // All other uses of `Amount` do have `shipping`, `shipping_discount` and
 // `subtotal` to calculate the `Total`.
 type amount struct {
-	private private_1apv825w0qyar
+	private private_p6lzdx9ziub7
 	Details *details `json:"details,omitempty"`
 }
 
-type private_1apv825w0qyar struct {
+type private_p6lzdx9ziub7 struct {
 	Currency CurrencyTypeEnum `json:"currency"`
 	Total    float64          `json:"total,string"`
 }
 
-type json_1apv825w0qyar struct {
-	*private_1apv825w0qyar
+type json_p6lzdx9ziub7 struct {
+	*private_p6lzdx9ziub7
 	Details *details `json:"details,omitempty"`
 }
 
@@ -867,7 +1025,7 @@ func (self *amount) Total() float64 {
 }
 
 func (self *amount) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1apv825w0qyar{
+	return json.Marshal(json_p6lzdx9ziub7{
 		&self.private,
 		self.Details,
 	})
@@ -888,33 +1046,47 @@ func (self *amount) UnmarshalJSON(j []byte) error {
 	// For every property found, perform a separate UnmarshalJSON operation. This
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
-		switch key { // The anon structs in each case are needed for field tags
+		// The anon structs in each case are needed for field tags
+
+		switch key {
 		case "currency":
 
-			var x = struct {
+			var x struct {
 				F CurrencyTypeEnum `json:"currency"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.Currency = x.F
 		case "total":
 
-			var x = struct {
+			var x struct {
 				F float64 `json:"total,string"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.Total = x.F
 		case "details":
 
-			var x = struct {
+			var x struct {
 				F *details `json:"details,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -934,12 +1106,12 @@ details struct
 ******************************/
 func NewDetails() *details {
 	return &details{
-		private: private_g0guny21ws78{},
+		private: private_1m1bkd6tss1pk{},
 	}
 }
 
 type details struct {
-	private private_g0guny21ws78
+	private private_1m1bkd6tss1pk
 	// Amount charged for shipping. 10 chars max, with support for 2 decimal places
 	Shipping float64 `json:"shipping,string,omitempty"`
 	// Amount being charged for handling fee. When `payment_method` is `paypal`
@@ -950,7 +1122,7 @@ type details struct {
 	ShippingDiscount float64 `json:"shipping_discount,string,omitempty"`
 }
 
-type private_g0guny21ws78 struct {
+type private_1m1bkd6tss1pk struct {
 	// Amount of the subtotal of the items. REQUIRED if line items are specified.
 	// 10 chars max, with support for 2 decimal places
 	Subtotal float64 `json:"subtotal,string,omitempty"`
@@ -958,8 +1130,8 @@ type private_g0guny21ws78 struct {
 	Tax float64 `json:"tax,string,omitempty"`
 }
 
-type json_g0guny21ws78 struct {
-	*private_g0guny21ws78
+type json_1m1bkd6tss1pk struct {
+	*private_1m1bkd6tss1pk
 	Shipping         float64 `json:"shipping,string,omitempty"`
 	HandlingFee      float64 `json:"handling_fee,string,omitempty"`
 	Insurance        float64 `json:"insurance,string,omitempty"`
@@ -975,7 +1147,7 @@ func (self *details) Tax() float64 {
 }
 
 func (self *details) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_g0guny21ws78{
+	return json.Marshal(json_1m1bkd6tss1pk{
 		&self.private,
 		self.Shipping,
 		self.HandlingFee,
@@ -999,33 +1171,47 @@ func (self *details) UnmarshalJSON(j []byte) error {
 	// For every property found, perform a separate UnmarshalJSON operation. This
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
-		switch key { // The anon structs in each case are needed for field tags
+		// The anon structs in each case are needed for field tags
+
+		switch key {
 		case "subtotal":
 
-			var x = struct {
+			var x struct {
 				F float64 `json:"subtotal,string,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.Subtotal = x.F
 		case "tax":
 
-			var x = struct {
+			var x struct {
 				F float64 `json:"tax,string,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.Tax = x.F
 		case "shipping":
 
-			var x = struct {
+			var x struct {
 				F float64 `json:"shipping,string,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -1033,10 +1219,14 @@ func (self *details) UnmarshalJSON(j []byte) error {
 
 		case "handling_fee":
 
-			var x = struct {
+			var x struct {
 				F float64 `json:"handling_fee,string,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -1044,10 +1234,14 @@ func (self *details) UnmarshalJSON(j []byte) error {
 
 		case "insurance":
 
-			var x = struct {
+			var x struct {
 				F float64 `json:"insurance,string,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -1055,10 +1249,14 @@ func (self *details) UnmarshalJSON(j []byte) error {
 
 		case "shipping_discount":
 
-			var x = struct {
+			var x struct {
 				F float64 `json:"shipping_discount,string,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -1078,26 +1276,26 @@ link struct
 ******************************/
 func NewLink() *link {
 	return &link{
-		private: private_kz8lwn5mdgax{},
+		private: private_hu9r4k8h8ws4{},
 	}
 }
 
 type link struct {
-	private private_kz8lwn5mdgax
+	private private_hu9r4k8h8ws4
 }
 
-type private_kz8lwn5mdgax struct {
+type private_hu9r4k8h8ws4 struct {
 	Href   string      `json:"href,omitempty"`
 	Rel    relTypeEnum `json:"rel,omitempty"`
 	Method string      `json:"method,omitempty"`
 }
 
-type json_kz8lwn5mdgax struct {
-	*private_kz8lwn5mdgax
+type json_hu9r4k8h8ws4 struct {
+	*private_hu9r4k8h8ws4
 }
 
 func (self *link) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_kz8lwn5mdgax{
+	return json.Marshal(json_hu9r4k8h8ws4{
 		&self.private,
 	})
 }
@@ -1117,33 +1315,47 @@ func (self *link) UnmarshalJSON(j []byte) error {
 	// For every property found, perform a separate UnmarshalJSON operation. This
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
-		switch key { // The anon structs in each case are needed for field tags
+		// The anon structs in each case are needed for field tags
+
+		switch key {
 		case "href":
 
-			var x = struct {
+			var x struct {
 				F string `json:"href,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.Href = x.F
 		case "rel":
 
-			var x = struct {
+			var x struct {
 				F relTypeEnum `json:"rel,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.Rel = x.F
 		case "method":
 
-			var x = struct {
+			var x struct {
 				F string `json:"method,omitempty"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -1162,27 +1374,27 @@ currency struct
 ******************************/
 func NewCurrency() *currency {
 	return &currency{
-		private: private_1gezpsfday127{},
+		private: private_d1qbnu0nzezr{},
 	}
 }
 
 // Base object for all financial value related fields (balance, payment due, etc.)
 type currency struct {
-	private  private_1gezpsfday127
+	private  private_d1qbnu0nzezr
 	Currency string `json:"currency"`
 	Value    string `json:"value"`
 }
 
-type private_1gezpsfday127 struct{}
+type private_d1qbnu0nzezr struct{}
 
-type json_1gezpsfday127 struct {
-	*private_1gezpsfday127
+type json_d1qbnu0nzezr struct {
+	*private_d1qbnu0nzezr
 	Currency string `json:"currency"`
 	Value    string `json:"value"`
 }
 
 func (self *currency) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1gezpsfday127{
+	return json.Marshal(json_d1qbnu0nzezr{
 		&self.private,
 		self.Currency,
 		self.Value,
@@ -1204,13 +1416,19 @@ func (self *currency) UnmarshalJSON(j []byte) error {
 	// For every property found, perform a separate UnmarshalJSON operation. This
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
-		switch key { // The anon structs in each case are needed for field tags
+		// The anon structs in each case are needed for field tags
+
+		switch key {
 		case "currency":
 
-			var x = struct {
+			var x struct {
 				F string `json:"currency"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -1218,10 +1436,14 @@ func (self *currency) UnmarshalJSON(j []byte) error {
 
 		case "value":
 
-			var x = struct {
+			var x struct {
 				F string `json:"value"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
@@ -1241,24 +1463,24 @@ fmfDetails struct
 ******************************/
 func NewFmfDetails() *fmfDetails {
 	return &fmfDetails{
-		private: private_1e9jq98259gdr{},
+		private: private_1pbe00qed41oy{},
 	}
 }
 
 // This object represents Fraud Management Filter (FMF) details for a payment.
 type fmfDetails struct {
-	private private_1e9jq98259gdr
+	private private_1pbe00qed41oy
 }
 
-type private_1e9jq98259gdr struct {
+type private_1pbe00qed41oy struct {
 	FilterType  fmfFilterEnum `json:"filter_type"`
 	FilterID    filterIdEnum  `json:"filter_id"`
 	Name        string        `json:"name"`
 	Description string        `json:"description"`
 }
 
-type json_1e9jq98259gdr struct {
-	*private_1e9jq98259gdr
+type json_1pbe00qed41oy struct {
+	*private_1pbe00qed41oy
 }
 
 func (self *fmfDetails) FilterType() fmfFilterEnum {
@@ -1278,7 +1500,7 @@ func (self *fmfDetails) Description() string {
 }
 
 func (self *fmfDetails) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1e9jq98259gdr{
+	return json.Marshal(json_1pbe00qed41oy{
 		&self.private,
 	})
 }
@@ -1298,43 +1520,61 @@ func (self *fmfDetails) UnmarshalJSON(j []byte) error {
 	// For every property found, perform a separate UnmarshalJSON operation. This
 	// prevents overwrite of values in 'self' where properties are absent.
 	for key, rawMsg := range m {
-		switch key { // The anon structs in each case are needed for field tags
+		// The anon structs in each case are needed for field tags
+
+		switch key {
 		case "filter_type":
 
-			var x = struct {
+			var x struct {
 				F fmfFilterEnum `json:"filter_type"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.FilterType = x.F
 		case "filter_id":
 
-			var x = struct {
+			var x struct {
 				F filterIdEnum `json:"filter_id"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.FilterID = x.F
 		case "name":
 
-			var x = struct {
+			var x struct {
 				F string `json:"name"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 
 			self.private.Name = x.F
 		case "description":
 
-			var x = struct {
+			var x struct {
 				F string `json:"description"`
-			}{}
-			if err = json.Unmarshal(rawMsg, &x.F); err != nil {
+			}
+
+			var msgForStruct = append(append(append(append(
+				[]byte("{\""), key...), "\":"...), rawMsg...), '}')
+
+			if err = json.Unmarshal(msgForStruct, &x); err != nil {
 				return err
 			}
 

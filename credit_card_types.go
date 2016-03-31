@@ -31,7 +31,7 @@ func (self *connection) NewCreditCardPayment() *CreditCardPayment {
 @struct CreditCardPayment
   *connection
   Intent				      intentEnum 		`json:"intent,omitempty"` --read
-  State 							stateEnum `json:"state,omitempty"` --read
+  State 							StateEnum `json:"state,omitempty"` --read
   Id 									string `json:"id,omitempty"` --read
   FailureReason				FailureReasonEnum `json:"failure_reason,omitempty"` --read
   CreateTime 					dateTime `json:"create_time,omitempty"` --read
@@ -121,7 +121,7 @@ func (self *CreditCardPayment) Authorize() (to string, code int, err error) {
 
 	if err == nil {
 		switch pymt.private.State {
-		case state.Created:
+		case State.Created:
 			// Set url to redirect to PayPal site to begin approval process
 			to, _ = pymt.private.Links.get(relType.ApprovalUrl)
 			code = 303

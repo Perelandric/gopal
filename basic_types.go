@@ -199,7 +199,7 @@ func (self *connection) FetchPayment(payment_id string) (Payment, error) {
 	Id 						string `json:"id,omitempty"` 						--read
 	CreateTime 		dateTime `json:"create_time,omitempty"` --read
 	UpdateTime 		dateTime `json:"update_time,omitempty"` --read
-	State 				stateEnum `json:"state,omitempty"` 			--read
+	State 				StateEnum `json:"state,omitempty"` 			--read
 	ParentPayment string `json:"parent_payment,omitempty"` --read
 	Links 				links `json:"links,omitempty"`
 	*identity_error
@@ -525,7 +525,7 @@ type credit_card struct {
 	FirstName      string    `json:"first_name,omitempty"`
 	LastName       string    `json:"last_name,omitempty"`
 	BillingAddress *Address  `json:"billing_address,omitempty"`
-	State          stateEnum `json:"state,omitempty"`
+	State          StateEnum `json:"state,omitempty"`
 	ValidUntil     string    `json:"valid_until,omitempty"`
 }
 type credit_card_token struct {

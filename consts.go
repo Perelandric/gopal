@@ -181,7 +181,7 @@ func (self PaymentMethodEnum) validate() error {
 	Discover --string=discover
 	Amex --string=amex
 
-@enum state --json=string
+@enum State --json=string
 	Created --string=created
 	Approved --string=approved
 	Canceled --string=canceled

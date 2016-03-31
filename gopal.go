@@ -5,7 +5,6 @@ package gopal
 import (
 	"bytes"
 	"fmt"
-	"log"
 )
 
 import "encoding/json"
@@ -61,8 +60,6 @@ func (self *connection) authenticate() error {
 		return err
 	}
 
-	fmt.Printf("%#v\n", self.tokeninfo)
-
 	// Set the duration to expire 3 minutes early to avoid expiration during a request cycle
 	duration = time.Duration(self.tokeninfo.ExpiresIn)*time.Second - 3*time.Minute
 	self.tokeninfo.expiration = time.Now().Add(duration)
@@ -110,7 +107,7 @@ func (self *connection) send(reqData *request) error {
 		if result, err := json.Marshal(val); err != nil {
 			return err
 		} else {
-			fmt.Println("sending...", string(result))
+			//fmt.Println("sending...", string(result))
 			body_reader = bytes.NewReader(result)
 		}
 	}
@@ -146,10 +143,9 @@ func (self *connection) send(reqData *request) error {
 
 	result, err = ioutil.ReadAll(resp.Body)
 
-	fmt.Println("received...", string(result))
+	//fmt.Println("received...", string(result))
 
 	if err != nil {
-		fmt.Println("Ready Body error")
 		return err
 	}
 
@@ -161,16 +157,8 @@ func (self *connection) send(reqData *request) error {
 	}
 
 	if err = json.Unmarshal(result, reqData.response); err != nil {
-		fmt.Println("Unmarshaling error")
 		return err
 	}
 
-	var e = reqData.response.to_error()
-	if err != nil {
-		log.Printf("Paypal response error: %q\n", e.Error())
-	} else {
-		fmt.Println("was nil")
-	}
-
-	return e
+	return reqData.response.to_error()
 }
