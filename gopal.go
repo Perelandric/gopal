@@ -5,6 +5,7 @@ package gopal
 import (
 	"bytes"
 	"fmt"
+	"log"
 )
 
 import "encoding/json"
@@ -25,7 +26,8 @@ func NewConnection(s ServerEnum, id, secret string) (c *connection, err error) {
 		secret: secret,
 	}
 
-	fmt.Printf("Creating Paypal %q connection.\n", s)
+	log.Println()
+	log.Printf("Creating Paypal %q connection.\n", s)
 
 	if err = c.authenticate(); err != nil {
 		return nil, err
@@ -33,36 +35,99 @@ func NewConnection(s ServerEnum, id, secret string) (c *connection, err error) {
 	return
 }
 
+// From the docs, regarding [re]authentication:
+//
+// PayPal-issued access tokens can be used to access all the REST API endpoints.
+// These tokens have a finite lifetime and you must write code to detect when an
+// access token expires. You can do this either by keeping track of the
+// `expires_in` value returned in the response from the token request (the value
+// is expressed in seconds), or handle the error response (401 Unauthorized)
+// from the API endpoint when an expired token is detected.
 func (self *connection) authenticate() error {
 	// If an error is returned, zero the tokeninfo
 	var err error
 	var duration time.Duration
 
-	// No need to authenticate if the previous has not yet expired
+	self.tokeninfo.mux.Lock()
+	defer self.tokeninfo.mux.Unlock()
+
+	// Check this here as well, since the current auth request could have been
+	// waiting for another. If it succeeded, no sense in sending it again.
 	if time.Now().Before(self.tokeninfo.expiration) {
-		return nil
+		return nil // Another request must have updated the tokeninfo.
 	}
 
-	defer func() {
-		if err != nil {
-			self.tokeninfo = tokeninfo{}
-		}
-	}()
+	// Don't log each re-attempt after failure
+	if self.tokeninfo.reauthAttempts == 0 {
+		log.Println("Attempting authentication...")
+	}
 
 	// (re)authenticate
-	if err = self.send(&request{
+	err = self.send(&request{
 		method:    method.Post,
 		path:      "/oauth2/token",
 		body:      "grant_type=client_credentials",
 		response:  &self.tokeninfo,
 		isAuthReq: true,
-	}); err != nil {
+	})
+
+	if err != nil {
+		self.tokeninfo.reauthAttempts += 1
+
+		if self.tokeninfo.reauthAttempts == 1 {
+			// The first client to have an auth failure on this conn.
+			log.Println("Authentication failure")
+
+			for self.tokeninfo.reauthAttempts < 3 { // Retry in 5 second increments.
+				time.Sleep(5 * time.Second)
+
+				// (re)authenticate
+				err = self.send(&request{
+					method:    method.Post,
+					path:      "/oauth2/token",
+					body:      "grant_type=client_credentials",
+					response:  &self.tokeninfo,
+					isAuthReq: true,
+				})
+
+				if err != nil {
+					self.tokeninfo.reauthAttempts += 1
+
+				} else { // Success! Skip ahead to set new duration.
+					goto OK
+				}
+			}
+
+			// The incremented attempts all failed, so give up and return the error.
+			self.tokeninfo = tokeninfo{
+				reauthAttempts: self.tokeninfo.reauthAttempts,
+			}
+		}
+
+		var attempts = self.tokeninfo.reauthAttempts
+		var logEvery = uint(1)
+
+		for attempts > 10 {
+			logEvery *= 10
+			attempts /= 10
+		}
+
+		if self.tokeninfo.reauthAttempts%logEvery == 0 {
+			log.Printf(
+				"Authentication failed %d consecutive attempts.\n",
+				self.tokeninfo.reauthAttempts,
+			)
+		}
+
 		return err
 	}
 
-	// Set the duration to expire 3 minutes early to avoid expiration during a request cycle
+OK: // Set to expire 3 minutes early to avoid expiration during a request cycle
 	duration = time.Duration(self.tokeninfo.ExpiresIn)*time.Second - 3*time.Minute
 	self.tokeninfo.expiration = time.Now().Add(duration)
+	self.tokeninfo.reauthAttempts = 0
+
+	log.Println("Authentication succeeded.")
 
 	return nil
 }
@@ -80,14 +145,17 @@ func (self *connection) send(reqData *request) error {
 	var url = "https://" // can't include this when doing the `.Join()` below
 
 	// Make sure we're still authenticated. Will refresh if not.
-	/* TODO: How do I know if the authentication is still valid before sending?
-
 	if !reqData.isAuthReq {
-		if err := self.authenticate(); err != nil {
-			return err
+		self.tokeninfo.mux.RLock()
+		var isExpired = time.Now().After(self.tokeninfo.expiration)
+		self.tokeninfo.mux.RUnlock()
+
+		if isExpired {
+			if err := self.authenticate(); err != nil {
+				return err
+			}
 		}
 	}
-	*/
 
 	// use sandbox url if requested
 	if self.server == Server.Sandbox {
@@ -99,10 +167,13 @@ func (self *connection) send(reqData *request) error {
 	switch val := reqData.body.(type) {
 	case string:
 		body_reader = strings.NewReader(val)
+
 	case []byte:
 		body_reader = bytes.NewReader(val)
+
 	case nil:
 		body_reader = bytes.NewReader(nil)
+
 	default:
 		if result, err := json.Marshal(val); err != nil {
 			return err
@@ -135,24 +206,46 @@ func (self *connection) send(reqData *request) error {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Accept-Language", "en_US")
 
-	resp, err = self.client.Do(req)
-	if err != nil {
+	if resp, err = self.client.Do(req); err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	result, err = ioutil.ReadAll(resp.Body)
-
 	//fmt.Println("received...", string(result))
 
+	if resp.StatusCode == 401 { // Unauthorized (probably needs token reauth)
+		if reqData.isAuthReq { // Unlikely... the auth request received a 401
+			result, err = ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return fmt.Errorf("Auth request received 401: %s", err)
+			}
+			return fmt.Errorf("Auth request received 401: %s", result)
+		}
+
+		// Expired, yet somehow made it past the `expiration` check above.
+		log.Println("Unexpected 401 response. Attempting re-auth.")
+		if err = self.authenticate(); err != nil {
+			log.Printf("Re-auth after 401 resulted in err: %s\n", err)
+			return err
+		}
+
+		log.Println("Re-auth succeeded. Attempting recursive send()")
+		return self.send(reqData)
+	}
+
+	if reqData.response == nil {
+		return nil
+	}
+
+	result, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
 
-	reqData.responseData = result
+	reqData.responseData = bytes.TrimSpace(result)
 
 	// If there was no Body, we can return
-	if len(bytes.TrimSpace(result)) == 0 || reqData.response == nil {
+	if len(reqData.responseData) == 0 {
 		return nil
 	}
 

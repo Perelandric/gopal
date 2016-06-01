@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"sync"
 	"time"
 )
 
@@ -103,6 +104,10 @@ type tokeninfo struct {
 
 	////////////// Derived fields
 	expiration time.Time
+
+	reauthAttempts uint
+
+	mux sync.RWMutex
 
 	// Handles the case where an error is received instead
 	*identity_error
