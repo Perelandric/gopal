@@ -4,20 +4,18 @@ package gopal
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
+	"math"
+	"net/http"
+	"path"
+	"strconv"
+	"strings"
+	"time"
 )
-
-import "encoding/json"
-import "io"
-import "io/ioutil"
-import "net/http"
-
-import "path"
-
-import "strings"
-import "strconv"
-import "time"
 
 func NewConnection(s ServerEnum, id, secret string) (c *connection, err error) {
 	c = &connection{
@@ -46,7 +44,6 @@ func NewConnection(s ServerEnum, id, secret string) (c *connection, err error) {
 func (self *connection) authenticate() error {
 	// If an error is returned, zero the tokeninfo
 	var err error
-	var duration time.Duration
 
 	self.tokeninfo.mux.Lock()
 	defer self.tokeninfo.mux.Unlock()
@@ -62,74 +59,67 @@ func (self *connection) authenticate() error {
 		log.Println("Attempting authentication...")
 	}
 
-	// (re)authenticate
-	err = self.send(&request{
+	auth_req_data := request{
 		method:    method.Post,
 		path:      "/oauth2/token",
 		body:      "grant_type=client_credentials",
 		response:  &self.tokeninfo,
 		isAuthReq: true,
-	})
-
-	if err != nil {
-		self.tokeninfo.reauthAttempts += 1
-
-		if self.tokeninfo.reauthAttempts == 1 {
-			// The first client to have an auth failure on this conn.
-			log.Println("Authentication failure")
-
-			for self.tokeninfo.reauthAttempts < 3 { // Retry in 5 second increments.
-				time.Sleep(5 * time.Second)
-
-				// (re)authenticate
-				err = self.send(&request{
-					method:    method.Post,
-					path:      "/oauth2/token",
-					body:      "grant_type=client_credentials",
-					response:  &self.tokeninfo,
-					isAuthReq: true,
-				})
-
-				if err != nil {
-					self.tokeninfo.reauthAttempts += 1
-
-				} else { // Success! Skip ahead to set new duration.
-					goto OK
-				}
-			}
-
-			// The incremented attempts all failed, so give up and return the error.
-			self.tokeninfo = tokeninfo{
-				reauthAttempts: self.tokeninfo.reauthAttempts,
-			}
-		}
-
-		var attempts = self.tokeninfo.reauthAttempts
-		var logEvery = uint(1)
-
-		for attempts > 10 {
-			logEvery *= 10
-			attempts /= 10
-		}
-
-		if self.tokeninfo.reauthAttempts%logEvery == 0 {
-			log.Printf(
-				"Authentication failed %d consecutive attempts.\n",
-				self.tokeninfo.reauthAttempts,
-			)
-		}
-
-		return err
 	}
 
-OK: // Set to expire 3 minutes early to avoid expiration during a request cycle
-	duration = time.Duration(self.tokeninfo.ExpiresIn)*time.Second - 3*time.Minute
+	// TODO: Would be nice to let `n` clients try to authenticate at any given
+	// time. This could be done with a buffered channel.
+
+	var auth_attempts = self.tokeninfo.reauthAttempts + 1
+	var num_attempts = auth_attempts + 3
+
+	// (re)authenticate
+	if err = self.send(&auth_req_data); err == nil {
+		self.auth_success()
+		return nil
+	}
+
+	if auth_attempts == 1 {
+		// The first client to have an auth failure on this conn.
+		log.Println("Authentication failure")
+	}
+
+	for auth_attempts < num_attempts { // Retry in 3 second increments.
+		time.Sleep(3 * time.Second)
+
+		// (re)authenticate
+		if err = self.send(&auth_req_data); err == nil {
+			self.auth_success()
+			return nil
+		}
+
+		auth_attempts += 1
+		n := float64(auth_attempts)
+
+		if math.Mod(n, math.Pow(10, math.Floor(math.Log10(n)))) == 0 {
+			log.Printf( // every 10, then 100, then 1000, etc...
+				"Authentication failed %d consecutive attempts.\n",
+				auth_attempts,
+			)
+		}
+	}
+
+	// The incremented attempts all failed, so give up and return the error.
+	self.tokeninfo = tokeninfo{
+		reauthAttempts: auth_attempts,
+	}
+
+	return err
+}
+
+func (self *connection) auth_success() {
+	// Set to expire 3 minutes early to avoid expiration during a request cycle
+	var duration = time.Duration(self.tokeninfo.ExpiresIn)*time.Second - 3*time.Minute
+
 	self.tokeninfo.expiration = time.Now().Add(duration)
 	self.tokeninfo.reauthAttempts = 0
 
 	log.Println("Authentication succeeded.")
-
-	return nil
 }
 
 func (self *tokeninfo) auth_token() string {
