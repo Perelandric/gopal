@@ -2,6 +2,8 @@ package gopal
 
 import "path"
 
+//go:generate Golific $GOFILE
+
 /*************************************************************
 
 	AUTHORIZATIONS:  https://api.paypal.com/v1/payments/payment/authorization
@@ -11,6 +13,24 @@ import "path"
 	voiding, and reauthorizing authorizations.
 
 **************************************************************/
+
+/*
+@struct drop_ctor
+*/
+// State items are:
+// pending, authorized, captured, partially_captured, expired, voided
+type __Authorization struct {
+	_shared
+	Amount             amount                 `gRead json:"amount"`
+	BillingAgreementId string                 `gRead json:"billing_agreement_id"`
+	PaymentMode        paymentModeEnum        `gRead json:"payment_mode"`
+	ReasonCode         reasonCodeEnum         `gRead json:"reason_code"`
+	ValidUntil         dateTime               `gRead json:"valid_until"`
+	ClearingTime       string                 `gRead json:"clearing_time"`
+	ProtectionElig     protectionEligEnum     `gRead json:"protection_eligibility"`
+	ProtectionEligType protectionEligTypeEnum `gRead json:"protection_eligibility_type"`
+	FmfDetails         fmfDetails             `gRead json:"fmf_details"`
+}
 
 // Implement the resource interface
 

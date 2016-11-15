@@ -13,9 +13,9 @@ Several types are used for both Paypal and credit cards, yet have restrictions
 for one or the other.
 */
 
-func (self *connection) NewCreditCardPayment() *CreditCardPayment {
+func (c *connection) NewCreditCardPayment() *CreditCardPayment {
 	var pymt = CreditCardPayment{
-		connection: self,
+		connection: c,
 	}
 	pymt.private.Intent = intent.Sale
 	pymt.private.Transactions = make([]*CreditCardTransaction, 0)
@@ -28,26 +28,34 @@ func (self *connection) NewCreditCardPayment() *CreditCardPayment {
 
 /*
 // TODO: Add `billing_agreement_tokens`, `payment_instruction`
-@struct CreditCardPayment
-  *connection
-  Intent				      intentEnum 		`json:"intent,omitempty"` --read
-  State 							StateEnum `json:"state,omitempty"` --read
-  Id 									string `json:"id,omitempty"` --read
-  FailureReason				FailureReasonEnum `json:"failure_reason,omitempty"` --read
-  CreateTime 					dateTime `json:"create_time,omitempty"` --read
-  UpdateTime 					dateTime `json:"update_time,omitempty"` --read
-  Links 							links `json:"links,omitempty"` --read
-  Transactions	      CreditCardTransactions 	`json:"transactions,omitempty"` --read
-	ExperienceProfileId string `json:"experience_profile_id"` --read --write
-	Payer 							creditCardPayer `json:"payer,omitempty"` --read
-	RedirectUrls				Redirects `json:"redirect_urls,omitempty"` --read
-  *payment_error
 */
 
-func (self *CreditCardPayment) AddTransaction(
-	c CurrencyTypeEnum, shp *ShippingAddress) *CreditCardTransaction {
+/*
+@struct
+*/
+type __CreditCardPayment struct {
+	*connection
+	Intent              intentEnum             `gRead json:"intent,omitempty"`
+	State               StateEnum              `gRead json:"state,omitempty"`
+	Id                  string                 `gRead json:"id,omitempty"`
+	FailureReason       FailureReasonEnum      `gRead json:"failure_reason,omitempty"`
+	CreateTime          dateTime               `gRead json:"create_time,omitempty"`
+	UpdateTime          dateTime               `gRead json:"update_time,omitempty"`
+	Links               links                  `gRead json:"links,omitempty"`
+	Transactions        CreditCardTransactions `gRead json:"transactions,omitempty"`
+	ExperienceProfileId string                 `gRead gWrite json:"experience_profile_id"`
+	Payer               creditCardPayer        `gRead json:"payer,omitempty"`
+	RedirectUrls        Redirects              `gRead json:"redirect_urls,omitempty"`
+	*payment_error
+}
+
+func (cp *CreditCardPayment) AddTransaction(
+	c CurrencyTypeEnum,
+	shp *ShippingAddress,
+) *CreditCardTransaction {
 
 	var t CreditCardTransaction
+
 	t.private.Amount = amount{}
 	t.private.ItemList = &creditCardItemList{}
 
@@ -57,7 +65,7 @@ func (self *CreditCardPayment) AddTransaction(
 	t.private.ItemList.private.Items = make([]*CreditCardItem, 0, 1)
 	t.private.ItemList.private.ShippingAddress = shp
 
-	self.private.Transactions = append(self.private.Transactions, &t)
+	cp.private.Transactions = append(cp.private.Transactions, &t)
 
 	return &t
 }
@@ -151,16 +159,18 @@ func (self *CreditCardPayment) FetchSale() []*Sale {
 type CreditCardTransactions []*CreditCardTransaction
 
 /*
-@struct CreditCardTransaction
-  ItemList 				*creditCardItemList `json:"item_list,omitempty"` --read
-  Amount 					amount `json:"amount"` --read
-  RelatedResources relatedResources `json:"related_resources,omitempty"` --read
-  Description 		string `json:"description,omitempty"` --read --write
-  PaymentOptions  paymentOptions `json:"payment_options,omitempty"` --read --write
-	InvoiceNumber 	string `json:"invoice_number,omitempty"` --read --write
-	Custom 					string `json:"custom,omitempty"` --read --write
-	SoftDescriptor 	string `json:"soft_descriptor,omitempty"` --read --write
+@struct
 */
+type __CreditCardTransaction struct {
+	ItemList         *creditCardItemList `gRead json:"item_list,omitempty"`
+	Amount           amount              `gRead json:"amount"`
+	RelatedResources relatedResources    `gRead json:"related_resources,omitempty"`
+	Description      string              `gRead gWrite json:"description,omitempty"`
+	PaymentOptions   paymentOptions      `gRead gWrite json:"payment_options,omitempty"`
+	InvoiceNumber    string              `gRead gWrite json:"invoice_number,omitempty"`
+	Custom           string              `gRead gWrite json:"custom,omitempty"`
+	SoftDescriptor   string              `gRead gWrite json:"soft_descriptor,omitempty"`
+}
 
 // Prices are assumed to use the CurrencyType passed to NewTransaction.
 func (t *CreditCardTransaction) AddItem(item *CreditCardItem) (err error) {
@@ -216,13 +226,13 @@ func (self *CreditCardTransaction) calculateToAuthorize() {
 			self.private.Amount.Details.ShippingDiscount)
 }
 
-type CreditCardItems []*CreditCardItem
-
 /*
-@struct creditCardItemList
-	Items           CreditCardItems          	 `json:"items,omitempty"` --read
-	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"` --read
+@struct
 */
+type __creditCardItemList struct {
+	Items           []*CreditCardItem `gRead json:"items,omitempty"`
+	ShippingAddress *ShippingAddress  `gRead json:"shipping_address,omitempty"`
+}
 
 func (self *creditCardItemList) validate() (err error) {
 	if self == nil {
@@ -241,39 +251,17 @@ func (self *creditCardItemList) validate() (err error) {
 }
 
 /*
-@struct CreditCardItem
-	Currency 		CurrencyTypeEnum 	`json:"currency"` --read
-	Quantity 		int64 			`json:"quantity,string"` --read --write
-	Name 				string 			`json:"name"` --read --write
-	Price 			float64 		`json:"price,string"` --read --write
-	Sku 				string 			`json:"sku,omitempty"` --read --write
+@struct
 */
-
-func (self *CreditCardItem) validate() (err error) {
-	if err = checkStr("Item.Name", &self.Name, 127, true, true); err != nil {
-		return err
-	}
-	if err = checkStr("Item.Sku", &self.Sku, 50, false, true); err != nil {
-		return err
-	}
-
-	if err = checkFloat7_10("Item.Price", &self.Price, true); err != nil {
-		return err
-	}
-
-	return checkInt10("Item.Quantity", self.Quantity, true)
-}
-
-/*
 // Source of the funds for this payment represented by a credit card.
-@struct creditCardPayer
-  // Must be PaymentMethod.CreditCard
-	PaymentMethod      PaymentMethodEnum `json:"payment_method,omitempty"` --read
+type __creditCardPayer struct {
+	// Must be PaymentMethod.CreditCard
+	PaymentMethod PaymentMethodEnum `gRead json:"payment_method,omitempty"`
 
-	FundingInstruments fundingInstruments `json:"funding_instruments,omitempty"` --read
+	FundingInstruments fundingInstruments `gRead json:"funding_instruments,omitempty"`
 
-	PayerInfo          *PayerInfo `json:"payer_info,omitempty"` --read
-*/
+	PayerInfo *PayerInfo `gRead json:"payer_info,omitempty"`
+}
 
 func (self *creditCardPayer) validate() error {
 	err := self.private.PaymentMethod.validate()
@@ -284,37 +272,39 @@ func (self *creditCardPayer) validate() error {
 }
 
 /*
-@struct PayerInfo
+@struct
+*/
+type __PayerInfo struct {
 	// Email address representing the payer. 127 characters max.
-	Email string `json:"email,omitempty"` --read --write
+	Email string `gRead gWrite json:"email,omitempty"`
 
 	// Salutation of the payer.
-	Salutation string `json:"salutation,omitempty"` --read --write
+	Salutation string `gRead gWrite json:"salutation,omitempty"`
 
 	// Suffix of the payer.
-	Suffix string `json:"suffix,omitempty"` --read --write
+	Suffix string `gRead gWrite json:"suffix,omitempty"`
 
 	// Two-letter registered country code of the payer to identify the buyer country.
-	CountryCode CountryCodeEnum `json:"country_code,omitempty"` --read --write
+	CountryCode CountryCodeEnum `gRead gWrite json:"country_code,omitempty"`
 
 	// Phone number representing the payer. 20 characters max.
-	Phone string `json:"phone,omitempty"` --read --write
+	Phone string `gRead gWrite json:"phone,omitempty"`
 
 	// First name of the payer. Value assigned by PayPal.
-	FirstName string `json:"first_name,omitempty"` --read --write
+	FirstName string `gRead gWrite json:"first_name,omitempty"`
 
 	// Middle name of the payer. Value assigned by PayPal.
-	MiddleName string `json:"middle_name,omitempty"` --read --write
+	MiddleName string `gRead gWrite json:"middle_name,omitempty"`
 
 	// Last name of the payer. Value assigned by PayPal.
-	LastName string `json:"last_name,omitempty"` --read --write
+	LastName string `gRead gWrite json:"last_name,omitempty"`
 
 	// PayPal assigned Payer ID. Value assigned by PayPal.
-	PayerId string `json:"payer_id,omitempty"` --read --write
+	PayerId string `gRead gWrite json:"payer_id,omitempty"`
 
 	// Shipping address of payer PayPal account. Value assigned by PayPal.
-	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"` --read --write
-*/
+	ShippingAddress *ShippingAddress `gRead gWrite json:"shipping_address,omitempty"`
+}
 
 func (self *PayerInfo) validate() error {
 	// TODO: Implement

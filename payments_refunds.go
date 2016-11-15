@@ -5,6 +5,8 @@ import (
 	"path"
 )
 
+//go:generate Golific $GOFILE
+
 /*************************************************************
 
 	REFUNDS:  https://api.paypal.com/v1/refund
@@ -19,6 +21,19 @@ import (
 	https://developer.paypal.com/webapps/developer/docs/integration/direct/refund-payment/
 
 **************************************************************/
+
+/*
+@struct
+*/
+// State items are: pending; completed; failed
+type __Refund struct {
+	_shared
+	Amount      amount `gRead json:"amount"`
+	Description string `gRead gWrite json:"description,omitempty"`
+	Reason      string `gRead gWrite json:"reason,omitempty"`
+	SaleId      string `gRead json:"sale_id,omitempty"`
+	CaptureId   string `gRead json:"capture_id,omitempty"`
+}
 
 // Implement the resource interface
 

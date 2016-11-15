@@ -15,12 +15,15 @@ types are used for both Paypal and credit cards, yet have restrictions for one
 or the other.
 */
 
-func (self *connection) NewPaypalPayment(
-	urls Redirects, info *PaypalPayerInfo) (*PaypalPayment, error) {
+func (c *connection) NewPaypalPayment(
+	urls Redirects,
+	info *PaypalPayerInfo,
+) (*PaypalPayment, error) {
 
 	var pymt = PaypalPayment{
-		connection: self,
+		connection: c,
 	}
+
 	pymt.private.Intent = intent.Sale
 	pymt.private.Transactions = make([]*PaypalTransaction, 0)
 	pymt.private.RedirectUrls = urls
@@ -43,8 +46,8 @@ type Redirects struct {
 	Cancel string `json:"cancel_url,omitempty"`
 }
 
-func (self *Redirects) validate() error {
-	for _, s := range [2]string{self.Return, self.Cancel} {
+func (r *Redirects) validate() error {
+	for _, s := range [2]string{r.Return, r.Cancel} {
 		u, err := url.Parse(s)
 		if err != nil {
 			return err
@@ -62,26 +65,31 @@ func (self *Redirects) validate() error {
 
 type PaypalTransactions []*PaypalTransaction
 
-/*
 // TODO: Add `billing_agreement_tokens`, `payment_instruction`
-@struct PaypalPayment
-  *connection
-  Intent							intentEnum 		`json:"intent,omitempty"` --read
-  State 							*StateEnum `json:"state,omitempty"` --read
-  Id 									string `json:"id,omitempty"` --read
-  FailureReason				*FailureReasonEnum `json:"failure_reason,omitempty"` --read
-  CreateTime 					dateTime `json:"create_time,omitempty"` --read
-  UpdateTime 					dateTime `json:"update_time,omitempty"` --read
-  Links 							links `json:"links,omitempty"` --read
-  Transactions				PaypalTransactions 	`json:"transactions,omitempty"` --read
-	Payer 							paypalPayer `json:"payer,omitempty"` --read
-	RedirectUrls				Redirects `json:"redirect_urls,omitempty"` --read
-	ExperienceProfileId string `json:"experience_profile_id,omitempty"` --read --write
-  *payment_error
-*/
 
-func (self *PaypalPayment) AddTransaction(
-	c CurrencyTypeEnum, shp *ShippingAddress) *PaypalTransaction {
+/*
+@struct
+*/
+type __PaypalPayment struct {
+	*connection
+	Intent              intentEnum         `gRead json:"intent,omitempty"`
+	State               *StateEnum         `gRead json:"state,omitempty"`
+	Id                  string             `gRead json:"id,omitempty"`
+	FailureReason       *FailureReasonEnum `gRead json:"failure_reason,omitempty"`
+	CreateTime          dateTime           `gRead json:"create_time,omitempty"`
+	UpdateTime          dateTime           `gRead json:"update_time,omitempty"`
+	Links               links              `gRead json:"links,omitempty"`
+	Transactions        PaypalTransactions `gRead json:"transactions,omitempty"`
+	Payer               paypalPayer        `gRead json:"payer,omitempty"`
+	RedirectUrls        Redirects          `gRead json:"redirect_urls,omitempty"`
+	ExperienceProfileId string             `gRead gWrite json:"experience_profile_id,omitempty"`
+	*payment_error
+}
+
+func (pp *PaypalPayment) AddTransaction(
+	c CurrencyTypeEnum,
+	shp *ShippingAddress,
+) *PaypalTransaction {
 
 	var t PaypalTransaction
 	t.private.Amount = amount{Details: &details{}}
@@ -93,25 +101,25 @@ func (self *PaypalPayment) AddTransaction(
 	t.private.ItemList.private.Items = make([]*PaypalItem, 0, 1)
 	t.private.ItemList.private.ShippingAddress = shp
 
-	self.private.Transactions = append(self.private.Transactions, &t)
+	pp.private.Transactions = append(pp.private.Transactions, &t)
 
 	return &t
 }
 
-func (self *PaypalPayment) calculateToAuthorize() {
-	for _, t := range self.private.Transactions {
+func (pp *PaypalPayment) calculateToAuthorize() {
+	for _, t := range pp.private.Transactions {
 		t.calculateToAuthorize()
 	}
 }
 
 // TODO: Needs to validate some sub-properties that are valid only when
 // Payer.PaymentMethod is "paypal"
-func (self *PaypalPayment) validate() (err error) {
-	if len(self.private.Transactions) == 0 {
+func (pp *PaypalPayment) validate() (err error) {
+	if len(pp.private.Transactions) == 0 {
 		return fmt.Errorf("A Payment needs at least one Transaction")
 	}
 
-	for _, t := range self.private.Transactions {
+	for _, t := range pp.private.Transactions {
 		if err = t.validate(); err != nil {
 			return err
 		}
@@ -119,24 +127,24 @@ func (self *PaypalPayment) validate() (err error) {
 
 	// TODO: More validation
 
-	return self.private.Payer.validate()
+	return pp.private.Payer.validate()
 }
 
 // TODO: Should send a query string parameter `token=[some token]`
-func (self *PaypalPayment) Authorize() (to string, code int, err error) {
-	if err = self.validate(); err != nil {
+func (pp *PaypalPayment) Authorize() (to string, code int, err error) {
+	if err = pp.validate(); err != nil {
 		return "", 0, err
 	}
 
-	self.calculateToAuthorize()
+	pp.calculateToAuthorize()
 
 	// Create Totals
 	var pymt PaypalPayment
 
-	err = self.send(&request{
+	err = pp.send(&request{
 		method:   method.Post,
 		path:     _paymentsPath,
-		body:     self,
+		body:     pp,
 		response: &pymt,
 	})
 
@@ -217,16 +225,18 @@ func (self *PaypalPayment) FetchSale() []*Sale {
 }
 
 /*
-@struct PaypalTransaction
-  ItemList 				*paypalItemList `json:"item_list,omitempty"` --read
-  Amount 					amount `json:"amount"` --read
-  RelatedResources relatedResources `json:"related_resources,omitempty"` --read
-  Description 		string `json:"description,omitempty"` --read --write
-  PaymentOptions  *paymentOptions `json:"payment_options,omitempty"` --read --write
-	InvoiceNumber 	string `json:"invoice_number,omitempty"` --read --write
-	Custom 					string `json:"custom,omitempty"` --read --write
-	SoftDescriptor 	string `json:"soft_descriptor,omitempty"` --read --write
+@struct
 */
+type __PaypalTransaction struct {
+	ItemList         *paypalItemList  `gRead json:"item_list,omitempty"`
+	Amount           amount           `gRead json:"amount"`
+	RelatedResources relatedResources `gRead json:"related_resources,omitempty"`
+	Description      string           `gRead gWrite json:"description,omitempty"`
+	PaymentOptions   *paymentOptions  `gRead gWrite json:"payment_options,omitempty"`
+	InvoiceNumber    string           `gRead gWrite json:"invoice_number,omitempty"`
+	Custom           string           `gRead gWrite json:"custom,omitempty"`
+	SoftDescriptor   string           `gRead gWrite json:"soft_descriptor,omitempty"`
+}
 
 // Prices are assumed to use the CurrencyType passed to NewTransaction.
 func (t *PaypalTransaction) AddItem(item *PaypalItem) (err error) {
@@ -288,10 +298,12 @@ func (self *PaypalTransaction) calculateToAuthorize() {
 type PaypalItems []*PaypalItem
 
 /*
-@struct paypalItemList
-	Items           PaypalItems          	 `json:"items,omitempty"` --read
-	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"` --read
+@struct
 */
+type __paypalItemList struct {
+	Items           PaypalItems      `gRead json:"items,omitempty"`
+	ShippingAddress *ShippingAddress `gRead json:"shipping_address,omitempty"`
+}
 
 func (self *paypalItemList) validate() (err error) {
 	if self == nil {
@@ -310,49 +322,21 @@ func (self *paypalItemList) validate() (err error) {
 }
 
 /*
-@struct PaypalItem
-	Currency 		CurrencyTypeEnum 	`json:"currency"` --read
-	Quantity 		int64 			`json:"quantity"` --read --write
-	Name 				string 			`json:"name"` --read --write
-	Price 			float64 		`json:"price,string"` --read --write
-	Tax 				float64 		`json:"tax,string,omitempty"` --read --write
-	Sku 				string 			`json:"sku,omitempty"` --read --write
-	Description string 			`json:"description,omitempty"` --read --write
+@struct
 */
+// Source of the funds for this payment represented by a PayPal account.
+type __paypalPayer struct {
+	// Must be PaymentMethod.Paypal
+	PaymentMethod PaymentMethodEnum `json:"payment_method,omitempty"`
 
-func (self *PaypalItem) validate() (err error) {
-	if self.Tax < 0 { // TODO: No other validation here???
-		return fmt.Errorf("%q must not be a negative number", "Item.Tax")
-	}
-	if err = checkStr("Item.Name", &self.Name, 127, true, true); err != nil {
-		return err
-	}
-	if err = checkStr("Item.Sku", &self.Sku, 50, false, true); err != nil {
-		return err
-	}
-	_ = checkStr("Item.Description", &self.Description, 127, false, false)
+	// Status of the payer’s PayPal account. Allowed values: VERIFIED or UNVERIFIED.
+	Status *payerStatusEnum `gRead json:"status,omitempty"`
 
-	if err = checkFloat7_10("Item.Price", &self.Price, true); err != nil {
-		return err
-	}
-
-	return checkInt10("Item.Quantity", self.Quantity, true)
+	PaypalPayerInfo *PaypalPayerInfo `gRead json:"payer_info,omitempty"`
 }
 
-/*
-// Source of the funds for this payment represented by a PayPal account.
-@struct paypalPayer
-  // Must be PaymentMethod.Paypal
-	PaymentMethod      PaymentMethodEnum `json:"payment_method,omitempty"`
-
-  // Status of the payer’s PayPal account. Allowed values: VERIFIED or UNVERIFIED.
-	Status 						 *payerStatusEnum `json:"status,omitempty"` --read
-
-	PaypalPayerInfo    *PaypalPayerInfo `json:"payer_info,omitempty"` --read
-*/
-
-func (self *paypalPayer) validate() error {
-	err := self.private.PaymentMethod.validate()
+func (pp *paypalPayer) validate() error {
+	err := pp.private.PaymentMethod.validate()
 	if err != nil {
 		return err
 	}
@@ -360,45 +344,47 @@ func (self *paypalPayer) validate() error {
 }
 
 /*
+@struct
+*/
 // This object is pre-filled by PayPal when the payment_method is paypal.
-@struct PaypalPayerInfo
-  // Payer’s tax ID type. Allowed values: BR_CPF or BR_C`NPJ. Only supported when
-  // the payment_method is set to paypal.
-  TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"` --read --write
+type __PaypalPayerInfo struct {
+	// Payer’s tax ID type. Allowed values: BR_CPF or BR_C`NPJ. Only supported when
+	// the payment_method is set to paypal.
+	TaxIdType TaxIdTypeEnum `gRead gWrite json:"tax_id_type,omitempty"`
 
-  // Payer’s tax ID. Only supported when the payment_method is set to paypal.
-  TaxId string `json:"tax_id,omitempty"` --read --write
+	// Payer’s tax ID. Only supported when the payment_method is set to paypal.
+	TaxId string `gRead gWrite json:"tax_id,omitempty"`
 
 	// Email address representing the payer. 127 characters max.
-	Email string `json:"email,omitempty"` --read
+	Email string `gRead json:"email,omitempty"`
 
 	// Salutation of the payer.
-	Salutation string `json:"salutation,omitempty"` --read
+	Salutation string `gRead json:"salutation,omitempty"`
 
 	// Suffix of the payer.
-	Suffix string `json:"suffix,omitempty"` --read
+	Suffix string `gRead json:"suffix,omitempty"`
 
 	// Two-letter registered country code of the payer to identify the buyer country.
-	CountryCode CountryCodeEnum `json:"country_code,omitempty"` --read
+	CountryCode CountryCodeEnum `gRead json:"country_code,omitempty"`
 
 	// Phone number representing the payer. 20 characters max.
-	Phone string `json:"phone,omitempty"` --read
+	Phone string `gRead json:"phone,omitempty"`
 
 	// First name of the payer. Value assigned by PayPal.
-	FirstName string `json:"first_name,omitempty"` --read
+	FirstName string `gRead json:"first_name,omitempty"`
 
 	// Middle name of the payer. Value assigned by PayPal.
-	MiddleName string `json:"middle_name,omitempty"` --read
+	MiddleName string `gRead json:"middle_name,omitempty"`
 
 	// Last name of the payer. Value assigned by PayPal.
-	LastName string `json:"last_name,omitempty"` --read
+	LastName string `gRead json:"last_name,omitempty"`
 
 	// PayPal assigned Payer ID. Value assigned by PayPal.
-	PayerId string `json:"payer_id,omitempty"` --read
+	PayerId string `gRead json:"payer_id,omitempty"`
 
 	// Shipping address of payer PayPal account. Value assigned by PayPal.
-	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"` --read
-*/
+	ShippingAddress *ShippingAddress `gRead json:"shipping_address,omitempty"`
+}
 
 func (self *PaypalPayerInfo) validate() error {
 	// TODO: Implement

@@ -2,6 +2,8 @@ package gopal
 
 import "path"
 
+//go:generate Golific $GOFILE
+
 /*************************************************************
 
     CAPTURES:  https://api.paypal.com/v1/payments/payment/capture
@@ -10,6 +12,17 @@ import "path"
 	refund captured payments.
 
 **************************************************************/
+
+/*
+@struct
+*/
+// State values are: pending, completed, refunded, partially_refunded
+type __Capture struct {
+	_shared
+	Amount         amount   `gRead json:"amount"`
+	TransactionFee currency `gRead gWrite json:"transaction_fee"`
+	IsFinalCapture bool     `gRead gWrite json:"is_final_capture,omitempty"`
+}
 
 // Implement the resource interface
 

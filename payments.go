@@ -4,10 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
-	"net/url"
 	"path"
-	"sync"
 	"time"
 )
 
@@ -17,6 +14,67 @@ type dateTime string // TODO: How should this be done? [Un]Marshalers?
 
 // TODO: only needed until Golific acknowledges more types
 type fundingInstruments []*fundingInstrument
+
+/*
+@struct
+*/
+type __CreditCardItem struct {
+	Currency CurrencyTypeEnum `gRead json:"currency"`
+	Quantity int64            `gRead gWrite json:"quantity,string"`
+	Name     string           `gRead gWrite json:"name"`
+	Price    float64          `gRead gWrite json:"price,string"`
+	Sku      string           `gRead gWrite json:"sku,omitempty"`
+	Url      string           `gRead gWrite json:"url,omitempty"`
+}
+
+func (ti *CreditCardItem) validate() (err error) {
+	if err = checkStr("Item.Name", &ti.Name, 127, true, true); err != nil {
+		return err
+	}
+	if err = checkStr("Item.Sku", &ti.Sku, 127, false, true); err != nil {
+		return err
+	}
+
+	if err = checkFloat7_10("Item.Price", &ti.Price, true); err != nil {
+		return err
+	}
+
+	return checkInt10("Item.Quantity", ti.Quantity, true)
+}
+
+/*
+@struct
+*/
+type __PaypalItem struct {
+	Currency    CurrencyTypeEnum `gRead json:"currency"`
+	Quantity    int64            `gRead gWrite json:"quantity,string"`
+	Name        string           `gRead gWrite json:"name"`
+	Price       float64          `gRead gWrite json:"price,string"`
+	Sku         string           `gRead gWrite json:"sku,omitempty"`
+	Url         string           `gRead gWrite json:"url,omitempty"`
+	Tax         float64          `gRead gWrite json:"tax,string,omitempty"`
+	Description string           `gRead gWrite json:"description,omitempty"`
+}
+
+func (pi *PaypalItem) validate() (err error) {
+	if pi.Tax < 0 { // TODO: No other validation here???
+		return fmt.Errorf("%q must not be a negative number", "Item.Tax")
+	}
+	_ = checkStr("Item.Description", &pi.Description, 127, false, false)
+
+	if err = checkStr("Item.Name", &pi.Name, 127, true, true); err != nil {
+		return err
+	}
+	if err = checkStr("Item.Sku", &pi.Sku, 127, false, true); err != nil {
+		return err
+	}
+
+	if err = checkFloat7_10("Item.Price", &pi.Price, true); err != nil {
+		return err
+	}
+
+	return checkInt10("Item.Quantity", pi.Quantity, true)
+}
 
 type resource interface {
 	errorable
@@ -36,81 +94,6 @@ type Transaction interface {
 type refundable interface {
 	resource
 	getRefundPath() string
-}
-
-type request struct {
-	method       methodEnum
-	path         string
-	body         interface{}
-	response     errorable
-	responseData []byte
-	isAuthReq    bool
-}
-
-type connection struct {
-	server     ServerEnum
-	id, secret string
-	tokeninfo  tokeninfo
-	client     http.Client
-}
-
-type Connection interface {
-	FetchPayment(string) (Payment, error)
-	GetAllPayments(int, sortByEnum, sortOrderEnum, ...time.Time) *PaymentBatcher
-	FetchAuthorization(string) (*Authorization, error)
-	FetchCapture(string) (*Capture, error)
-	NewCreditCardPayment() *CreditCardPayment
-	NewPaypalPayment(Redirects, *PaypalPayerInfo) (*PaypalPayment, error)
-	Execute(*url.URL) error
-	FetchRefund(string) (*Refund, error)
-	FetchSale(string) (*Sale, error)
-
-	authenticate() error
-	send(*request) error
-}
-
-// Authorization response
-type tokeninfo struct {
-	// The access token issued by the authorization server.
-	AccessToken string `json:"access_token,omitempty"`
-
-	// The refresh token, which can be used to obtain new access tokens using the
-	// same authorization grant as described in OAuth2.0 RFC6749 - Section 6.
-	RefreshToken string `json:"refresh_token,omitempty"`
-
-	// The type of the token issued as described in OAuth2.0 RFC6749 - Section 7.1
-	// Value is case insensitive.
-	TokenType string `json:"token_type,omitempty"`
-
-	// The lifetime of the access token in seconds. After the access token
-	// expires, use the refresh_token to refresh the access token.
-	ExpiresIn uint `json:"expires_in,omitempty"`
-
-	// Not sure what this is for. Appears once in a response example, but no
-	// explanation is given anywhere.
-	AppId string `json:"app_id,omitempty"`
-
-	// THERE SEEM TO BE DIFFERENT DOCS IN DIFFERENT PLACES FOR THIS!!!
-	//
-	// Required if different from the scope requested by the client. For a list of
-	// possible values, see the attributes table.
-	// https://developer.paypal.com/docs/integration/direct/identity/attributes/
-	//
-	// Scopes expressed in the form of resource URL endpoints. The value of the
-	// scope parameter is expressed as a list of space-delimited, case-sensitive
-	// strings.
-	// Value assigned by PayPal.
-	Scope string `json:"scope,omitempty"`
-
-	////////////// Derived fields
-	expiration time.Time
-
-	reauthAttempts uint
-
-	mux sync.RWMutex
-
-	// Handles the case where an error is received instead
-	*identity_error
 }
 
 type relatedResources []resource
@@ -199,88 +182,37 @@ func (self *connection) FetchPayment(payment_id string) (Payment, error) {
 }
 
 /*
-@struct _shared --drop_ctor
-	*connection
-	Id 						string `json:"id,omitempty"` 						--read
-	CreateTime 		dateTime `json:"create_time,omitempty"` --read
-	UpdateTime 		dateTime `json:"update_time,omitempty"` --read
-	State 				StateEnum `json:"state,omitempty"` 			--read
-	ParentPayment string `json:"parent_payment,omitempty"` --read
-	Links 				links `json:"links,omitempty"`
-	*identity_error
+@struct drop_ctor
 */
+type ___shared struct {
+	*connection
+	Id            string    `gRead json:"id,omitempty"`
+	CreateTime    dateTime  `gRead json:"create_time,omitempty"`
+	UpdateTime    dateTime  `gRead json:"update_time,omitempty"`
+	State         StateEnum `gRead json:"state,omitempty"`
+	ParentPayment string    `gRead json:"parent_payment,omitempty"`
+	Links         links     `json:"links,omitempty"`
+	*identity_error
+}
 
 func (self *_shared) FetchParentPayment() (Payment, error) {
 	return self.FetchPayment(self.private.ParentPayment)
 }
 
 /*
-// State items are: pending, authorized, captured, partially_captured, expired,
-// 									voided
-@struct Authorization --drop_ctor
-	_shared
-	Amount 						amount `json:"amount"` --read
-	BillingAgreementId string `json:"billing_agreement_id"` --read
-	PaymentMode 			paymentModeEnum `json:"payment_mode"` --read
-	ReasonCode 				reasonCodeEnum `json:"reason_code"` --read
-	ValidUntil 				dateTime `json:"valid_until"` --read
-	ClearingTime 			string `json:"clearing_time"` --read
-	ProtectionElig 		protectionEligEnum `json:"protection_eligibility"` --read
-	ProtectionEligType protectionEligTypeEnum `json:"protection_eligibility_type"` --read
-	FmfDetails 				fmfDetails `json:"fmf_details"` --read
-
-
-// State values are: pending, completed, refunded, partially_refunded
-@struct Capture
-	_shared
-	Amount 				 amount `json:"amount"` --read
-	TransactionFee currency `json:"transaction_fee"` --read --write
-	IsFinalCapture bool `json:"is_final_capture,omitempty"` --read --write
-
-
-// State values are: pending; completed; refunded; partially_refunded
-// TODO: PendingReason appears in the old docs under the general Sale object description
-// but not under the lower "sale object" definition. The new docs have it
-// marked as [DEPRECATED] in one area, but not another.
-@struct Sale
-	_shared
-	Amount 										amount `json:"amount"` --read
-	Description 							string `json:"description,omitempty"` --read --write
-	TransactionFee 						currency `json:"transaction_fee"` --read --write
-	ReceivableAmount 					currency `json:"receivable_amount"` --read --write
-	PendingReason 						pendingReasonEnum `json:"pending_reason"` --read
-	PaymentMode 							paymentModeEnum `json:"payment_mode"` --read
-	ExchangeRate 							string `json:"exchange_rate"` --read
-	FmfDetails 								fmfDetails `json:"fmf_details"` --read
-	ReceiptId 								string `json:"receipt_id"` --read
-	ReasonCode 								reasonCodeEnum `json:"reason_code"` --read
-	ProtectionEligibility 		protectionEligEnum `json:"protection_eligibility"` --read
-	ProtectionEligibilityType protectionEligTypeEnum `json:"protection_eligibility_type"` --read
-	ClearingTime 							string `json:"clearing_time"` --read
-	BillingAgreementId 				string `json:"billing_agreement_id"` --read
-
-
-// State items are: pending; completed; failed
-@struct Refund
-	_shared
-	Amount 			amount `json:"amount"` --read
-	Description string `json:"description,omitempty"` --read --write
-	Reason 			string `json:"reason,omitempty"` --read --write
-	SaleId 			string `json:"sale_id,omitempty"` --read
-	CaptureId 	string `json:"capture_id,omitempty"` --read
-
-
+@struct
+*/
 // Amount Object
-//  A`Transaction` object also may have an `ItemList`, which has dollar amounts.
+//  A `Transaction` object also may have an `ItemList`, which has dollar amounts.
 //  These amounts are used to calculate the `Total` field of the `Amount` object
 //
 //	All other uses of `Amount` do have `shipping`, `shipping_discount` and
 // `subtotal` to calculate the `Total`.
-@struct amount
-	Currency CurrencyTypeEnum `json:"currency"` --read
-	Total 	 float64 					`json:"total,string"` --read
-	Details *details 					`json:"details,omitempty"` --read --write
-*/
+type __amount struct {
+	Currency CurrencyTypeEnum `gRead json:"currency"`
+	Total    float64          `gRead json:"total,string"`
+	Details  *details         `gRead gWrite json:"details,omitempty"`
+}
 
 func (self amount) validate() (err error) {
 	if err = self.private.Currency.validate(); err != nil {
@@ -294,37 +226,41 @@ func (self amount) validate() (err error) {
 	return nil
 }
 
+/*
+@struct
+*/
 // The Details can all be read/write because the Amount object is read only,
 // so it gets a copy anyway.
 // No need to validate because its values are calculated or validated when set.
-/*
-@struct details
+type __details struct {
 	// Amount of the subtotal of the items. REQUIRED if line items are specified.
 	// 10 chars max, with support for 2 decimal places
-	Subtotal float64 `json:"subtotal,string,omitempty"` --read
+	Subtotal float64 `gRead json:"subtotal,string,omitempty"`
 
 	// Amount charged for tax. 10 chars max, with support for 2 decimal places
-	Tax float64 `json:"tax,string,omitempty"` --read
+	Tax float64 `gRead json:"tax,string,omitempty"`
 
 	// Amount charged for shipping. 10 chars max, with support for 2 decimal places
-	Shipping float64 `json:"shipping,string,omitempty"` --read --write
+	Shipping float64 `gRead gWrite json:"shipping,string,omitempty"`
 
 	// Amount being charged for handling fee. When `payment_method` is `paypal`
-	HandlingFee float64 `json:"handling_fee,string,omitempty"` --read --write
+	HandlingFee float64 `gRead gWrite json:"handling_fee,string,omitempty"`
 
 	// Amount being charged for insurance fee. When `payment_method` is `paypal`
-	Insurance float64 `json:"insurance,string,omitempty"` --read --write
+	Insurance float64 `gRead gWrite json:"insurance,string,omitempty"`
 
 	// Amount being discounted for shipping fee. When `payment_method` is `paypal`
-	ShippingDiscount float64 `json:"shipping_discount,string,omitempty"` --read --write
-*/
+	ShippingDiscount float64 `gRead gWrite json:"shipping_discount,string,omitempty"`
+}
 
 /*
-@struct link
-	Href 	 string `json:"href,omitempty"`
-	Rel 	 relTypeEnum `json:"rel,omitempty"`
-	Method string `json:"method,omitempty"`
+@struct
 */
+type __link struct {
+	Href   string      `json:"href,omitempty"`
+	Rel    relTypeEnum `json:"rel,omitempty"`
+	Method string      `json:"method,omitempty"`
+}
 
 type links []link
 
@@ -338,20 +274,24 @@ func (l links) get(r relTypeEnum) (string, string) {
 }
 
 /*
-// Base object for all financial value related fields (balance, payment due, etc.)
-@struct currency
-	Currency string `json:"currency"` --read --write
-	Value 	 string `json:"value"` --read --write
+@struct
 */
+// Base object for all financial value related fields (balance, payment due, etc.)
+type __currency struct {
+	Currency string `gRead gWrite json:"currency"`
+	Value    string `gRead gWrite json:"value"`
+}
 
 /*
-// This object represents Fraud Management Filter (FMF) details for a payment.
-@struct fmfDetails
-	FilterType 	fmfFilterEnum `json:"filter_type"` --read
-	FilterID 		filterIdEnum `json:"filter_id"` --read
-	Name 				string `json:"name"` --read
-	Description string `json:"description"` --read
+@struct
 */
+// This object represents Fraud Management Filter (FMF) details for a payment.
+type __fmfDetails struct {
+	FilterType  fmfFilterEnum `gRead json:"filter_type"`
+	FilterID    filterIdEnum  `gRead json:"filter_id"`
+	Name        string        `gRead json:"name"`
+	Description string        `gRead json:"description"`
+}
 
 // Address: This object is used for billing or shipping addresses.
 type Address struct {
