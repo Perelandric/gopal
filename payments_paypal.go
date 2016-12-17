@@ -73,14 +73,14 @@ type PaypalTransactions []*PaypalTransaction
 type __PaypalPayment struct {
 	*connection
 	Intent              intentEnum         `gRead json:"intent,omitempty"`
-	State               *StateEnum         `gRead json:"state,omitempty"`
+	State               StateEnum          `gRead json:"state,omitempty"`
 	Id                  string             `gRead json:"id,omitempty"`
-	FailureReason       *FailureReasonEnum `gRead json:"failure_reason,omitempty"`
+	FailureReason       FailureReasonEnum  `gRead json:"failure_reason,omitempty"`
 	CreateTime          dateTime           `gRead json:"create_time,omitempty"`
 	UpdateTime          dateTime           `gRead json:"update_time,omitempty"`
 	Links               links              `gRead json:"links,omitempty"`
 	Transactions        PaypalTransactions `gRead json:"transactions,omitempty"`
-	Payer               paypalPayer        `gRead json:"payer,omitempty"`
+	Payer               paypalPayer        `gRead json:"payer"`
 	RedirectUrls        Redirects          `gRead json:"redirect_urls,omitempty"`
 	ExperienceProfileId string             `gRead gWrite json:"experience_profile_id,omitempty"`
 	*payment_error
@@ -149,19 +149,14 @@ func (pp *PaypalPayment) Authorize() (to string, code int, err error) {
 	})
 
 	if err == nil {
-		if pymt.private.State == nil {
-			err = UnexpectedResponse
-
-		} else {
-			switch *pymt.private.State {
-			case State.Created:
-				// Set url to redirect to PayPal site to begin approval process
-				to, _ = pymt.private.Links.get(relType.ApprovalUrl)
-				code = 303
-			default:
-				// otherwise cancel the payment and return an error
-				err = UnexpectedResponse
-			}
+		switch pymt.private.State {
+		case State.Created:
+			// Set url to redirect to PayPal site to begin approval process
+			to, _ = pymt.private.Links.get(relType.ApprovalUrl)
+			code = 303
+		default:
+			// otherwise cancel the payment and return an error
+			err = fmt.Errorf("Unexpected state: %s", pymt.private.State.String())
 		}
 	}
 
@@ -202,7 +197,7 @@ func (self *connection) Execute(u *url.URL) error {
 		return err
 	}
 
-	if pymt.private.State == nil || *pymt.private.State != State.Approved {
+	if pymt.private.State != State.Approved {
 		return fmt.Errorf(
 			"Payment with ID %q for payer %q was not approved", pymtid, payerid)
 	}
@@ -327,10 +322,10 @@ func (self *paypalItemList) validate() (err error) {
 // Source of the funds for this payment represented by a PayPal account.
 type __paypalPayer struct {
 	// Must be PaymentMethod.Paypal
-	PaymentMethod PaymentMethodEnum `json:"payment_method,omitempty"`
+	PaymentMethod PaymentMethodEnum `json:"payment_method"`
 
 	// Status of the payer’s PayPal account. Allowed values: VERIFIED or UNVERIFIED.
-	Status *payerStatusEnum `gRead json:"status,omitempty"`
+	Status payerStatusEnum `gRead json:"status,omitempty"`
 
 	PaypalPayerInfo *PaypalPayerInfo `gRead json:"payer_info,omitempty"`
 }

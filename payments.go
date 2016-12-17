@@ -11,6 +11,9 @@ import (
 //go:generate Golific $GOFILE
 
 type dateTime string // TODO: How should this be done? [Un]Marshalers?
+func (d dateTime) CanElide() bool {
+	return len(d) == 0
+}
 
 // TODO: only needed until Golific acknowledges more types
 type fundingInstruments []*fundingInstrument
@@ -20,7 +23,7 @@ type fundingInstruments []*fundingInstrument
 */
 type __CreditCardItem struct {
 	Currency CurrencyTypeEnum `gRead json:"currency"`
-	Quantity int64            `gRead gWrite json:"quantity,string"`
+	Quantity int64            `gRead gWrite json:"quantity"`
 	Name     string           `gRead gWrite json:"name"`
 	Price    float64          `gRead gWrite json:"price,string"`
 	Sku      string           `gRead gWrite json:"sku,omitempty"`
@@ -47,7 +50,7 @@ func (ti *CreditCardItem) validate() (err error) {
 */
 type __PaypalItem struct {
 	Currency    CurrencyTypeEnum `gRead json:"currency"`
-	Quantity    int64            `gRead gWrite json:"quantity,string"`
+	Quantity    int64            `gRead gWrite json:"quantity"`
 	Name        string           `gRead gWrite json:"name"`
 	Price       float64          `gRead gWrite json:"price,string"`
 	Sku         string           `gRead gWrite json:"sku,omitempty"`
@@ -263,6 +266,10 @@ type __link struct {
 }
 
 type links []link
+
+func (l links) CanElide() bool {
+	return len(l) == 0
+}
 
 func (l links) get(r relTypeEnum) (string, string) {
 	for i, _ := range l {

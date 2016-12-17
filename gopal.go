@@ -3,6 +3,7 @@ package gopal
 // http://play.golang.org/p/zUgqXPsjjg // Idea for generated enums
 
 import (
+	"Golific/gJson"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -105,8 +106,9 @@ func NewConnection(s ServerEnum, id, secret string) (c *connection, err error) {
 	return
 }
 
-var authTimeout = fmt.Errorf(`
-Temporarily unable to connect to the payment server. Please try again shortly.`)
+var authTimeout = fmt.Errorf(
+	`Temporarily unable to connect to the payment server. Please try again shortly.`,
+)
 
 // From the docs, regarding [re]authentication:
 //
@@ -304,19 +306,31 @@ func (r *request) getHttpRequest(s ServerEnum) (*http.Request, error) {
 
 	switch val := r.body.(type) {
 	case string:
+
+		//		fmt.Printf("req:\n%s\n\n", val)
+
 		body_reader = strings.NewReader(val)
 
 	case []byte:
+
+		//		fmt.Printf("req:\n%s\n\n", val)
+
 		body_reader = bytes.NewReader(val)
 
 	case nil:
 		body_reader = bytes.NewReader(nil)
 
+	case gJson.JSONEncodable:
+		var enc = gJson.Encoder{}
+		val.JSONEncode(&enc)
+		body_reader = bytes.NewReader(enc.Bytes())
+		//		fmt.Printf("req:\n%s\n\n", enc.Bytes())
+
 	default:
 		if result, err := json.Marshal(val); err != nil {
 			return nil, err
 		} else {
-			//fmt.Println("sending...", string(result))
+			//			fmt.Printf("req:\n%s\n\n", result)
 			body_reader = bytes.NewReader(result)
 		}
 	}
@@ -333,6 +347,7 @@ func (r *request) getHttpRequest(s ServerEnum) (*http.Request, error) {
 	}
 
 	req, err := http.NewRequest(r.method.String(), url, body_reader)
+
 	if err != nil {
 		return nil, err
 	}
@@ -354,6 +369,8 @@ func (r *request) processBody(resp *http.Response) error {
 	}
 
 	r.responseData = bytes.TrimSpace(result)
+
+	//	fmt.Printf("response:\n%s\n\n", result)
 
 	// If there was no Body, we can return
 	if len(r.responseData) == 0 {

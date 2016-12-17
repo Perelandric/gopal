@@ -10,6 +10,8 @@ package gopal
 import (
 	"Golific/gJson"
 	"encoding/json"
+	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -22,11 +24,10 @@ Authorization struct
 // State items are:
 // pending, authorized, captured, partially_captured, expired, voided
 type Authorization struct {
-	private private_ijox678hfw6u
+	private private_18g4dtozdii90
 	_shared
 }
-
-type private_ijox678hfw6u struct {
+type private_18g4dtozdii90 struct {
 	Amount             amount                 `json:"amount"`
 	BillingAgreementId string                 `json:"billing_agreement_id"`
 	PaymentMode        paymentModeEnum        `json:"payment_mode"`
@@ -39,38 +40,231 @@ type private_ijox678hfw6u struct {
 }
 
 // JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *private_ijox678hfw6u) JSONEncode(encoder *gJson.Encoder) {
+func (self *private_18g4dtozdii90) JSONEncode(encoder *gJson.Encoder) bool {
 	var first = true
-	encoder.EncodeKeyVal("amount", self.Amount, first)
-	first = false
 
-	encoder.EncodeKeyVal("billing_agreement_id", self.BillingAgreementId, first)
-	first = false
+	if true {
+		var d interface{}
 
-	encoder.EncodeKeyVal("payment_mode", self.PaymentMode, first)
-	first = false
+		if true && reflect.ValueOf(self.Amount).Kind() == reflect.Struct {
+			d = &self.Amount
+		} else {
+			d = self.Amount
+		}
 
-	encoder.EncodeKeyVal("reason_code", self.ReasonCode, first)
-	first = false
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
 
-	encoder.EncodeKeyVal("valid_until", self.ValidUntil, first)
-	first = false
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
 
-	encoder.EncodeKeyVal("clearing_time", self.ClearingTime, first)
-	first = false
+		if doEncode {
+			first = !encoder.EncodeKeyVal("amount", d, first, false) && first
+		}
+	}
 
-	encoder.EncodeKeyVal("protection_eligibility", self.ProtectionElig, first)
-	first = false
+	if true {
+		var d interface{}
 
-	encoder.EncodeKeyVal("protection_eligibility_type", self.ProtectionEligType, first)
-	first = false
+		if false && reflect.ValueOf(self.BillingAgreementId).Kind() == reflect.Struct {
+			d = &self.BillingAgreementId
+		} else {
+			d = self.BillingAgreementId
+		}
 
-	encoder.EncodeKeyVal("fmf_details", self.FmfDetails, first)
-	first = false
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("billing_agreement_id", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.PaymentMode).Kind() == reflect.Struct {
+			d = &self.PaymentMode
+		} else {
+			d = self.PaymentMode
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("payment_mode", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.ReasonCode).Kind() == reflect.Struct {
+			d = &self.ReasonCode
+		} else {
+			d = self.ReasonCode
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("reason_code", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.ValidUntil).Kind() == reflect.Struct {
+			d = &self.ValidUntil
+		} else {
+			d = self.ValidUntil
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("valid_until", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if false && reflect.ValueOf(self.ClearingTime).Kind() == reflect.Struct {
+			d = &self.ClearingTime
+		} else {
+			d = self.ClearingTime
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("clearing_time", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.ProtectionElig).Kind() == reflect.Struct {
+			d = &self.ProtectionElig
+		} else {
+			d = self.ProtectionElig
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("protection_eligibility", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.ProtectionEligType).Kind() == reflect.Struct {
+			d = &self.ProtectionEligType
+		} else {
+			d = self.ProtectionEligType
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("protection_eligibility_type", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.FmfDetails).Kind() == reflect.Struct {
+			d = &self.FmfDetails
+		} else {
+			d = self.FmfDetails
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("fmf_details", d, first, false) && first
+		}
+	}
+
+	return !first
 }
 
-type json_ijox678hfw6u struct {
-	*private_ijox678hfw6u
+type json_18g4dtozdii90 struct {
+	*private_18g4dtozdii90
+
 	_shared
 }
 
@@ -111,27 +305,30 @@ func (self *Authorization) FmfDetails() fmfDetails {
 }
 
 // JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *Authorization) JSONEncode(encoder *gJson.Encoder) {
+func (self *Authorization) JSONEncode(encoder *gJson.Encoder) bool {
+	if self == nil {
+		return encoder.EncodeNull(false)
+	}
+
 	encoder.WriteRawByte('{')
 
-	var startPos = encoder.Len()
-
 	// Encodes only the fields of the struct, without curly braces
-	self.private.JSONEncode(encoder)
-
-	var first = encoder.Len() == startPos
+	var first = !self.private.JSONEncode(encoder)
 
 	if je, ok := interface{}(self._shared).(gJson.JSONEncodable); ok {
-		first = encoder.EmbedEncodedStruct(je, first)
+		first = !encoder.EmbedEncodedStruct(je, first) && first
 	} else {
-		first = encoder.EmbedMarshaledStruct(self._shared, first)
+		first = !encoder.EmbedMarshaledStruct(self._shared, first) && first
 	}
 
 	encoder.WriteRawByte('}')
+
+	return true || !first
 }
 
 func (self *Authorization) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_ijox678hfw6u{
+	return json.Marshal(json_18g4dtozdii90{
+
 		&self.private,
 		self._shared,
 	})
@@ -159,57 +356,138 @@ func (self *Authorization) UnmarshalJSON(j []byte) error {
 	var data json.RawMessage
 	var ok bool
 	if data, ok = m["amount"]; ok {
-		if err = json.Unmarshal(data, &self.private.Amount); err != nil {
-			return err
+		var temp struct {
+			Amount amount `json:"amount"`
 		}
+		data = append(append([]byte("{ \"amount\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "amount", err.Error(),
+			)
+		}
+
+		self.private.Amount = temp.Amount
 	}
 
 	if data, ok = m["billing_agreement_id"]; ok {
-		if err = json.Unmarshal(data, &self.private.BillingAgreementId); err != nil {
-			return err
+		var temp struct {
+			BillingAgreementId string `json:"billing_agreement_id"`
 		}
+		data = append(append([]byte("{ \"billing_agreement_id\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "billing_agreement_id", err.Error(),
+			)
+		}
+
+		self.private.BillingAgreementId = temp.BillingAgreementId
 	}
 
 	if data, ok = m["payment_mode"]; ok {
-		if err = json.Unmarshal(data, &self.private.PaymentMode); err != nil {
-			return err
+		var temp struct {
+			PaymentMode paymentModeEnum `json:"payment_mode"`
 		}
+		data = append(append([]byte("{ \"payment_mode\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "payment_mode", err.Error(),
+			)
+		}
+
+		self.private.PaymentMode = temp.PaymentMode
 	}
 
 	if data, ok = m["reason_code"]; ok {
-		if err = json.Unmarshal(data, &self.private.ReasonCode); err != nil {
-			return err
+		var temp struct {
+			ReasonCode reasonCodeEnum `json:"reason_code"`
 		}
+		data = append(append([]byte("{ \"reason_code\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "reason_code", err.Error(),
+			)
+		}
+
+		self.private.ReasonCode = temp.ReasonCode
 	}
 
 	if data, ok = m["valid_until"]; ok {
-		if err = json.Unmarshal(data, &self.private.ValidUntil); err != nil {
-			return err
+		var temp struct {
+			ValidUntil dateTime `json:"valid_until"`
 		}
+		data = append(append([]byte("{ \"valid_until\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "valid_until", err.Error(),
+			)
+		}
+
+		self.private.ValidUntil = temp.ValidUntil
 	}
 
 	if data, ok = m["clearing_time"]; ok {
-		if err = json.Unmarshal(data, &self.private.ClearingTime); err != nil {
-			return err
+		var temp struct {
+			ClearingTime string `json:"clearing_time"`
 		}
+		data = append(append([]byte("{ \"clearing_time\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "clearing_time", err.Error(),
+			)
+		}
+
+		self.private.ClearingTime = temp.ClearingTime
 	}
 
 	if data, ok = m["protection_eligibility"]; ok {
-		if err = json.Unmarshal(data, &self.private.ProtectionElig); err != nil {
-			return err
+		var temp struct {
+			ProtectionElig protectionEligEnum `json:"protection_eligibility"`
 		}
+		data = append(append([]byte("{ \"protection_eligibility\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "protection_eligibility", err.Error(),
+			)
+		}
+
+		self.private.ProtectionElig = temp.ProtectionElig
 	}
 
 	if data, ok = m["protection_eligibility_type"]; ok {
-		if err = json.Unmarshal(data, &self.private.ProtectionEligType); err != nil {
-			return err
+		var temp struct {
+			ProtectionEligType protectionEligTypeEnum `json:"protection_eligibility_type"`
 		}
+		data = append(append([]byte("{ \"protection_eligibility_type\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "protection_eligibility_type", err.Error(),
+			)
+		}
+
+		self.private.ProtectionEligType = temp.ProtectionEligType
 	}
 
 	if data, ok = m["fmf_details"]; ok {
-		if err = json.Unmarshal(data, &self.private.FmfDetails); err != nil {
-			return err
+		var temp struct {
+			FmfDetails fmfDetails `json:"fmf_details"`
 		}
+		data = append(append([]byte("{ \"fmf_details\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "fmf_details", err.Error(),
+			)
+		}
+
+		self.private.FmfDetails = temp.FmfDetails
 	}
 	return nil
 }

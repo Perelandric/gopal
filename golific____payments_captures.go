@@ -10,6 +10,8 @@ package gopal
 import (
 	"Golific/gJson"
 	"encoding/json"
+	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -21,25 +23,49 @@ Capture struct
 
 // State values are: pending, completed, refunded, partially_refunded
 type Capture struct {
-	private private_ievo6wy1il2e
+	private private_1v66jzy7wsqve
 	_shared
 	TransactionFee currency `json:"transaction_fee"`
 	IsFinalCapture bool     `json:"is_final_capture,omitempty"`
 }
-
-type private_ievo6wy1il2e struct {
+type private_1v66jzy7wsqve struct {
 	Amount amount `json:"amount"`
 }
 
 // JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *private_ievo6wy1il2e) JSONEncode(encoder *gJson.Encoder) {
+func (self *private_1v66jzy7wsqve) JSONEncode(encoder *gJson.Encoder) bool {
 	var first = true
-	encoder.EncodeKeyVal("amount", self.Amount, first)
-	first = false
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.Amount).Kind() == reflect.Struct {
+			d = &self.Amount
+		} else {
+			d = self.Amount
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("amount", d, first, false) && first
+		}
+	}
+
+	return !first
 }
 
-type json_ievo6wy1il2e struct {
-	*private_ievo6wy1il2e
+type json_1v66jzy7wsqve struct {
+	*private_1v66jzy7wsqve
+
 	_shared
 	TransactionFee currency `json:"transaction_fee"`
 	IsFinalCapture bool     `json:"is_final_capture,omitempty"`
@@ -50,34 +76,78 @@ func (self *Capture) Amount() amount {
 }
 
 // JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *Capture) JSONEncode(encoder *gJson.Encoder) {
+func (self *Capture) JSONEncode(encoder *gJson.Encoder) bool {
+	if self == nil {
+		return encoder.EncodeNull(false)
+	}
+
 	encoder.WriteRawByte('{')
 
-	var startPos = encoder.Len()
-
 	// Encodes only the fields of the struct, without curly braces
-	self.private.JSONEncode(encoder)
-
-	var first = encoder.Len() == startPos
+	var first = !self.private.JSONEncode(encoder)
 
 	if je, ok := interface{}(self._shared).(gJson.JSONEncodable); ok {
-		first = encoder.EmbedEncodedStruct(je, first)
+		first = !encoder.EmbedEncodedStruct(je, first) && first
 	} else {
-		first = encoder.EmbedMarshaledStruct(self._shared, first)
+		first = !encoder.EmbedMarshaledStruct(self._shared, first) && first
 	}
 
-	encoder.EncodeKeyVal("transaction_fee", self.TransactionFee, first)
-	first = false
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.TransactionFee).Kind() == reflect.Struct {
+			d = &self.TransactionFee
+		} else {
+			d = self.TransactionFee
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("transaction_fee", d, first, false) && first
+		}
+	}
 
 	if !self.IsFinalCapture {
-		encoder.EncodeKeyVal("is_final_capture", self.IsFinalCapture, first)
-		first = false
+		var d interface{}
+
+		if false && reflect.ValueOf(self.IsFinalCapture).Kind() == reflect.Struct {
+			d = &self.IsFinalCapture
+		} else {
+			d = self.IsFinalCapture
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("is_final_capture", d, first, true) && first
+		}
 	}
+
 	encoder.WriteRawByte('}')
+
+	return true || !first
 }
 
 func (self *Capture) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_ievo6wy1il2e{
+	return json.Marshal(json_1v66jzy7wsqve{
+
 		&self.private,
 		self._shared,
 		self.TransactionFee,
@@ -107,21 +177,48 @@ func (self *Capture) UnmarshalJSON(j []byte) error {
 	var data json.RawMessage
 	var ok bool
 	if data, ok = m["amount"]; ok {
-		if err = json.Unmarshal(data, &self.private.Amount); err != nil {
-			return err
+		var temp struct {
+			Amount amount `json:"amount"`
 		}
+		data = append(append([]byte("{ \"amount\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "amount", err.Error(),
+			)
+		}
+
+		self.private.Amount = temp.Amount
 	}
 
 	if data, ok = m["transaction_fee"]; ok {
-		if err = json.Unmarshal(data, &self.TransactionFee); err != nil {
-			return err
+		var temp struct {
+			TransactionFee currency `json:"transaction_fee"`
 		}
+		data = append(append([]byte("{ \"transaction_fee\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "transaction_fee", err.Error(),
+			)
+		}
+
+		self.TransactionFee = temp.TransactionFee
 	}
 
 	if data, ok = m["is_final_capture"]; ok {
-		if err = json.Unmarshal(data, &self.IsFinalCapture); err != nil {
-			return err
+		var temp struct {
+			IsFinalCapture bool `json:"is_final_capture,omitempty"`
 		}
+		data = append(append([]byte("{ \"is_final_capture\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "is_final_capture", err.Error(),
+			)
+		}
+
+		self.IsFinalCapture = temp.IsFinalCapture
 	}
 	return nil
 }

@@ -10,6 +10,8 @@ package gopal
 import (
 	"Golific/gJson"
 	"encoding/json"
+	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -24,14 +26,13 @@ Sale struct
 // but not under the lower "sale object" definition. The new docs have it
 // marked as [DEPRECATED] in one area, but not another.
 type Sale struct {
-	private private_pn8law5ao4zc
+	private private_5nvv1k2l9av0
 	_shared
 	Description      string   `json:"description,omitempty"`
 	TransactionFee   currency `json:"transaction_fee"`
 	ReceivableAmount currency `json:"receivable_amount"`
 }
-
-type private_pn8law5ao4zc struct {
+type private_5nvv1k2l9av0 struct {
 	Amount                    amount                 `json:"amount"`
 	PendingReason             pendingReasonEnum      `json:"pending_reason"`
 	PaymentMode               paymentModeEnum        `json:"payment_mode"`
@@ -46,44 +47,279 @@ type private_pn8law5ao4zc struct {
 }
 
 // JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *private_pn8law5ao4zc) JSONEncode(encoder *gJson.Encoder) {
+func (self *private_5nvv1k2l9av0) JSONEncode(encoder *gJson.Encoder) bool {
 	var first = true
-	encoder.EncodeKeyVal("amount", self.Amount, first)
-	first = false
 
-	encoder.EncodeKeyVal("pending_reason", self.PendingReason, first)
-	first = false
+	if true {
+		var d interface{}
 
-	encoder.EncodeKeyVal("payment_mode", self.PaymentMode, first)
-	first = false
+		if true && reflect.ValueOf(self.Amount).Kind() == reflect.Struct {
+			d = &self.Amount
+		} else {
+			d = self.Amount
+		}
 
-	encoder.EncodeKeyVal("exchange_rate", self.ExchangeRate, first)
-	first = false
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
 
-	encoder.EncodeKeyVal("fmf_details", self.FmfDetails, first)
-	first = false
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
 
-	encoder.EncodeKeyVal("receipt_id", self.ReceiptId, first)
-	first = false
+		if doEncode {
+			first = !encoder.EncodeKeyVal("amount", d, first, false) && first
+		}
+	}
 
-	encoder.EncodeKeyVal("reason_code", self.ReasonCode, first)
-	first = false
+	if true {
+		var d interface{}
 
-	encoder.EncodeKeyVal("protection_eligibility", self.ProtectionEligibility, first)
-	first = false
+		if true && reflect.ValueOf(self.PendingReason).Kind() == reflect.Struct {
+			d = &self.PendingReason
+		} else {
+			d = self.PendingReason
+		}
 
-	encoder.EncodeKeyVal("protection_eligibility_type", self.ProtectionEligibilityType, first)
-	first = false
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
 
-	encoder.EncodeKeyVal("clearing_time", self.ClearingTime, first)
-	first = false
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
 
-	encoder.EncodeKeyVal("billing_agreement_id", self.BillingAgreementId, first)
-	first = false
+		if doEncode {
+			first = !encoder.EncodeKeyVal("pending_reason", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.PaymentMode).Kind() == reflect.Struct {
+			d = &self.PaymentMode
+		} else {
+			d = self.PaymentMode
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("payment_mode", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if false && reflect.ValueOf(self.ExchangeRate).Kind() == reflect.Struct {
+			d = &self.ExchangeRate
+		} else {
+			d = self.ExchangeRate
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("exchange_rate", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.FmfDetails).Kind() == reflect.Struct {
+			d = &self.FmfDetails
+		} else {
+			d = self.FmfDetails
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("fmf_details", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if false && reflect.ValueOf(self.ReceiptId).Kind() == reflect.Struct {
+			d = &self.ReceiptId
+		} else {
+			d = self.ReceiptId
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("receipt_id", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.ReasonCode).Kind() == reflect.Struct {
+			d = &self.ReasonCode
+		} else {
+			d = self.ReasonCode
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("reason_code", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.ProtectionEligibility).Kind() == reflect.Struct {
+			d = &self.ProtectionEligibility
+		} else {
+			d = self.ProtectionEligibility
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("protection_eligibility", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.ProtectionEligibilityType).Kind() == reflect.Struct {
+			d = &self.ProtectionEligibilityType
+		} else {
+			d = self.ProtectionEligibilityType
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("protection_eligibility_type", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if false && reflect.ValueOf(self.ClearingTime).Kind() == reflect.Struct {
+			d = &self.ClearingTime
+		} else {
+			d = self.ClearingTime
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("clearing_time", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if false && reflect.ValueOf(self.BillingAgreementId).Kind() == reflect.Struct {
+			d = &self.BillingAgreementId
+		} else {
+			d = self.BillingAgreementId
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("billing_agreement_id", d, first, false) && first
+		}
+	}
+
+	return !first
 }
 
-type json_pn8law5ao4zc struct {
-	*private_pn8law5ao4zc
+type json_5nvv1k2l9av0 struct {
+	*private_5nvv1k2l9av0
+
 	_shared
 	Description      string   `json:"description,omitempty"`
 	TransactionFee   currency `json:"transaction_fee"`
@@ -135,37 +371,102 @@ func (self *Sale) BillingAgreementId() string {
 }
 
 // JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *Sale) JSONEncode(encoder *gJson.Encoder) {
+func (self *Sale) JSONEncode(encoder *gJson.Encoder) bool {
+	if self == nil {
+		return encoder.EncodeNull(false)
+	}
+
 	encoder.WriteRawByte('{')
 
-	var startPos = encoder.Len()
-
 	// Encodes only the fields of the struct, without curly braces
-	self.private.JSONEncode(encoder)
-
-	var first = encoder.Len() == startPos
+	var first = !self.private.JSONEncode(encoder)
 
 	if je, ok := interface{}(self._shared).(gJson.JSONEncodable); ok {
-		first = encoder.EmbedEncodedStruct(je, first)
+		first = !encoder.EmbedEncodedStruct(je, first) && first
 	} else {
-		first = encoder.EmbedMarshaledStruct(self._shared, first)
+		first = !encoder.EmbedMarshaledStruct(self._shared, first) && first
 	}
 
 	if len(self.Description) != 0 {
-		encoder.EncodeKeyVal("description", self.Description, first)
-		first = false
+		var d interface{}
+
+		if false && reflect.ValueOf(self.Description).Kind() == reflect.Struct {
+			d = &self.Description
+		} else {
+			d = self.Description
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("description", d, first, true) && first
+		}
 	}
 
-	encoder.EncodeKeyVal("transaction_fee", self.TransactionFee, first)
-	first = false
+	if true {
+		var d interface{}
 
-	encoder.EncodeKeyVal("receivable_amount", self.ReceivableAmount, first)
-	first = false
+		if true && reflect.ValueOf(self.TransactionFee).Kind() == reflect.Struct {
+			d = &self.TransactionFee
+		} else {
+			d = self.TransactionFee
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("transaction_fee", d, first, false) && first
+		}
+	}
+
+	if true {
+		var d interface{}
+
+		if true && reflect.ValueOf(self.ReceivableAmount).Kind() == reflect.Struct {
+			d = &self.ReceivableAmount
+		} else {
+			d = self.ReceivableAmount
+		}
+
+		var doEncode = true
+		if false { // has omitempty?
+			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
+				doEncode = !eli.CanElide()
+
+			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("receivable_amount", d, first, false) && first
+		}
+	}
+
 	encoder.WriteRawByte('}')
+
+	return true || !first
 }
 
 func (self *Sale) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_pn8law5ao4zc{
+	return json.Marshal(json_5nvv1k2l9av0{
+
 		&self.private,
 		self._shared,
 		self.Description,
@@ -196,87 +497,213 @@ func (self *Sale) UnmarshalJSON(j []byte) error {
 	var data json.RawMessage
 	var ok bool
 	if data, ok = m["amount"]; ok {
-		if err = json.Unmarshal(data, &self.private.Amount); err != nil {
-			return err
+		var temp struct {
+			Amount amount `json:"amount"`
 		}
+		data = append(append([]byte("{ \"amount\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "amount", err.Error(),
+			)
+		}
+
+		self.private.Amount = temp.Amount
 	}
 
 	if data, ok = m["description"]; ok {
-		if err = json.Unmarshal(data, &self.Description); err != nil {
-			return err
+		var temp struct {
+			Description string `json:"description,omitempty"`
 		}
+		data = append(append([]byte("{ \"description\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "description", err.Error(),
+			)
+		}
+
+		self.Description = temp.Description
 	}
 
 	if data, ok = m["transaction_fee"]; ok {
-		if err = json.Unmarshal(data, &self.TransactionFee); err != nil {
-			return err
+		var temp struct {
+			TransactionFee currency `json:"transaction_fee"`
 		}
+		data = append(append([]byte("{ \"transaction_fee\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "transaction_fee", err.Error(),
+			)
+		}
+
+		self.TransactionFee = temp.TransactionFee
 	}
 
 	if data, ok = m["receivable_amount"]; ok {
-		if err = json.Unmarshal(data, &self.ReceivableAmount); err != nil {
-			return err
+		var temp struct {
+			ReceivableAmount currency `json:"receivable_amount"`
 		}
+		data = append(append([]byte("{ \"receivable_amount\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "receivable_amount", err.Error(),
+			)
+		}
+
+		self.ReceivableAmount = temp.ReceivableAmount
 	}
 
 	if data, ok = m["pending_reason"]; ok {
-		if err = json.Unmarshal(data, &self.private.PendingReason); err != nil {
-			return err
+		var temp struct {
+			PendingReason pendingReasonEnum `json:"pending_reason"`
 		}
+		data = append(append([]byte("{ \"pending_reason\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "pending_reason", err.Error(),
+			)
+		}
+
+		self.private.PendingReason = temp.PendingReason
 	}
 
 	if data, ok = m["payment_mode"]; ok {
-		if err = json.Unmarshal(data, &self.private.PaymentMode); err != nil {
-			return err
+		var temp struct {
+			PaymentMode paymentModeEnum `json:"payment_mode"`
 		}
+		data = append(append([]byte("{ \"payment_mode\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "payment_mode", err.Error(),
+			)
+		}
+
+		self.private.PaymentMode = temp.PaymentMode
 	}
 
 	if data, ok = m["exchange_rate"]; ok {
-		if err = json.Unmarshal(data, &self.private.ExchangeRate); err != nil {
-			return err
+		var temp struct {
+			ExchangeRate string `json:"exchange_rate"`
 		}
+		data = append(append([]byte("{ \"exchange_rate\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "exchange_rate", err.Error(),
+			)
+		}
+
+		self.private.ExchangeRate = temp.ExchangeRate
 	}
 
 	if data, ok = m["fmf_details"]; ok {
-		if err = json.Unmarshal(data, &self.private.FmfDetails); err != nil {
-			return err
+		var temp struct {
+			FmfDetails fmfDetails `json:"fmf_details"`
 		}
+		data = append(append([]byte("{ \"fmf_details\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "fmf_details", err.Error(),
+			)
+		}
+
+		self.private.FmfDetails = temp.FmfDetails
 	}
 
 	if data, ok = m["receipt_id"]; ok {
-		if err = json.Unmarshal(data, &self.private.ReceiptId); err != nil {
-			return err
+		var temp struct {
+			ReceiptId string `json:"receipt_id"`
 		}
+		data = append(append([]byte("{ \"receipt_id\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "receipt_id", err.Error(),
+			)
+		}
+
+		self.private.ReceiptId = temp.ReceiptId
 	}
 
 	if data, ok = m["reason_code"]; ok {
-		if err = json.Unmarshal(data, &self.private.ReasonCode); err != nil {
-			return err
+		var temp struct {
+			ReasonCode reasonCodeEnum `json:"reason_code"`
 		}
+		data = append(append([]byte("{ \"reason_code\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "reason_code", err.Error(),
+			)
+		}
+
+		self.private.ReasonCode = temp.ReasonCode
 	}
 
 	if data, ok = m["protection_eligibility"]; ok {
-		if err = json.Unmarshal(data, &self.private.ProtectionEligibility); err != nil {
-			return err
+		var temp struct {
+			ProtectionEligibility protectionEligEnum `json:"protection_eligibility"`
 		}
+		data = append(append([]byte("{ \"protection_eligibility\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "protection_eligibility", err.Error(),
+			)
+		}
+
+		self.private.ProtectionEligibility = temp.ProtectionEligibility
 	}
 
 	if data, ok = m["protection_eligibility_type"]; ok {
-		if err = json.Unmarshal(data, &self.private.ProtectionEligibilityType); err != nil {
-			return err
+		var temp struct {
+			ProtectionEligibilityType protectionEligTypeEnum `json:"protection_eligibility_type"`
 		}
+		data = append(append([]byte("{ \"protection_eligibility_type\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "protection_eligibility_type", err.Error(),
+			)
+		}
+
+		self.private.ProtectionEligibilityType = temp.ProtectionEligibilityType
 	}
 
 	if data, ok = m["clearing_time"]; ok {
-		if err = json.Unmarshal(data, &self.private.ClearingTime); err != nil {
-			return err
+		var temp struct {
+			ClearingTime string `json:"clearing_time"`
 		}
+		data = append(append([]byte("{ \"clearing_time\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "clearing_time", err.Error(),
+			)
+		}
+
+		self.private.ClearingTime = temp.ClearingTime
 	}
 
 	if data, ok = m["billing_agreement_id"]; ok {
-		if err = json.Unmarshal(data, &self.private.BillingAgreementId); err != nil {
-			return err
+		var temp struct {
+			BillingAgreementId string `json:"billing_agreement_id"`
 		}
+		data = append(append([]byte("{ \"billing_agreement_id\":"), data...), '}')
+
+		if err = json.Unmarshal(data, &temp); err != nil {
+			return fmt.Errorf(
+				"Field: %s, Error: %s", "billing_agreement_id", err.Error(),
+			)
+		}
+
+		self.private.BillingAgreementId = temp.BillingAgreementId
 	}
 	return nil
 }
