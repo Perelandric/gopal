@@ -10,10 +10,91 @@ package gopal
 import (
 	"Golific/gJson"
 	"encoding/json"
-	"fmt"
 	"reflect"
-	"strings"
 )
+
+/*****************************
+
+Redirects struct
+
+******************************/
+
+// JSONEncode implements part of Golific's JSONEncodable interface.
+func (self *Redirects) JSONEncode(encoder *gJson.Encoder) bool {
+	if self == nil {
+		return encoder.EncodeNull(false)
+	}
+
+	encoder.WriteRawByte('{')
+	var first = true
+
+	if len(self.Return) != 0 {
+		var d interface{} = self.Return
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.Return).Kind() == reflect.Struct {
+				d = &self.Return
+			}
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("return_url", d, first, true) && first
+		}
+	}
+
+	if len(self.Cancel) != 0 {
+		var d interface{} = self.Cancel
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.Cancel).Kind() == reflect.Struct {
+				d = &self.Cancel
+			}
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("cancel_url", d, first, true) && first
+		}
+	}
+
+	encoder.WriteRawByte('}')
+
+	return true || !first
+}
+
+func (self *Redirects) MarshalJSON() ([]byte, error) {
+	var encoder gJson.Encoder
+	self.JSONEncode(&encoder)
+	return encoder.Bytes(), nil
+}
+
+func (self *Redirects) UnmarshalJSON(j []byte) error {
+	if len(j) == 4 && string(j) == "null" {
+		return nil
+	}
+
+	// First unmarshal using the default unmarshaler. The temp type is so that
+	// this method is not called recursively.
+	type temp *Redirects
+	if err := json.Unmarshal(j, temp(self)); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 /*****************************
 
@@ -21,44 +102,33 @@ PaypalPayment struct
 
 ******************************/
 
-type PaypalPayment struct {
-	private private_111a1il9k19gq
-	*connection
-	ExperienceProfileId string `json:"experience_profile_id,omitempty"`
-	*payment_error
-}
-type private_111a1il9k19gq struct {
-	Intent        intentEnum         `json:"intent,omitempty"`
-	State         StateEnum          `json:"state,omitempty"`
-	Id            string             `json:"id,omitempty"`
-	FailureReason FailureReasonEnum  `json:"failure_reason,omitempty"`
-	CreateTime    dateTime           `json:"create_time,omitempty"`
-	UpdateTime    dateTime           `json:"update_time,omitempty"`
-	Links         links              `json:"links,omitempty"`
-	Transactions  PaypalTransactions `json:"transactions,omitempty"`
-	Payer         paypalPayer        `json:"payer"`
-	RedirectUrls  Redirects          `json:"redirect_urls,omitempty"`
-}
-
 // JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *private_111a1il9k19gq) JSONEncode(encoder *gJson.Encoder) bool {
+func (self *PaypalPayment) JSONEncode(encoder *gJson.Encoder) bool {
+	if self == nil {
+		return encoder.EncodeNull(false)
+	}
+
+	encoder.WriteRawByte('{')
 	var first = true
 
-	if z, ok := interface{}(self.Intent).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if je, ok := interface{}(self.connection).(gJson.JSONEncodable); ok {
+		first = !encoder.EmbedEncodedStruct(je, first) && first
+	} else {
+		first = !encoder.EmbedMarshaledStruct(self.connection, first) && first
+	}
 
-		if true && reflect.ValueOf(self.Intent).Kind() == reflect.Struct {
-			d = &self.Intent
-		} else {
-			d = self.Intent
+	if z, ok := interface{}(self.Intent).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.Intent
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.Intent).Kind() == reflect.Struct {
+				d = &self.Intent
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -68,21 +138,18 @@ func (self *private_111a1il9k19gq) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	if z, ok := interface{}(self.State).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if z, ok := interface{}(self.State).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.State
 
-		if true && reflect.ValueOf(self.State).Kind() == reflect.Struct {
-			d = &self.State
-		} else {
-			d = self.State
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.State).Kind() == reflect.Struct {
+				d = &self.State
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -93,20 +160,17 @@ func (self *private_111a1il9k19gq) JSONEncode(encoder *gJson.Encoder) bool {
 	}
 
 	if len(self.Id) != 0 {
-		var d interface{}
+		var d interface{} = self.Id
 
-		if false && reflect.ValueOf(self.Id).Kind() == reflect.Struct {
-			d = &self.Id
-		} else {
-			d = self.Id
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.Id).Kind() == reflect.Struct {
+				d = &self.Id
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -116,21 +180,18 @@ func (self *private_111a1il9k19gq) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	if z, ok := interface{}(self.FailureReason).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if z, ok := interface{}(self.FailureReason).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.FailureReason
 
-		if true && reflect.ValueOf(self.FailureReason).Kind() == reflect.Struct {
-			d = &self.FailureReason
-		} else {
-			d = self.FailureReason
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.FailureReason).Kind() == reflect.Struct {
+				d = &self.FailureReason
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -140,21 +201,18 @@ func (self *private_111a1il9k19gq) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	if z, ok := interface{}(self.CreateTime).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if z, ok := interface{}(self.CreateTime).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.CreateTime
 
-		if true && reflect.ValueOf(self.CreateTime).Kind() == reflect.Struct {
-			d = &self.CreateTime
-		} else {
-			d = self.CreateTime
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.CreateTime).Kind() == reflect.Struct {
+				d = &self.CreateTime
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -164,21 +222,18 @@ func (self *private_111a1il9k19gq) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	if z, ok := interface{}(self.UpdateTime).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if z, ok := interface{}(self.UpdateTime).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.UpdateTime
 
-		if true && reflect.ValueOf(self.UpdateTime).Kind() == reflect.Struct {
-			d = &self.UpdateTime
-		} else {
-			d = self.UpdateTime
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.UpdateTime).Kind() == reflect.Struct {
+				d = &self.UpdateTime
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -188,21 +243,18 @@ func (self *private_111a1il9k19gq) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	if z, ok := interface{}(self.Links).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if z, ok := interface{}(self.Links).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.Links
 
-		if true && reflect.ValueOf(self.Links).Kind() == reflect.Struct {
-			d = &self.Links
-		} else {
-			d = self.Links
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.Links).Kind() == reflect.Struct {
+				d = &self.Links
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -212,21 +264,18 @@ func (self *private_111a1il9k19gq) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	if z, ok := interface{}(self.Transactions).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if len(self.Transactions) != 0 {
+		var d interface{} = self.Transactions
 
-		if true && reflect.ValueOf(self.Transactions).Kind() == reflect.Struct {
-			d = &self.Transactions
-		} else {
-			d = self.Transactions
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.Transactions).Kind() == reflect.Struct {
+				d = &self.Transactions
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -237,20 +286,17 @@ func (self *private_111a1il9k19gq) JSONEncode(encoder *gJson.Encoder) bool {
 	}
 
 	if true {
-		var d interface{}
+		var d interface{} = self.Payer
 
-		if true && reflect.ValueOf(self.Payer).Kind() == reflect.Struct {
-			d = &self.Payer
-		} else {
-			d = self.Payer
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.Payer).Kind() == reflect.Struct {
+				d = &self.Payer
+			}
 		}
 
 		var doEncode = true
 		if false { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -260,21 +306,18 @@ func (self *private_111a1il9k19gq) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	if z, ok := interface{}(self.RedirectUrls).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if z, ok := interface{}(self.RedirectUrls).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.RedirectUrls
 
-		if true && reflect.ValueOf(self.RedirectUrls).Kind() == reflect.Struct {
-			d = &self.RedirectUrls
-		} else {
-			d = self.RedirectUrls
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.RedirectUrls).Kind() == reflect.Struct {
+				d = &self.RedirectUrls
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -284,89 +327,18 @@ func (self *private_111a1il9k19gq) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	return !first
-}
-
-type json_111a1il9k19gq struct {
-	*private_111a1il9k19gq
-
-	*connection
-	ExperienceProfileId string `json:"experience_profile_id,omitempty"`
-	*payment_error
-}
-
-func (self *PaypalPayment) Intent() intentEnum {
-	return self.private.Intent
-}
-
-func (self *PaypalPayment) State() StateEnum {
-	return self.private.State
-}
-
-func (self *PaypalPayment) Id() string {
-	return self.private.Id
-}
-
-func (self *PaypalPayment) FailureReason() FailureReasonEnum {
-	return self.private.FailureReason
-}
-
-func (self *PaypalPayment) CreateTime() dateTime {
-	return self.private.CreateTime
-}
-
-func (self *PaypalPayment) UpdateTime() dateTime {
-	return self.private.UpdateTime
-}
-
-func (self *PaypalPayment) Links() links {
-	return self.private.Links
-}
-
-func (self *PaypalPayment) Transactions() PaypalTransactions {
-	return self.private.Transactions
-}
-
-func (self *PaypalPayment) Payer() paypalPayer {
-	return self.private.Payer
-}
-
-func (self *PaypalPayment) RedirectUrls() Redirects {
-	return self.private.RedirectUrls
-}
-
-// JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *PaypalPayment) JSONEncode(encoder *gJson.Encoder) bool {
-	if self == nil {
-		return encoder.EncodeNull(false)
-	}
-
-	encoder.WriteRawByte('{')
-
-	// Encodes only the fields of the struct, without curly braces
-	var first = !self.private.JSONEncode(encoder)
-
-	if je, ok := interface{}(self.connection).(gJson.JSONEncodable); ok {
-		first = !encoder.EmbedEncodedStruct(je, first) && first
-	} else {
-		first = !encoder.EmbedMarshaledStruct(self.connection, first) && first
-	}
-
 	if len(self.ExperienceProfileId) != 0 {
-		var d interface{}
+		var d interface{} = self.ExperienceProfileId
 
-		if false && reflect.ValueOf(self.ExperienceProfileId).Kind() == reflect.Struct {
-			d = &self.ExperienceProfileId
-		} else {
-			d = self.ExperienceProfileId
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.ExperienceProfileId).Kind() == reflect.Struct {
+				d = &self.ExperienceProfileId
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -388,13 +360,9 @@ func (self *PaypalPayment) JSONEncode(encoder *gJson.Encoder) bool {
 }
 
 func (self *PaypalPayment) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_111a1il9k19gq{
-
-		&self.private,
-		self.connection,
-		self.ExperienceProfileId,
-		self.payment_error,
-	})
+	var encoder gJson.Encoder
+	self.JSONEncode(&encoder)
+	return encoder.Bytes(), nil
 }
 
 func (self *PaypalPayment) UnmarshalJSON(j []byte) error {
@@ -402,186 +370,13 @@ func (self *PaypalPayment) UnmarshalJSON(j []byte) error {
 		return nil
 	}
 
-	// For every property found, perform a separate UnmarshalJSON operation. This
-	// prevents overwrite of values in 'self' where properties are absent.
-	m := make(map[string]json.RawMessage)
-
-	err := json.Unmarshal(j, &m)
-	if err != nil {
+	// First unmarshal using the default unmarshaler. The temp type is so that
+	// this method is not called recursively.
+	type temp *PaypalPayment
+	if err := json.Unmarshal(j, temp(self)); err != nil {
 		return err
 	}
 
-	// JSON key comparisons are case-insensitive
-	for k, v := range m {
-		m[strings.ToLower(k)] = v
-	}
-
-	var data json.RawMessage
-	var ok bool
-	if data, ok = m["intent"]; ok {
-		var temp struct {
-			Intent intentEnum `json:"intent,omitempty"`
-		}
-		data = append(append([]byte("{ \"intent\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "intent", err.Error(),
-			)
-		}
-
-		self.private.Intent = temp.Intent
-	}
-
-	if data, ok = m["state"]; ok {
-		var temp struct {
-			State StateEnum `json:"state,omitempty"`
-		}
-		data = append(append([]byte("{ \"state\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "state", err.Error(),
-			)
-		}
-
-		self.private.State = temp.State
-	}
-
-	if data, ok = m["id"]; ok {
-		var temp struct {
-			Id string `json:"id,omitempty"`
-		}
-		data = append(append([]byte("{ \"id\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "id", err.Error(),
-			)
-		}
-
-		self.private.Id = temp.Id
-	}
-
-	if data, ok = m["failure_reason"]; ok {
-		var temp struct {
-			FailureReason FailureReasonEnum `json:"failure_reason,omitempty"`
-		}
-		data = append(append([]byte("{ \"failure_reason\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "failure_reason", err.Error(),
-			)
-		}
-
-		self.private.FailureReason = temp.FailureReason
-	}
-
-	if data, ok = m["create_time"]; ok {
-		var temp struct {
-			CreateTime dateTime `json:"create_time,omitempty"`
-		}
-		data = append(append([]byte("{ \"create_time\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "create_time", err.Error(),
-			)
-		}
-
-		self.private.CreateTime = temp.CreateTime
-	}
-
-	if data, ok = m["update_time"]; ok {
-		var temp struct {
-			UpdateTime dateTime `json:"update_time,omitempty"`
-		}
-		data = append(append([]byte("{ \"update_time\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "update_time", err.Error(),
-			)
-		}
-
-		self.private.UpdateTime = temp.UpdateTime
-	}
-
-	if data, ok = m["links"]; ok {
-		var temp struct {
-			Links links `json:"links,omitempty"`
-		}
-		data = append(append([]byte("{ \"links\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "links", err.Error(),
-			)
-		}
-
-		self.private.Links = temp.Links
-	}
-
-	if data, ok = m["transactions"]; ok {
-		var temp struct {
-			Transactions PaypalTransactions `json:"transactions,omitempty"`
-		}
-		data = append(append([]byte("{ \"transactions\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "transactions", err.Error(),
-			)
-		}
-
-		self.private.Transactions = temp.Transactions
-	}
-
-	if data, ok = m["payer"]; ok {
-		var temp struct {
-			Payer paypalPayer `json:"payer"`
-		}
-		data = append(append([]byte("{ \"payer\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "payer", err.Error(),
-			)
-		}
-
-		self.private.Payer = temp.Payer
-	}
-
-	if data, ok = m["redirect_urls"]; ok {
-		var temp struct {
-			RedirectUrls Redirects `json:"redirect_urls,omitempty"`
-		}
-		data = append(append([]byte("{ \"redirect_urls\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "redirect_urls", err.Error(),
-			)
-		}
-
-		self.private.RedirectUrls = temp.RedirectUrls
-	}
-
-	if data, ok = m["experience_profile_id"]; ok {
-		var temp struct {
-			ExperienceProfileId string `json:"experience_profile_id,omitempty"`
-		}
-		data = append(append([]byte("{ \"experience_profile_id\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "experience_profile_id", err.Error(),
-			)
-		}
-
-		self.ExperienceProfileId = temp.ExperienceProfileId
-	}
 	return nil
 }
 
@@ -591,39 +386,27 @@ PaypalTransaction struct
 
 ******************************/
 
-type PaypalTransaction struct {
-	private        private_1rvkx4qok41k3
-	Description    string          `json:"description,omitempty"`
-	PaymentOptions *paymentOptions `json:"payment_options,omitempty"`
-	InvoiceNumber  string          `json:"invoice_number,omitempty"`
-	Custom         string          `json:"custom,omitempty"`
-	SoftDescriptor string          `json:"soft_descriptor,omitempty"`
-}
-type private_1rvkx4qok41k3 struct {
-	ItemList         *paypalItemList  `json:"item_list,omitempty"`
-	Amount           amount           `json:"amount"`
-	RelatedResources relatedResources `json:"related_resources,omitempty"`
-}
-
 // JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *private_1rvkx4qok41k3) JSONEncode(encoder *gJson.Encoder) bool {
+func (self *PaypalTransaction) JSONEncode(encoder *gJson.Encoder) bool {
+	if self == nil {
+		return encoder.EncodeNull(false)
+	}
+
+	encoder.WriteRawByte('{')
 	var first = true
 
-	if z, ok := interface{}(self.ItemList).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if z, ok := interface{}(self.ItemList).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.ItemList
 
-		if true && reflect.ValueOf(self.ItemList).Kind() == reflect.Struct {
-			d = &self.ItemList
-		} else {
-			d = self.ItemList
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.ItemList).Kind() == reflect.Struct {
+				d = &self.ItemList
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -634,20 +417,17 @@ func (self *private_1rvkx4qok41k3) JSONEncode(encoder *gJson.Encoder) bool {
 	}
 
 	if true {
-		var d interface{}
+		var d interface{} = self.Amount
 
-		if true && reflect.ValueOf(self.Amount).Kind() == reflect.Struct {
-			d = &self.Amount
-		} else {
-			d = self.Amount
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.Amount).Kind() == reflect.Struct {
+				d = &self.Amount
+			}
 		}
 
 		var doEncode = true
 		if false { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -657,21 +437,18 @@ func (self *private_1rvkx4qok41k3) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	if z, ok := interface{}(self.RelatedResources).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if z, ok := interface{}(self.RelatedResources).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.RelatedResources
 
-		if true && reflect.ValueOf(self.RelatedResources).Kind() == reflect.Struct {
-			d = &self.RelatedResources
-		} else {
-			d = self.RelatedResources
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.RelatedResources).Kind() == reflect.Struct {
+				d = &self.RelatedResources
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -681,57 +458,18 @@ func (self *private_1rvkx4qok41k3) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	return !first
-}
-
-type json_1rvkx4qok41k3 struct {
-	*private_1rvkx4qok41k3
-
-	Description    string          `json:"description,omitempty"`
-	PaymentOptions *paymentOptions `json:"payment_options,omitempty"`
-	InvoiceNumber  string          `json:"invoice_number,omitempty"`
-	Custom         string          `json:"custom,omitempty"`
-	SoftDescriptor string          `json:"soft_descriptor,omitempty"`
-}
-
-func (self *PaypalTransaction) ItemList() *paypalItemList {
-	return self.private.ItemList
-}
-
-func (self *PaypalTransaction) Amount() amount {
-	return self.private.Amount
-}
-
-func (self *PaypalTransaction) RelatedResources() relatedResources {
-	return self.private.RelatedResources
-}
-
-// JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *PaypalTransaction) JSONEncode(encoder *gJson.Encoder) bool {
-	if self == nil {
-		return encoder.EncodeNull(false)
-	}
-
-	encoder.WriteRawByte('{')
-
-	// Encodes only the fields of the struct, without curly braces
-	var first = !self.private.JSONEncode(encoder)
-
 	if len(self.Description) != 0 {
-		var d interface{}
+		var d interface{} = self.Description
 
-		if false && reflect.ValueOf(self.Description).Kind() == reflect.Struct {
-			d = &self.Description
-		} else {
-			d = self.Description
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.Description).Kind() == reflect.Struct {
+				d = &self.Description
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -741,21 +479,18 @@ func (self *PaypalTransaction) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	if z, ok := interface{}(self.PaymentOptions).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if z, ok := interface{}(self.PaymentOptions).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.PaymentOptions
 
-		if true && reflect.ValueOf(self.PaymentOptions).Kind() == reflect.Struct {
-			d = &self.PaymentOptions
-		} else {
-			d = self.PaymentOptions
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.PaymentOptions).Kind() == reflect.Struct {
+				d = &self.PaymentOptions
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -766,20 +501,17 @@ func (self *PaypalTransaction) JSONEncode(encoder *gJson.Encoder) bool {
 	}
 
 	if len(self.InvoiceNumber) != 0 {
-		var d interface{}
+		var d interface{} = self.InvoiceNumber
 
-		if false && reflect.ValueOf(self.InvoiceNumber).Kind() == reflect.Struct {
-			d = &self.InvoiceNumber
-		} else {
-			d = self.InvoiceNumber
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.InvoiceNumber).Kind() == reflect.Struct {
+				d = &self.InvoiceNumber
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -790,20 +522,17 @@ func (self *PaypalTransaction) JSONEncode(encoder *gJson.Encoder) bool {
 	}
 
 	if len(self.Custom) != 0 {
-		var d interface{}
+		var d interface{} = self.Custom
 
-		if false && reflect.ValueOf(self.Custom).Kind() == reflect.Struct {
-			d = &self.Custom
-		} else {
-			d = self.Custom
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.Custom).Kind() == reflect.Struct {
+				d = &self.Custom
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -814,20 +543,17 @@ func (self *PaypalTransaction) JSONEncode(encoder *gJson.Encoder) bool {
 	}
 
 	if len(self.SoftDescriptor) != 0 {
-		var d interface{}
+		var d interface{} = self.SoftDescriptor
 
-		if false && reflect.ValueOf(self.SoftDescriptor).Kind() == reflect.Struct {
-			d = &self.SoftDescriptor
-		} else {
-			d = self.SoftDescriptor
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.SoftDescriptor).Kind() == reflect.Struct {
+				d = &self.SoftDescriptor
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -843,15 +569,9 @@ func (self *PaypalTransaction) JSONEncode(encoder *gJson.Encoder) bool {
 }
 
 func (self *PaypalTransaction) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_1rvkx4qok41k3{
-
-		&self.private,
-		self.Description,
-		self.PaymentOptions,
-		self.InvoiceNumber,
-		self.Custom,
-		self.SoftDescriptor,
-	})
+	var encoder gJson.Encoder
+	self.JSONEncode(&encoder)
+	return encoder.Bytes(), nil
 }
 
 func (self *PaypalTransaction) UnmarshalJSON(j []byte) error {
@@ -859,141 +579,13 @@ func (self *PaypalTransaction) UnmarshalJSON(j []byte) error {
 		return nil
 	}
 
-	// For every property found, perform a separate UnmarshalJSON operation. This
-	// prevents overwrite of values in 'self' where properties are absent.
-	m := make(map[string]json.RawMessage)
-
-	err := json.Unmarshal(j, &m)
-	if err != nil {
+	// First unmarshal using the default unmarshaler. The temp type is so that
+	// this method is not called recursively.
+	type temp *PaypalTransaction
+	if err := json.Unmarshal(j, temp(self)); err != nil {
 		return err
 	}
 
-	// JSON key comparisons are case-insensitive
-	for k, v := range m {
-		m[strings.ToLower(k)] = v
-	}
-
-	var data json.RawMessage
-	var ok bool
-	if data, ok = m["item_list"]; ok {
-		var temp struct {
-			ItemList *paypalItemList `json:"item_list,omitempty"`
-		}
-		data = append(append([]byte("{ \"item_list\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "item_list", err.Error(),
-			)
-		}
-
-		self.private.ItemList = temp.ItemList
-	}
-
-	if data, ok = m["amount"]; ok {
-		var temp struct {
-			Amount amount `json:"amount"`
-		}
-		data = append(append([]byte("{ \"amount\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "amount", err.Error(),
-			)
-		}
-
-		self.private.Amount = temp.Amount
-	}
-
-	if data, ok = m["related_resources"]; ok {
-		var temp struct {
-			RelatedResources relatedResources `json:"related_resources,omitempty"`
-		}
-		data = append(append([]byte("{ \"related_resources\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "related_resources", err.Error(),
-			)
-		}
-
-		self.private.RelatedResources = temp.RelatedResources
-	}
-
-	if data, ok = m["description"]; ok {
-		var temp struct {
-			Description string `json:"description,omitempty"`
-		}
-		data = append(append([]byte("{ \"description\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "description", err.Error(),
-			)
-		}
-
-		self.Description = temp.Description
-	}
-
-	if data, ok = m["payment_options"]; ok {
-		var temp struct {
-			PaymentOptions *paymentOptions `json:"payment_options,omitempty"`
-		}
-		data = append(append([]byte("{ \"payment_options\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "payment_options", err.Error(),
-			)
-		}
-
-		self.PaymentOptions = temp.PaymentOptions
-	}
-
-	if data, ok = m["invoice_number"]; ok {
-		var temp struct {
-			InvoiceNumber string `json:"invoice_number,omitempty"`
-		}
-		data = append(append([]byte("{ \"invoice_number\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "invoice_number", err.Error(),
-			)
-		}
-
-		self.InvoiceNumber = temp.InvoiceNumber
-	}
-
-	if data, ok = m["custom"]; ok {
-		var temp struct {
-			Custom string `json:"custom,omitempty"`
-		}
-		data = append(append([]byte("{ \"custom\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "custom", err.Error(),
-			)
-		}
-
-		self.Custom = temp.Custom
-	}
-
-	if data, ok = m["soft_descriptor"]; ok {
-		var temp struct {
-			SoftDescriptor string `json:"soft_descriptor,omitempty"`
-		}
-		data = append(append([]byte("{ \"soft_descriptor\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "soft_descriptor", err.Error(),
-			)
-		}
-
-		self.SoftDescriptor = temp.SoftDescriptor
-	}
 	return nil
 }
 
@@ -1003,33 +595,27 @@ paypalItemList struct
 
 ******************************/
 
-type paypalItemList struct {
-	private private_5gvcdf7z4c87
-}
-type private_5gvcdf7z4c87 struct {
-	Items           PaypalItems      `json:"items,omitempty"`
-	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
-}
-
 // JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *private_5gvcdf7z4c87) JSONEncode(encoder *gJson.Encoder) bool {
+func (self *paypalItemList) JSONEncode(encoder *gJson.Encoder) bool {
+	if self == nil {
+		return encoder.EncodeNull(false)
+	}
+
+	encoder.WriteRawByte('{')
 	var first = true
 
-	if z, ok := interface{}(self.Items).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if len(self.Items) != 0 {
+		var d interface{} = self.Items
 
-		if true && reflect.ValueOf(self.Items).Kind() == reflect.Struct {
-			d = &self.Items
-		} else {
-			d = self.Items
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.Items).Kind() == reflect.Struct {
+				d = &self.Items
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -1039,21 +625,18 @@ func (self *private_5gvcdf7z4c87) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	if z, ok := interface{}(self.ShippingAddress).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if z, ok := interface{}(self.ShippingAddress).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.ShippingAddress
 
-		if true && reflect.ValueOf(self.ShippingAddress).Kind() == reflect.Struct {
-			d = &self.ShippingAddress
-		} else {
-			d = self.ShippingAddress
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.ShippingAddress).Kind() == reflect.Struct {
+				d = &self.ShippingAddress
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -1063,42 +646,15 @@ func (self *private_5gvcdf7z4c87) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	return !first
-}
-
-type json_5gvcdf7z4c87 struct {
-	*private_5gvcdf7z4c87
-}
-
-func (self *paypalItemList) Items() PaypalItems {
-	return self.private.Items
-}
-
-func (self *paypalItemList) ShippingAddress() *ShippingAddress {
-	return self.private.ShippingAddress
-}
-
-// JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *paypalItemList) JSONEncode(encoder *gJson.Encoder) bool {
-	if self == nil {
-		return encoder.EncodeNull(false)
-	}
-
-	encoder.WriteRawByte('{')
-
-	// Encodes only the fields of the struct, without curly braces
-	var first = !self.private.JSONEncode(encoder)
-
 	encoder.WriteRawByte('}')
 
 	return true || !first
 }
 
 func (self *paypalItemList) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_5gvcdf7z4c87{
-
-		&self.private,
-	})
+	var encoder gJson.Encoder
+	self.JSONEncode(&encoder)
+	return encoder.Bytes(), nil
 }
 
 func (self *paypalItemList) UnmarshalJSON(j []byte) error {
@@ -1106,51 +662,13 @@ func (self *paypalItemList) UnmarshalJSON(j []byte) error {
 		return nil
 	}
 
-	// For every property found, perform a separate UnmarshalJSON operation. This
-	// prevents overwrite of values in 'self' where properties are absent.
-	m := make(map[string]json.RawMessage)
-
-	err := json.Unmarshal(j, &m)
-	if err != nil {
+	// First unmarshal using the default unmarshaler. The temp type is so that
+	// this method is not called recursively.
+	type temp *paypalItemList
+	if err := json.Unmarshal(j, temp(self)); err != nil {
 		return err
 	}
 
-	// JSON key comparisons are case-insensitive
-	for k, v := range m {
-		m[strings.ToLower(k)] = v
-	}
-
-	var data json.RawMessage
-	var ok bool
-	if data, ok = m["items"]; ok {
-		var temp struct {
-			Items PaypalItems `json:"items,omitempty"`
-		}
-		data = append(append([]byte("{ \"items\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "items", err.Error(),
-			)
-		}
-
-		self.private.Items = temp.Items
-	}
-
-	if data, ok = m["shipping_address"]; ok {
-		var temp struct {
-			ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
-		}
-		data = append(append([]byte("{ \"shipping_address\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "shipping_address", err.Error(),
-			)
-		}
-
-		self.private.ShippingAddress = temp.ShippingAddress
-	}
 	return nil
 }
 
@@ -1160,37 +678,27 @@ paypalPayer struct
 
 ******************************/
 
-// Source of the funds for this payment represented by a PayPal account.
-type paypalPayer struct {
-	private private_g55fjh8duk3b
-}
-type private_g55fjh8duk3b struct {
-	// Must be PaymentMethod.Paypal
-	PaymentMethod PaymentMethodEnum `json:"payment_method"`
-	// Status of the payer’s PayPal account. Allowed values: VERIFIED or UNVERIFIED.
-	Status          payerStatusEnum  `json:"status,omitempty"`
-	PaypalPayerInfo *PaypalPayerInfo `json:"payer_info,omitempty"`
-}
-
 // JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *private_g55fjh8duk3b) JSONEncode(encoder *gJson.Encoder) bool {
+func (self *paypalPayer) JSONEncode(encoder *gJson.Encoder) bool {
+	if self == nil {
+		return encoder.EncodeNull(false)
+	}
+
+	encoder.WriteRawByte('{')
 	var first = true
 
 	if true {
-		var d interface{}
+		var d interface{} = self.PaymentMethod
 
-		if true && reflect.ValueOf(self.PaymentMethod).Kind() == reflect.Struct {
-			d = &self.PaymentMethod
-		} else {
-			d = self.PaymentMethod
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.PaymentMethod).Kind() == reflect.Struct {
+				d = &self.PaymentMethod
+			}
 		}
 
 		var doEncode = true
 		if false { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -1200,21 +708,18 @@ func (self *private_g55fjh8duk3b) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	if z, ok := interface{}(self.Status).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if z, ok := interface{}(self.Status).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.Status
 
-		if true && reflect.ValueOf(self.Status).Kind() == reflect.Struct {
-			d = &self.Status
-		} else {
-			d = self.Status
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.Status).Kind() == reflect.Struct {
+				d = &self.Status
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -1224,21 +729,18 @@ func (self *private_g55fjh8duk3b) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	if z, ok := interface{}(self.PaypalPayerInfo).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
+	if z, ok := interface{}(self.PaypalPayerInfo).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.PaypalPayerInfo
 
-		if true && reflect.ValueOf(self.PaypalPayerInfo).Kind() == reflect.Struct {
-			d = &self.PaypalPayerInfo
-		} else {
-			d = self.PaypalPayerInfo
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.PaypalPayerInfo).Kind() == reflect.Struct {
+				d = &self.PaypalPayerInfo
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -1248,42 +750,15 @@ func (self *private_g55fjh8duk3b) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
-	return !first
-}
-
-type json_g55fjh8duk3b struct {
-	*private_g55fjh8duk3b
-}
-
-func (self *paypalPayer) Status() payerStatusEnum {
-	return self.private.Status
-}
-
-func (self *paypalPayer) PaypalPayerInfo() *PaypalPayerInfo {
-	return self.private.PaypalPayerInfo
-}
-
-// JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *paypalPayer) JSONEncode(encoder *gJson.Encoder) bool {
-	if self == nil {
-		return encoder.EncodeNull(false)
-	}
-
-	encoder.WriteRawByte('{')
-
-	// Encodes only the fields of the struct, without curly braces
-	var first = !self.private.JSONEncode(encoder)
-
 	encoder.WriteRawByte('}')
 
 	return true || !first
 }
 
 func (self *paypalPayer) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_g55fjh8duk3b{
-
-		&self.private,
-	})
+	var encoder gJson.Encoder
+	self.JSONEncode(&encoder)
+	return encoder.Bytes(), nil
 }
 
 func (self *paypalPayer) UnmarshalJSON(j []byte) error {
@@ -1291,66 +766,13 @@ func (self *paypalPayer) UnmarshalJSON(j []byte) error {
 		return nil
 	}
 
-	// For every property found, perform a separate UnmarshalJSON operation. This
-	// prevents overwrite of values in 'self' where properties are absent.
-	m := make(map[string]json.RawMessage)
-
-	err := json.Unmarshal(j, &m)
-	if err != nil {
+	// First unmarshal using the default unmarshaler. The temp type is so that
+	// this method is not called recursively.
+	type temp *paypalPayer
+	if err := json.Unmarshal(j, temp(self)); err != nil {
 		return err
 	}
 
-	// JSON key comparisons are case-insensitive
-	for k, v := range m {
-		m[strings.ToLower(k)] = v
-	}
-
-	var data json.RawMessage
-	var ok bool
-	if data, ok = m["payment_method"]; ok {
-		var temp struct {
-			PaymentMethod PaymentMethodEnum `json:"payment_method"`
-		}
-		data = append(append([]byte("{ \"payment_method\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "payment_method", err.Error(),
-			)
-		}
-
-		self.private.PaymentMethod = temp.PaymentMethod
-	}
-
-	if data, ok = m["status"]; ok {
-		var temp struct {
-			Status payerStatusEnum `json:"status,omitempty"`
-		}
-		data = append(append([]byte("{ \"status\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "status", err.Error(),
-			)
-		}
-
-		self.private.Status = temp.Status
-	}
-
-	if data, ok = m["payer_info"]; ok {
-		var temp struct {
-			PaypalPayerInfo *PaypalPayerInfo `json:"payer_info,omitempty"`
-		}
-		data = append(append([]byte("{ \"payer_info\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "payer_info", err.Error(),
-			)
-		}
-
-		self.private.PaypalPayerInfo = temp.PaypalPayerInfo
-	}
 	return nil
 }
 
@@ -1360,332 +782,6 @@ PaypalPayerInfo struct
 
 ******************************/
 
-// This object is pre-filled by PayPal when the payment_method is paypal.
-type PaypalPayerInfo struct {
-	private private_nhhvic4beoqa
-	// Payer’s tax ID type. Allowed values: BR_CPF or BR_C`NPJ. Only supported when
-	// the payment_method is set to paypal.
-	TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"`
-	// Payer’s tax ID. Only supported when the payment_method is set to paypal.
-	TaxId string `json:"tax_id,omitempty"`
-}
-type private_nhhvic4beoqa struct {
-	// Email address representing the payer. 127 characters max.
-	Email string `json:"email,omitempty"`
-	// Salutation of the payer.
-	Salutation string `json:"salutation,omitempty"`
-	// Suffix of the payer.
-	Suffix string `json:"suffix,omitempty"`
-	// Two-letter registered country code of the payer to identify the buyer country.
-	CountryCode CountryCodeEnum `json:"country_code,omitempty"`
-	// Phone number representing the payer. 20 characters max.
-	Phone string `json:"phone,omitempty"`
-	// First name of the payer. Value assigned by PayPal.
-	FirstName string `json:"first_name,omitempty"`
-	// Middle name of the payer. Value assigned by PayPal.
-	MiddleName string `json:"middle_name,omitempty"`
-	// Last name of the payer. Value assigned by PayPal.
-	LastName string `json:"last_name,omitempty"`
-	// PayPal assigned Payer ID. Value assigned by PayPal.
-	PayerId string `json:"payer_id,omitempty"`
-	// Shipping address of payer PayPal account. Value assigned by PayPal.
-	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
-}
-
-// JSONEncode implements part of Golific's JSONEncodable interface.
-func (self *private_nhhvic4beoqa) JSONEncode(encoder *gJson.Encoder) bool {
-	var first = true
-
-	if len(self.Email) != 0 {
-		var d interface{}
-
-		if false && reflect.ValueOf(self.Email).Kind() == reflect.Struct {
-			d = &self.Email
-		} else {
-			d = self.Email
-		}
-
-		var doEncode = true
-		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
-				doEncode = !zer.IsZero()
-			}
-		}
-
-		if doEncode {
-			first = !encoder.EncodeKeyVal("email", d, first, true) && first
-		}
-	}
-
-	if len(self.Salutation) != 0 {
-		var d interface{}
-
-		if false && reflect.ValueOf(self.Salutation).Kind() == reflect.Struct {
-			d = &self.Salutation
-		} else {
-			d = self.Salutation
-		}
-
-		var doEncode = true
-		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
-				doEncode = !zer.IsZero()
-			}
-		}
-
-		if doEncode {
-			first = !encoder.EncodeKeyVal("salutation", d, first, true) && first
-		}
-	}
-
-	if len(self.Suffix) != 0 {
-		var d interface{}
-
-		if false && reflect.ValueOf(self.Suffix).Kind() == reflect.Struct {
-			d = &self.Suffix
-		} else {
-			d = self.Suffix
-		}
-
-		var doEncode = true
-		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
-				doEncode = !zer.IsZero()
-			}
-		}
-
-		if doEncode {
-			first = !encoder.EncodeKeyVal("suffix", d, first, true) && first
-		}
-	}
-
-	if z, ok := interface{}(self.CountryCode).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
-
-		if true && reflect.ValueOf(self.CountryCode).Kind() == reflect.Struct {
-			d = &self.CountryCode
-		} else {
-			d = self.CountryCode
-		}
-
-		var doEncode = true
-		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
-				doEncode = !zer.IsZero()
-			}
-		}
-
-		if doEncode {
-			first = !encoder.EncodeKeyVal("country_code", d, first, true) && first
-		}
-	}
-
-	if len(self.Phone) != 0 {
-		var d interface{}
-
-		if false && reflect.ValueOf(self.Phone).Kind() == reflect.Struct {
-			d = &self.Phone
-		} else {
-			d = self.Phone
-		}
-
-		var doEncode = true
-		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
-				doEncode = !zer.IsZero()
-			}
-		}
-
-		if doEncode {
-			first = !encoder.EncodeKeyVal("phone", d, first, true) && first
-		}
-	}
-
-	if len(self.FirstName) != 0 {
-		var d interface{}
-
-		if false && reflect.ValueOf(self.FirstName).Kind() == reflect.Struct {
-			d = &self.FirstName
-		} else {
-			d = self.FirstName
-		}
-
-		var doEncode = true
-		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
-				doEncode = !zer.IsZero()
-			}
-		}
-
-		if doEncode {
-			first = !encoder.EncodeKeyVal("first_name", d, first, true) && first
-		}
-	}
-
-	if len(self.MiddleName) != 0 {
-		var d interface{}
-
-		if false && reflect.ValueOf(self.MiddleName).Kind() == reflect.Struct {
-			d = &self.MiddleName
-		} else {
-			d = self.MiddleName
-		}
-
-		var doEncode = true
-		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
-				doEncode = !zer.IsZero()
-			}
-		}
-
-		if doEncode {
-			first = !encoder.EncodeKeyVal("middle_name", d, first, true) && first
-		}
-	}
-
-	if len(self.LastName) != 0 {
-		var d interface{}
-
-		if false && reflect.ValueOf(self.LastName).Kind() == reflect.Struct {
-			d = &self.LastName
-		} else {
-			d = self.LastName
-		}
-
-		var doEncode = true
-		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
-				doEncode = !zer.IsZero()
-			}
-		}
-
-		if doEncode {
-			first = !encoder.EncodeKeyVal("last_name", d, first, true) && first
-		}
-	}
-
-	if len(self.PayerId) != 0 {
-		var d interface{}
-
-		if false && reflect.ValueOf(self.PayerId).Kind() == reflect.Struct {
-			d = &self.PayerId
-		} else {
-			d = self.PayerId
-		}
-
-		var doEncode = true
-		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
-				doEncode = !zer.IsZero()
-			}
-		}
-
-		if doEncode {
-			first = !encoder.EncodeKeyVal("payer_id", d, first, true) && first
-		}
-	}
-
-	if z, ok := interface{}(self.ShippingAddress).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
-
-		if true && reflect.ValueOf(self.ShippingAddress).Kind() == reflect.Struct {
-			d = &self.ShippingAddress
-		} else {
-			d = self.ShippingAddress
-		}
-
-		var doEncode = true
-		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
-				doEncode = !zer.IsZero()
-			}
-		}
-
-		if doEncode {
-			first = !encoder.EncodeKeyVal("shipping_address", d, first, true) && first
-		}
-	}
-
-	return !first
-}
-
-type json_nhhvic4beoqa struct {
-	*private_nhhvic4beoqa
-
-	TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"`
-	TaxId     string        `json:"tax_id,omitempty"`
-}
-
-func (self *PaypalPayerInfo) Email() string {
-	return self.private.Email
-}
-
-func (self *PaypalPayerInfo) Salutation() string {
-	return self.private.Salutation
-}
-
-func (self *PaypalPayerInfo) Suffix() string {
-	return self.private.Suffix
-}
-
-func (self *PaypalPayerInfo) CountryCode() CountryCodeEnum {
-	return self.private.CountryCode
-}
-
-func (self *PaypalPayerInfo) Phone() string {
-	return self.private.Phone
-}
-
-func (self *PaypalPayerInfo) FirstName() string {
-	return self.private.FirstName
-}
-
-func (self *PaypalPayerInfo) MiddleName() string {
-	return self.private.MiddleName
-}
-
-func (self *PaypalPayerInfo) LastName() string {
-	return self.private.LastName
-}
-
-func (self *PaypalPayerInfo) PayerId() string {
-	return self.private.PayerId
-}
-
-func (self *PaypalPayerInfo) ShippingAddress() *ShippingAddress {
-	return self.private.ShippingAddress
-}
-
 // JSONEncode implements part of Golific's JSONEncodable interface.
 func (self *PaypalPayerInfo) JSONEncode(encoder *gJson.Encoder) bool {
 	if self == nil {
@@ -1693,25 +789,20 @@ func (self *PaypalPayerInfo) JSONEncode(encoder *gJson.Encoder) bool {
 	}
 
 	encoder.WriteRawByte('{')
+	var first = true
 
-	// Encodes only the fields of the struct, without curly braces
-	var first = !self.private.JSONEncode(encoder)
+	if z, ok := interface{}(self.TaxIdType).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.TaxIdType
 
-	if z, ok := interface{}(self.TaxIdType).(gJson.Elidable); !ok || !z.CanElide() {
-		var d interface{}
-
-		if true && reflect.ValueOf(self.TaxIdType).Kind() == reflect.Struct {
-			d = &self.TaxIdType
-		} else {
-			d = self.TaxIdType
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.TaxIdType).Kind() == reflect.Struct {
+				d = &self.TaxIdType
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -1722,20 +813,17 @@ func (self *PaypalPayerInfo) JSONEncode(encoder *gJson.Encoder) bool {
 	}
 
 	if len(self.TaxId) != 0 {
-		var d interface{}
+		var d interface{} = self.TaxId
 
-		if false && reflect.ValueOf(self.TaxId).Kind() == reflect.Struct {
-			d = &self.TaxId
-		} else {
-			d = self.TaxId
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.TaxId).Kind() == reflect.Struct {
+				d = &self.TaxId
+			}
 		}
 
 		var doEncode = true
 		if true { // has omitempty?
-			if eli, okCanElide := d.(gJson.Elidable); okCanElide {
-				doEncode = !eli.CanElide()
-
-			} else if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
 				doEncode = !zer.IsZero()
 			}
 		}
@@ -1745,18 +833,225 @@ func (self *PaypalPayerInfo) JSONEncode(encoder *gJson.Encoder) bool {
 		}
 	}
 
+	if len(self.Email) != 0 {
+		var d interface{} = self.Email
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.Email).Kind() == reflect.Struct {
+				d = &self.Email
+			}
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("email", d, first, true) && first
+		}
+	}
+
+	if len(self.Salutation) != 0 {
+		var d interface{} = self.Salutation
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.Salutation).Kind() == reflect.Struct {
+				d = &self.Salutation
+			}
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("salutation", d, first, true) && first
+		}
+	}
+
+	if len(self.Suffix) != 0 {
+		var d interface{} = self.Suffix
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.Suffix).Kind() == reflect.Struct {
+				d = &self.Suffix
+			}
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("suffix", d, first, true) && first
+		}
+	}
+
+	if z, ok := interface{}(self.CountryCode).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.CountryCode
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.CountryCode).Kind() == reflect.Struct {
+				d = &self.CountryCode
+			}
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("country_code", d, first, true) && first
+		}
+	}
+
+	if len(self.Phone) != 0 {
+		var d interface{} = self.Phone
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.Phone).Kind() == reflect.Struct {
+				d = &self.Phone
+			}
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("phone", d, first, true) && first
+		}
+	}
+
+	if len(self.FirstName) != 0 {
+		var d interface{} = self.FirstName
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.FirstName).Kind() == reflect.Struct {
+				d = &self.FirstName
+			}
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("first_name", d, first, true) && first
+		}
+	}
+
+	if len(self.MiddleName) != 0 {
+		var d interface{} = self.MiddleName
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.MiddleName).Kind() == reflect.Struct {
+				d = &self.MiddleName
+			}
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("middle_name", d, first, true) && first
+		}
+	}
+
+	if len(self.LastName) != 0 {
+		var d interface{} = self.LastName
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.LastName).Kind() == reflect.Struct {
+				d = &self.LastName
+			}
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("last_name", d, first, true) && first
+		}
+	}
+
+	if len(self.PayerId) != 0 {
+		var d interface{} = self.PayerId
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if false && reflect.ValueOf(self.PayerId).Kind() == reflect.Struct {
+				d = &self.PayerId
+			}
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("payer_id", d, first, true) && first
+		}
+	}
+
+	if z, ok := interface{}(self.ShippingAddress).(gJson.Zeroable); !ok || !z.IsZero() {
+		var d interface{} = self.ShippingAddress
+
+		if _, ok := d.(gJson.JSONEncodable); !ok {
+			if true && reflect.ValueOf(self.ShippingAddress).Kind() == reflect.Struct {
+				d = &self.ShippingAddress
+			}
+		}
+
+		var doEncode = true
+		if true { // has omitempty?
+			if zer, okCanZero := d.(gJson.Zeroable); okCanZero {
+				doEncode = !zer.IsZero()
+			}
+		}
+
+		if doEncode {
+			first = !encoder.EncodeKeyVal("shipping_address", d, first, true) && first
+		}
+	}
+
 	encoder.WriteRawByte('}')
 
 	return true || !first
 }
 
 func (self *PaypalPayerInfo) MarshalJSON() ([]byte, error) {
-	return json.Marshal(json_nhhvic4beoqa{
-
-		&self.private,
-		self.TaxIdType,
-		self.TaxId,
-	})
+	var encoder gJson.Encoder
+	self.JSONEncode(&encoder)
+	return encoder.Bytes(), nil
 }
 
 func (self *PaypalPayerInfo) UnmarshalJSON(j []byte) error {
@@ -1764,200 +1059,12 @@ func (self *PaypalPayerInfo) UnmarshalJSON(j []byte) error {
 		return nil
 	}
 
-	// For every property found, perform a separate UnmarshalJSON operation. This
-	// prevents overwrite of values in 'self' where properties are absent.
-	m := make(map[string]json.RawMessage)
-
-	err := json.Unmarshal(j, &m)
-	if err != nil {
+	// First unmarshal using the default unmarshaler. The temp type is so that
+	// this method is not called recursively.
+	type temp *PaypalPayerInfo
+	if err := json.Unmarshal(j, temp(self)); err != nil {
 		return err
 	}
 
-	// JSON key comparisons are case-insensitive
-	for k, v := range m {
-		m[strings.ToLower(k)] = v
-	}
-
-	var data json.RawMessage
-	var ok bool
-	if data, ok = m["tax_id_type"]; ok {
-		var temp struct {
-			TaxIdType TaxIdTypeEnum `json:"tax_id_type,omitempty"`
-		}
-		data = append(append([]byte("{ \"tax_id_type\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "tax_id_type", err.Error(),
-			)
-		}
-
-		self.TaxIdType = temp.TaxIdType
-	}
-
-	if data, ok = m["tax_id"]; ok {
-		var temp struct {
-			TaxId string `json:"tax_id,omitempty"`
-		}
-		data = append(append([]byte("{ \"tax_id\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "tax_id", err.Error(),
-			)
-		}
-
-		self.TaxId = temp.TaxId
-	}
-
-	if data, ok = m["email"]; ok {
-		var temp struct {
-			Email string `json:"email,omitempty"`
-		}
-		data = append(append([]byte("{ \"email\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "email", err.Error(),
-			)
-		}
-
-		self.private.Email = temp.Email
-	}
-
-	if data, ok = m["salutation"]; ok {
-		var temp struct {
-			Salutation string `json:"salutation,omitempty"`
-		}
-		data = append(append([]byte("{ \"salutation\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "salutation", err.Error(),
-			)
-		}
-
-		self.private.Salutation = temp.Salutation
-	}
-
-	if data, ok = m["suffix"]; ok {
-		var temp struct {
-			Suffix string `json:"suffix,omitempty"`
-		}
-		data = append(append([]byte("{ \"suffix\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "suffix", err.Error(),
-			)
-		}
-
-		self.private.Suffix = temp.Suffix
-	}
-
-	if data, ok = m["country_code"]; ok {
-		var temp struct {
-			CountryCode CountryCodeEnum `json:"country_code,omitempty"`
-		}
-		data = append(append([]byte("{ \"country_code\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "country_code", err.Error(),
-			)
-		}
-
-		self.private.CountryCode = temp.CountryCode
-	}
-
-	if data, ok = m["phone"]; ok {
-		var temp struct {
-			Phone string `json:"phone,omitempty"`
-		}
-		data = append(append([]byte("{ \"phone\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "phone", err.Error(),
-			)
-		}
-
-		self.private.Phone = temp.Phone
-	}
-
-	if data, ok = m["first_name"]; ok {
-		var temp struct {
-			FirstName string `json:"first_name,omitempty"`
-		}
-		data = append(append([]byte("{ \"first_name\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "first_name", err.Error(),
-			)
-		}
-
-		self.private.FirstName = temp.FirstName
-	}
-
-	if data, ok = m["middle_name"]; ok {
-		var temp struct {
-			MiddleName string `json:"middle_name,omitempty"`
-		}
-		data = append(append([]byte("{ \"middle_name\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "middle_name", err.Error(),
-			)
-		}
-
-		self.private.MiddleName = temp.MiddleName
-	}
-
-	if data, ok = m["last_name"]; ok {
-		var temp struct {
-			LastName string `json:"last_name,omitempty"`
-		}
-		data = append(append([]byte("{ \"last_name\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "last_name", err.Error(),
-			)
-		}
-
-		self.private.LastName = temp.LastName
-	}
-
-	if data, ok = m["payer_id"]; ok {
-		var temp struct {
-			PayerId string `json:"payer_id,omitempty"`
-		}
-		data = append(append([]byte("{ \"payer_id\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "payer_id", err.Error(),
-			)
-		}
-
-		self.private.PayerId = temp.PayerId
-	}
-
-	if data, ok = m["shipping_address"]; ok {
-		var temp struct {
-			ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
-		}
-		data = append(append([]byte("{ \"shipping_address\":"), data...), '}')
-
-		if err = json.Unmarshal(data, &temp); err != nil {
-			return fmt.Errorf(
-				"Field: %s, Error: %s", "shipping_address", err.Error(),
-			)
-		}
-
-		self.private.ShippingAddress = temp.ShippingAddress
-	}
 	return nil
 }

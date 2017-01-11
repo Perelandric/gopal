@@ -20,7 +20,7 @@ ServerEnum
 
 ******************************/
 
-type ServerEnum struct{ value_1iz96i5r5b839 uint8 }
+type ServerEnum struct{ value_ccmtogqqifk4 uint8 }
 
 var Server = struct {
 	Live    ServerEnum
@@ -29,8 +29,8 @@ var Server = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [2]ServerEnum
 }{
-	Live:    ServerEnum{value_1iz96i5r5b839: 1},
-	Sandbox: ServerEnum{value_1iz96i5r5b839: 2},
+	Live:    ServerEnum{value_ccmtogqqifk4: 1},
+	Sandbox: ServerEnum{value_ccmtogqqifk4: 2},
 }
 
 func init() {
@@ -41,17 +41,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self ServerEnum) Value() uint8 {
-	return self.value_1iz96i5r5b839
+	return self.value_ccmtogqqifk4
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self ServerEnum) IntValue() int {
-	return int(self.value_1iz96i5r5b839)
+	return int(self.value_ccmtogqqifk4)
 }
 
 // Name returns the name of the variant as a string.
 func (self ServerEnum) Name() string {
-	switch self.value_1iz96i5r5b839 {
+	switch self.value_ccmtogqqifk4 {
 	case 1:
 		return "Live"
 	case 2:
@@ -74,13 +74,13 @@ func (self ServerEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self ServerEnum) IsDefault() bool {
-	return self.value_1iz96i5r5b839 == 0
+	return self.value_ccmtogqqifk4 == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self ServerEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self ServerEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -88,7 +88,7 @@ func (self ServerEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self ServerEnum) String() string {
-	switch self.value_1iz96i5r5b839 {
+	switch self.value_ccmtogqqifk4 {
 	case 1:
 		return "Live"
 	case 2:
@@ -101,7 +101,7 @@ func (self ServerEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self ServerEnum) Description() string {
-	switch self.value_1iz96i5r5b839 {
+	switch self.value_ccmtogqqifk4 {
 	case 1:
 		return "Live"
 	case 2:
@@ -112,13 +112,13 @@ func (self ServerEnum) Description() string {
 
 // JSONEncode implements part of Golific's JSONEncodable interface.
 func (self ServerEnum) JSONEncode(encoder *gJson.Encoder) bool {
-	encoder.EncodeInt(int64(self.value_1iz96i5r5b839), false)
+	encoder.EncodeInt(int64(self.value_ccmtogqqifk4), false)
 	return true
 }
 
 // JSON marshaling methods
 func (self ServerEnum) MarshalJSON() ([]byte, error) {
-	return []byte(strconv.Itoa(int(self.value_1iz96i5r5b839))), nil
+	return []byte(strconv.Itoa(int(self.value_ccmtogqqifk4))), nil
 }
 
 func (self *ServerEnum) UnmarshalJSON(b []byte) error {
@@ -126,7 +126,7 @@ func (self *ServerEnum) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	self.value_1iz96i5r5b839 = uint8(n)
+	self.value_ccmtogqqifk4 = uint8(n)
 	return nil
 }
 
@@ -136,7 +136,7 @@ sortByEnum
 
 ******************************/
 
-type sortByEnum struct{ value_yrk4ye6vwew7 uint8 }
+type sortByEnum struct{ value_1519d12vr7af3 uint8 }
 
 var sortBy = struct {
 	CreateTime sortByEnum
@@ -145,8 +145,8 @@ var sortBy = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [2]sortByEnum
 }{
-	CreateTime: sortByEnum{value_yrk4ye6vwew7: 1},
-	UpdateTime: sortByEnum{value_yrk4ye6vwew7: 2},
+	CreateTime: sortByEnum{value_1519d12vr7af3: 1},
+	UpdateTime: sortByEnum{value_1519d12vr7af3: 2},
 }
 
 func init() {
@@ -157,17 +157,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self sortByEnum) Value() uint8 {
-	return self.value_yrk4ye6vwew7
+	return self.value_1519d12vr7af3
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self sortByEnum) IntValue() int {
-	return int(self.value_yrk4ye6vwew7)
+	return int(self.value_1519d12vr7af3)
 }
 
 // Name returns the name of the variant as a string.
 func (self sortByEnum) Name() string {
-	switch self.value_yrk4ye6vwew7 {
+	switch self.value_1519d12vr7af3 {
 	case 1:
 		return "CreateTime"
 	case 2:
@@ -190,13 +190,13 @@ func (self sortByEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self sortByEnum) IsDefault() bool {
-	return self.value_yrk4ye6vwew7 == 0
+	return self.value_1519d12vr7af3 == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self sortByEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self sortByEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -204,7 +204,7 @@ func (self sortByEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self sortByEnum) String() string {
-	switch self.value_yrk4ye6vwew7 {
+	switch self.value_1519d12vr7af3 {
 	case 1:
 		return "create_time"
 	case 2:
@@ -217,7 +217,7 @@ func (self sortByEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self sortByEnum) Description() string {
-	switch self.value_yrk4ye6vwew7 {
+	switch self.value_1519d12vr7af3 {
 	case 1:
 		return "create_time"
 	case 2:
@@ -249,10 +249,10 @@ func (self *sortByEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "create_time":
-		self.value_yrk4ye6vwew7 = 1
+		self.value_1519d12vr7af3 = 1
 		return nil
 	case "update_time":
-		self.value_yrk4ye6vwew7 = 2
+		self.value_1519d12vr7af3 = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling sortByEnum\n", s)
@@ -267,7 +267,7 @@ sortOrderEnum
 
 ******************************/
 
-type sortOrderEnum struct{ value_1k9vekfu628u uint8 }
+type sortOrderEnum struct{ value_o1y3rndb1hlk uint8 }
 
 var sortOrder = struct {
 	DESC sortOrderEnum
@@ -276,8 +276,8 @@ var sortOrder = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [2]sortOrderEnum
 }{
-	DESC: sortOrderEnum{value_1k9vekfu628u: 1},
-	ASC:  sortOrderEnum{value_1k9vekfu628u: 2},
+	DESC: sortOrderEnum{value_o1y3rndb1hlk: 1},
+	ASC:  sortOrderEnum{value_o1y3rndb1hlk: 2},
 }
 
 func init() {
@@ -288,17 +288,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self sortOrderEnum) Value() uint8 {
-	return self.value_1k9vekfu628u
+	return self.value_o1y3rndb1hlk
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self sortOrderEnum) IntValue() int {
-	return int(self.value_1k9vekfu628u)
+	return int(self.value_o1y3rndb1hlk)
 }
 
 // Name returns the name of the variant as a string.
 func (self sortOrderEnum) Name() string {
-	switch self.value_1k9vekfu628u {
+	switch self.value_o1y3rndb1hlk {
 	case 1:
 		return "DESC"
 	case 2:
@@ -321,13 +321,13 @@ func (self sortOrderEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self sortOrderEnum) IsDefault() bool {
-	return self.value_1k9vekfu628u == 0
+	return self.value_o1y3rndb1hlk == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self sortOrderEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self sortOrderEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -335,7 +335,7 @@ func (self sortOrderEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self sortOrderEnum) String() string {
-	switch self.value_1k9vekfu628u {
+	switch self.value_o1y3rndb1hlk {
 	case 1:
 		return "DESC"
 	case 2:
@@ -348,7 +348,7 @@ func (self sortOrderEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self sortOrderEnum) Description() string {
-	switch self.value_1k9vekfu628u {
+	switch self.value_o1y3rndb1hlk {
 	case 1:
 		return "DESC"
 	case 2:
@@ -380,10 +380,10 @@ func (self *sortOrderEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "desc":
-		self.value_1k9vekfu628u = 1
+		self.value_o1y3rndb1hlk = 1
 		return nil
 	case "asc":
-		self.value_1k9vekfu628u = 2
+		self.value_o1y3rndb1hlk = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling sortOrderEnum\n", s)
@@ -398,7 +398,7 @@ relTypeEnum
 
 ******************************/
 
-type relTypeEnum struct{ value_1dg4tod74ra5n uint8 }
+type relTypeEnum struct{ value_1mv39pb6it11r uint8 }
 
 var relType = struct {
 	Self          relTypeEnum
@@ -431,32 +431,32 @@ var relType = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [26]relTypeEnum
 }{
-	Self:          relTypeEnum{value_1dg4tod74ra5n: 1},
-	ParentPayment: relTypeEnum{value_1dg4tod74ra5n: 2},
-	Execute:       relTypeEnum{value_1dg4tod74ra5n: 3},
-	Refund:        relTypeEnum{value_1dg4tod74ra5n: 4},
-	ApprovalUrl:   relTypeEnum{value_1dg4tod74ra5n: 5},
-	Suspend:       relTypeEnum{value_1dg4tod74ra5n: 6},
-	ReActivate:    relTypeEnum{value_1dg4tod74ra5n: 7},
-	Cancel:        relTypeEnum{value_1dg4tod74ra5n: 8},
-	Void:          relTypeEnum{value_1dg4tod74ra5n: 9},
-	Authorization: relTypeEnum{value_1dg4tod74ra5n: 10},
-	Capture:       relTypeEnum{value_1dg4tod74ra5n: 11},
-	Reauthorize:   relTypeEnum{value_1dg4tod74ra5n: 12},
-	Order:         relTypeEnum{value_1dg4tod74ra5n: 13},
-	Item:          relTypeEnum{value_1dg4tod74ra5n: 14},
-	Batch:         relTypeEnum{value_1dg4tod74ra5n: 15},
-	Delete:        relTypeEnum{value_1dg4tod74ra5n: 16},
-	Patch:         relTypeEnum{value_1dg4tod74ra5n: 17},
-	First:         relTypeEnum{value_1dg4tod74ra5n: 18},
-	Last:          relTypeEnum{value_1dg4tod74ra5n: 19},
-	Update:        relTypeEnum{value_1dg4tod74ra5n: 20},
-	Resend:        relTypeEnum{value_1dg4tod74ra5n: 21},
-	Next:          relTypeEnum{value_1dg4tod74ra5n: 22},
-	Previous:      relTypeEnum{value_1dg4tod74ra5n: 23},
-	Start:         relTypeEnum{value_1dg4tod74ra5n: 24},
-	NextPage:      relTypeEnum{value_1dg4tod74ra5n: 25},
-	PreviousPage:  relTypeEnum{value_1dg4tod74ra5n: 26},
+	Self:          relTypeEnum{value_1mv39pb6it11r: 1},
+	ParentPayment: relTypeEnum{value_1mv39pb6it11r: 2},
+	Execute:       relTypeEnum{value_1mv39pb6it11r: 3},
+	Refund:        relTypeEnum{value_1mv39pb6it11r: 4},
+	ApprovalUrl:   relTypeEnum{value_1mv39pb6it11r: 5},
+	Suspend:       relTypeEnum{value_1mv39pb6it11r: 6},
+	ReActivate:    relTypeEnum{value_1mv39pb6it11r: 7},
+	Cancel:        relTypeEnum{value_1mv39pb6it11r: 8},
+	Void:          relTypeEnum{value_1mv39pb6it11r: 9},
+	Authorization: relTypeEnum{value_1mv39pb6it11r: 10},
+	Capture:       relTypeEnum{value_1mv39pb6it11r: 11},
+	Reauthorize:   relTypeEnum{value_1mv39pb6it11r: 12},
+	Order:         relTypeEnum{value_1mv39pb6it11r: 13},
+	Item:          relTypeEnum{value_1mv39pb6it11r: 14},
+	Batch:         relTypeEnum{value_1mv39pb6it11r: 15},
+	Delete:        relTypeEnum{value_1mv39pb6it11r: 16},
+	Patch:         relTypeEnum{value_1mv39pb6it11r: 17},
+	First:         relTypeEnum{value_1mv39pb6it11r: 18},
+	Last:          relTypeEnum{value_1mv39pb6it11r: 19},
+	Update:        relTypeEnum{value_1mv39pb6it11r: 20},
+	Resend:        relTypeEnum{value_1mv39pb6it11r: 21},
+	Next:          relTypeEnum{value_1mv39pb6it11r: 22},
+	Previous:      relTypeEnum{value_1mv39pb6it11r: 23},
+	Start:         relTypeEnum{value_1mv39pb6it11r: 24},
+	NextPage:      relTypeEnum{value_1mv39pb6it11r: 25},
+	PreviousPage:  relTypeEnum{value_1mv39pb6it11r: 26},
 }
 
 func init() {
@@ -467,17 +467,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self relTypeEnum) Value() uint8 {
-	return self.value_1dg4tod74ra5n
+	return self.value_1mv39pb6it11r
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self relTypeEnum) IntValue() int {
-	return int(self.value_1dg4tod74ra5n)
+	return int(self.value_1mv39pb6it11r)
 }
 
 // Name returns the name of the variant as a string.
 func (self relTypeEnum) Name() string {
-	switch self.value_1dg4tod74ra5n {
+	switch self.value_1mv39pb6it11r {
 	case 1:
 		return "Self"
 	case 2:
@@ -548,13 +548,13 @@ func (self relTypeEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self relTypeEnum) IsDefault() bool {
-	return self.value_1dg4tod74ra5n == 0
+	return self.value_1mv39pb6it11r == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self relTypeEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self relTypeEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -562,7 +562,7 @@ func (self relTypeEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self relTypeEnum) String() string {
-	switch self.value_1dg4tod74ra5n {
+	switch self.value_1mv39pb6it11r {
 	case 1:
 		return "Self"
 	case 2:
@@ -623,7 +623,7 @@ func (self relTypeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self relTypeEnum) Description() string {
-	switch self.value_1dg4tod74ra5n {
+	switch self.value_1mv39pb6it11r {
 	case 1:
 		return "Self"
 	case 2:
@@ -703,82 +703,82 @@ func (self *relTypeEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "self":
-		self.value_1dg4tod74ra5n = 1
+		self.value_1mv39pb6it11r = 1
 		return nil
 	case "parent_payment":
-		self.value_1dg4tod74ra5n = 2
+		self.value_1mv39pb6it11r = 2
 		return nil
 	case "execute":
-		self.value_1dg4tod74ra5n = 3
+		self.value_1mv39pb6it11r = 3
 		return nil
 	case "refund":
-		self.value_1dg4tod74ra5n = 4
+		self.value_1mv39pb6it11r = 4
 		return nil
 	case "approval_url":
-		self.value_1dg4tod74ra5n = 5
+		self.value_1mv39pb6it11r = 5
 		return nil
 	case "suspend":
-		self.value_1dg4tod74ra5n = 6
+		self.value_1mv39pb6it11r = 6
 		return nil
 	case "re_activate":
-		self.value_1dg4tod74ra5n = 7
+		self.value_1mv39pb6it11r = 7
 		return nil
 	case "cancel":
-		self.value_1dg4tod74ra5n = 8
+		self.value_1mv39pb6it11r = 8
 		return nil
 	case "void":
-		self.value_1dg4tod74ra5n = 9
+		self.value_1mv39pb6it11r = 9
 		return nil
 	case "authorization":
-		self.value_1dg4tod74ra5n = 10
+		self.value_1mv39pb6it11r = 10
 		return nil
 	case "capture":
-		self.value_1dg4tod74ra5n = 11
+		self.value_1mv39pb6it11r = 11
 		return nil
 	case "reauthorize":
-		self.value_1dg4tod74ra5n = 12
+		self.value_1mv39pb6it11r = 12
 		return nil
 	case "order":
-		self.value_1dg4tod74ra5n = 13
+		self.value_1mv39pb6it11r = 13
 		return nil
 	case "item":
-		self.value_1dg4tod74ra5n = 14
+		self.value_1mv39pb6it11r = 14
 		return nil
 	case "batch":
-		self.value_1dg4tod74ra5n = 15
+		self.value_1mv39pb6it11r = 15
 		return nil
 	case "delete":
-		self.value_1dg4tod74ra5n = 16
+		self.value_1mv39pb6it11r = 16
 		return nil
 	case "patch":
-		self.value_1dg4tod74ra5n = 17
+		self.value_1mv39pb6it11r = 17
 		return nil
 	case "first":
-		self.value_1dg4tod74ra5n = 18
+		self.value_1mv39pb6it11r = 18
 		return nil
 	case "last":
-		self.value_1dg4tod74ra5n = 19
+		self.value_1mv39pb6it11r = 19
 		return nil
 	case "update":
-		self.value_1dg4tod74ra5n = 20
+		self.value_1mv39pb6it11r = 20
 		return nil
 	case "resend":
-		self.value_1dg4tod74ra5n = 21
+		self.value_1mv39pb6it11r = 21
 		return nil
 	case "next":
-		self.value_1dg4tod74ra5n = 22
+		self.value_1mv39pb6it11r = 22
 		return nil
 	case "previous":
-		self.value_1dg4tod74ra5n = 23
+		self.value_1mv39pb6it11r = 23
 		return nil
 	case "start":
-		self.value_1dg4tod74ra5n = 24
+		self.value_1mv39pb6it11r = 24
 		return nil
 	case "next_page":
-		self.value_1dg4tod74ra5n = 25
+		self.value_1mv39pb6it11r = 25
 		return nil
 	case "previous_page":
-		self.value_1dg4tod74ra5n = 26
+		self.value_1mv39pb6it11r = 26
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling relTypeEnum\n", s)
@@ -793,7 +793,7 @@ methodEnum
 
 ******************************/
 
-type methodEnum struct{ value_114zwujdkh4np uint8 }
+type methodEnum struct{ value_ngyszrvf2n7r uint8 }
 
 var method = struct {
 	Get      methodEnum
@@ -805,11 +805,11 @@ var method = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [5]methodEnum
 }{
-	Get:      methodEnum{value_114zwujdkh4np: 1},
-	Post:     methodEnum{value_114zwujdkh4np: 2},
-	Redirect: methodEnum{value_114zwujdkh4np: 3},
-	Delete:   methodEnum{value_114zwujdkh4np: 4},
-	Patch:    methodEnum{value_114zwujdkh4np: 5},
+	Get:      methodEnum{value_ngyszrvf2n7r: 1},
+	Post:     methodEnum{value_ngyszrvf2n7r: 2},
+	Redirect: methodEnum{value_ngyszrvf2n7r: 3},
+	Delete:   methodEnum{value_ngyszrvf2n7r: 4},
+	Patch:    methodEnum{value_ngyszrvf2n7r: 5},
 }
 
 func init() {
@@ -820,17 +820,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self methodEnum) Value() uint8 {
-	return self.value_114zwujdkh4np
+	return self.value_ngyszrvf2n7r
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self methodEnum) IntValue() int {
-	return int(self.value_114zwujdkh4np)
+	return int(self.value_ngyszrvf2n7r)
 }
 
 // Name returns the name of the variant as a string.
 func (self methodEnum) Name() string {
-	switch self.value_114zwujdkh4np {
+	switch self.value_ngyszrvf2n7r {
 	case 1:
 		return "Get"
 	case 2:
@@ -859,13 +859,13 @@ func (self methodEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self methodEnum) IsDefault() bool {
-	return self.value_114zwujdkh4np == 0
+	return self.value_ngyszrvf2n7r == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self methodEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self methodEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -873,7 +873,7 @@ func (self methodEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self methodEnum) String() string {
-	switch self.value_114zwujdkh4np {
+	switch self.value_ngyszrvf2n7r {
 	case 1:
 		return "GET"
 	case 2:
@@ -892,7 +892,7 @@ func (self methodEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self methodEnum) Description() string {
-	switch self.value_114zwujdkh4np {
+	switch self.value_ngyszrvf2n7r {
 	case 1:
 		return "GET"
 	case 2:
@@ -930,19 +930,19 @@ func (self *methodEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "get":
-		self.value_114zwujdkh4np = 1
+		self.value_ngyszrvf2n7r = 1
 		return nil
 	case "post":
-		self.value_114zwujdkh4np = 2
+		self.value_ngyszrvf2n7r = 2
 		return nil
 	case "redirect":
-		self.value_114zwujdkh4np = 3
+		self.value_ngyszrvf2n7r = 3
 		return nil
 	case "delete":
-		self.value_114zwujdkh4np = 4
+		self.value_ngyszrvf2n7r = 4
 		return nil
 	case "patch":
-		self.value_114zwujdkh4np = 5
+		self.value_ngyszrvf2n7r = 5
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling methodEnum\n", s)
@@ -957,7 +957,7 @@ payerStatusEnum
 
 ******************************/
 
-type payerStatusEnum struct{ value_1moxgj4tqf32r uint8 }
+type payerStatusEnum struct{ value_1bh0yttk0lrqv uint8 }
 
 var payerStatus = struct {
 	Verified   payerStatusEnum
@@ -966,8 +966,8 @@ var payerStatus = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [2]payerStatusEnum
 }{
-	Verified:   payerStatusEnum{value_1moxgj4tqf32r: 1},
-	Unverified: payerStatusEnum{value_1moxgj4tqf32r: 2},
+	Verified:   payerStatusEnum{value_1bh0yttk0lrqv: 1},
+	Unverified: payerStatusEnum{value_1bh0yttk0lrqv: 2},
 }
 
 func init() {
@@ -978,17 +978,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self payerStatusEnum) Value() uint8 {
-	return self.value_1moxgj4tqf32r
+	return self.value_1bh0yttk0lrqv
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self payerStatusEnum) IntValue() int {
-	return int(self.value_1moxgj4tqf32r)
+	return int(self.value_1bh0yttk0lrqv)
 }
 
 // Name returns the name of the variant as a string.
 func (self payerStatusEnum) Name() string {
-	switch self.value_1moxgj4tqf32r {
+	switch self.value_1bh0yttk0lrqv {
 	case 1:
 		return "Verified"
 	case 2:
@@ -1011,13 +1011,13 @@ func (self payerStatusEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self payerStatusEnum) IsDefault() bool {
-	return self.value_1moxgj4tqf32r == 0
+	return self.value_1bh0yttk0lrqv == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self payerStatusEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self payerStatusEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -1025,7 +1025,7 @@ func (self payerStatusEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self payerStatusEnum) String() string {
-	switch self.value_1moxgj4tqf32r {
+	switch self.value_1bh0yttk0lrqv {
 	case 1:
 		return "VERIFIED"
 	case 2:
@@ -1038,7 +1038,7 @@ func (self payerStatusEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self payerStatusEnum) Description() string {
-	switch self.value_1moxgj4tqf32r {
+	switch self.value_1bh0yttk0lrqv {
 	case 1:
 		return "VERIFIED"
 	case 2:
@@ -1070,10 +1070,10 @@ func (self *payerStatusEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "verified":
-		self.value_1moxgj4tqf32r = 1
+		self.value_1bh0yttk0lrqv = 1
 		return nil
 	case "unverified":
-		self.value_1moxgj4tqf32r = 2
+		self.value_1bh0yttk0lrqv = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling payerStatusEnum\n", s)
@@ -1088,7 +1088,7 @@ intentEnum
 
 ******************************/
 
-type intentEnum struct{ value_1t4nabrcd1npe uint8 }
+type intentEnum struct{ value_c0chn6bgztnh uint8 }
 
 var intent = struct {
 	Sale      intentEnum
@@ -1098,9 +1098,9 @@ var intent = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [3]intentEnum
 }{
-	Sale:      intentEnum{value_1t4nabrcd1npe: 1},
-	Authorize: intentEnum{value_1t4nabrcd1npe: 2},
-	Order:     intentEnum{value_1t4nabrcd1npe: 3},
+	Sale:      intentEnum{value_c0chn6bgztnh: 1},
+	Authorize: intentEnum{value_c0chn6bgztnh: 2},
+	Order:     intentEnum{value_c0chn6bgztnh: 3},
 }
 
 func init() {
@@ -1111,17 +1111,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self intentEnum) Value() uint8 {
-	return self.value_1t4nabrcd1npe
+	return self.value_c0chn6bgztnh
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self intentEnum) IntValue() int {
-	return int(self.value_1t4nabrcd1npe)
+	return int(self.value_c0chn6bgztnh)
 }
 
 // Name returns the name of the variant as a string.
 func (self intentEnum) Name() string {
-	switch self.value_1t4nabrcd1npe {
+	switch self.value_c0chn6bgztnh {
 	case 1:
 		return "Sale"
 	case 2:
@@ -1146,13 +1146,13 @@ func (self intentEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self intentEnum) IsDefault() bool {
-	return self.value_1t4nabrcd1npe == 0
+	return self.value_c0chn6bgztnh == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self intentEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self intentEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -1160,7 +1160,7 @@ func (self intentEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self intentEnum) String() string {
-	switch self.value_1t4nabrcd1npe {
+	switch self.value_c0chn6bgztnh {
 	case 1:
 		return "sale"
 	case 2:
@@ -1175,7 +1175,7 @@ func (self intentEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self intentEnum) Description() string {
-	switch self.value_1t4nabrcd1npe {
+	switch self.value_c0chn6bgztnh {
 	case 1:
 		return "sale"
 	case 2:
@@ -1209,13 +1209,13 @@ func (self *intentEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "sale":
-		self.value_1t4nabrcd1npe = 1
+		self.value_c0chn6bgztnh = 1
 		return nil
 	case "authorize":
-		self.value_1t4nabrcd1npe = 2
+		self.value_c0chn6bgztnh = 2
 		return nil
 	case "order":
-		self.value_1t4nabrcd1npe = 3
+		self.value_c0chn6bgztnh = 3
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling intentEnum\n", s)
@@ -1230,7 +1230,7 @@ FailureReasonEnum
 
 ******************************/
 
-type FailureReasonEnum struct{ value_160paorh30zwj uint8 }
+type FailureReasonEnum struct{ value_3y30yh90e35a uint8 }
 
 var FailureReason = struct {
 	UnableToCompleteTransaction FailureReasonEnum
@@ -1243,12 +1243,12 @@ var FailureReason = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [6]FailureReasonEnum
 }{
-	UnableToCompleteTransaction: FailureReasonEnum{value_160paorh30zwj: 1},
-	InvalidPaymentMethod:        FailureReasonEnum{value_160paorh30zwj: 2},
-	PayerCannotPay:              FailureReasonEnum{value_160paorh30zwj: 3},
-	CannotPayThisPayee:          FailureReasonEnum{value_160paorh30zwj: 4},
-	RedirectRequired:            FailureReasonEnum{value_160paorh30zwj: 5},
-	PayeeFilterRestrictions:     FailureReasonEnum{value_160paorh30zwj: 6},
+	UnableToCompleteTransaction: FailureReasonEnum{value_3y30yh90e35a: 1},
+	InvalidPaymentMethod:        FailureReasonEnum{value_3y30yh90e35a: 2},
+	PayerCannotPay:              FailureReasonEnum{value_3y30yh90e35a: 3},
+	CannotPayThisPayee:          FailureReasonEnum{value_3y30yh90e35a: 4},
+	RedirectRequired:            FailureReasonEnum{value_3y30yh90e35a: 5},
+	PayeeFilterRestrictions:     FailureReasonEnum{value_3y30yh90e35a: 6},
 }
 
 func init() {
@@ -1259,17 +1259,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self FailureReasonEnum) Value() uint8 {
-	return self.value_160paorh30zwj
+	return self.value_3y30yh90e35a
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self FailureReasonEnum) IntValue() int {
-	return int(self.value_160paorh30zwj)
+	return int(self.value_3y30yh90e35a)
 }
 
 // Name returns the name of the variant as a string.
 func (self FailureReasonEnum) Name() string {
-	switch self.value_160paorh30zwj {
+	switch self.value_3y30yh90e35a {
 	case 1:
 		return "UnableToCompleteTransaction"
 	case 2:
@@ -1300,13 +1300,13 @@ func (self FailureReasonEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self FailureReasonEnum) IsDefault() bool {
-	return self.value_160paorh30zwj == 0
+	return self.value_3y30yh90e35a == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self FailureReasonEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self FailureReasonEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -1314,7 +1314,7 @@ func (self FailureReasonEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self FailureReasonEnum) String() string {
-	switch self.value_160paorh30zwj {
+	switch self.value_3y30yh90e35a {
 	case 1:
 		return "UNABLE_TO_COMPLETE_TRANSACTION"
 	case 2:
@@ -1335,7 +1335,7 @@ func (self FailureReasonEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self FailureReasonEnum) Description() string {
-	switch self.value_160paorh30zwj {
+	switch self.value_3y30yh90e35a {
 	case 1:
 		return "UNABLE_TO_COMPLETE_TRANSACTION"
 	case 2:
@@ -1375,22 +1375,22 @@ func (self *FailureReasonEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "unable_to_complete_transaction":
-		self.value_160paorh30zwj = 1
+		self.value_3y30yh90e35a = 1
 		return nil
 	case "invalid_payment_method":
-		self.value_160paorh30zwj = 2
+		self.value_3y30yh90e35a = 2
 		return nil
 	case "payer_cannot_pay":
-		self.value_160paorh30zwj = 3
+		self.value_3y30yh90e35a = 3
 		return nil
 	case "cannot_pay_this_payee":
-		self.value_160paorh30zwj = 4
+		self.value_3y30yh90e35a = 4
 		return nil
 	case "redirect_required":
-		self.value_160paorh30zwj = 5
+		self.value_3y30yh90e35a = 5
 		return nil
 	case "payee_filter_restrictions":
-		self.value_160paorh30zwj = 6
+		self.value_3y30yh90e35a = 6
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling FailureReasonEnum\n", s)
@@ -1405,7 +1405,7 @@ fmfFilterEnum
 
 ******************************/
 
-type fmfFilterEnum struct{ value_18z1penk5km2w uint8 }
+type fmfFilterEnum struct{ value_3l2bkqkqeurj uint8 }
 
 var fmfFilter = struct {
 	Accept  fmfFilterEnum
@@ -1416,10 +1416,10 @@ var fmfFilter = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [4]fmfFilterEnum
 }{
-	Accept:  fmfFilterEnum{value_18z1penk5km2w: 1},
-	Pending: fmfFilterEnum{value_18z1penk5km2w: 2},
-	Deny:    fmfFilterEnum{value_18z1penk5km2w: 3},
-	Report:  fmfFilterEnum{value_18z1penk5km2w: 4},
+	Accept:  fmfFilterEnum{value_3l2bkqkqeurj: 1},
+	Pending: fmfFilterEnum{value_3l2bkqkqeurj: 2},
+	Deny:    fmfFilterEnum{value_3l2bkqkqeurj: 3},
+	Report:  fmfFilterEnum{value_3l2bkqkqeurj: 4},
 }
 
 func init() {
@@ -1430,17 +1430,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self fmfFilterEnum) Value() uint8 {
-	return self.value_18z1penk5km2w
+	return self.value_3l2bkqkqeurj
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self fmfFilterEnum) IntValue() int {
-	return int(self.value_18z1penk5km2w)
+	return int(self.value_3l2bkqkqeurj)
 }
 
 // Name returns the name of the variant as a string.
 func (self fmfFilterEnum) Name() string {
-	switch self.value_18z1penk5km2w {
+	switch self.value_3l2bkqkqeurj {
 	case 1:
 		return "Accept"
 	case 2:
@@ -1467,13 +1467,13 @@ func (self fmfFilterEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self fmfFilterEnum) IsDefault() bool {
-	return self.value_18z1penk5km2w == 0
+	return self.value_3l2bkqkqeurj == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self fmfFilterEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self fmfFilterEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -1481,7 +1481,7 @@ func (self fmfFilterEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self fmfFilterEnum) String() string {
-	switch self.value_18z1penk5km2w {
+	switch self.value_3l2bkqkqeurj {
 	case 1:
 		return "ACCEPT"
 	case 2:
@@ -1498,7 +1498,7 @@ func (self fmfFilterEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self fmfFilterEnum) Description() string {
-	switch self.value_18z1penk5km2w {
+	switch self.value_3l2bkqkqeurj {
 	case 1:
 		return "An ACCEPT filter is triggered only for the TOTAL_PURCHASE_PRICE_MINIMUM filter setting and is returned only in direct credit card payments where payment is accepted."
 	case 2:
@@ -1534,16 +1534,16 @@ func (self *fmfFilterEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "accept":
-		self.value_18z1penk5km2w = 1
+		self.value_3l2bkqkqeurj = 1
 		return nil
 	case "pending":
-		self.value_18z1penk5km2w = 2
+		self.value_3l2bkqkqeurj = 2
 		return nil
 	case "deny":
-		self.value_18z1penk5km2w = 3
+		self.value_3l2bkqkqeurj = 3
 		return nil
 	case "report":
-		self.value_18z1penk5km2w = 4
+		self.value_3l2bkqkqeurj = 4
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling fmfFilterEnum\n", s)
@@ -1558,7 +1558,7 @@ filterIdEnum
 
 ******************************/
 
-type filterIdEnum struct{ value_19y6kcre2u4a4 uint8 }
+type filterIdEnum struct{ value_1rieh6jdsdkt6 uint8 }
 
 var filterId = struct {
 	MaximumTransactionAmount           filterIdEnum
@@ -1582,23 +1582,23 @@ var filterId = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [17]filterIdEnum
 }{
-	MaximumTransactionAmount:           filterIdEnum{value_19y6kcre2u4a4: 1},
-	UnconfirmedAddress:                 filterIdEnum{value_19y6kcre2u4a4: 2},
-	CountryMonitor:                     filterIdEnum{value_19y6kcre2u4a4: 3},
-	AvsNoMatch:                         filterIdEnum{value_19y6kcre2u4a4: 4},
-	AvsPartialMatch:                    filterIdEnum{value_19y6kcre2u4a4: 5},
-	AvsUnavailableOrUnsupported:        filterIdEnum{value_19y6kcre2u4a4: 6},
-	CardSecurityCodeMismatch:           filterIdEnum{value_19y6kcre2u4a4: 7},
-	BillingOrShippingAddressMismatch:   filterIdEnum{value_19y6kcre2u4a4: 8},
-	RiskyZipCode:                       filterIdEnum{value_19y6kcre2u4a4: 9},
-	SuspectedFreightForwarderCheck:     filterIdEnum{value_19y6kcre2u4a4: 10},
-	RiskyEmailAddressDomainCheck:       filterIdEnum{value_19y6kcre2u4a4: 11},
-	RiskyBankIdentificationNumberCheck: filterIdEnum{value_19y6kcre2u4a4: 12},
-	RiskyIpAddressRange:                filterIdEnum{value_19y6kcre2u4a4: 13},
-	LargeOrderNumber:                   filterIdEnum{value_19y6kcre2u4a4: 14},
-	TotalPurchasePriceMinimum:          filterIdEnum{value_19y6kcre2u4a4: 15},
-	IpAddressVelocity:                  filterIdEnum{value_19y6kcre2u4a4: 16},
-	PaypalFraudModel:                   filterIdEnum{value_19y6kcre2u4a4: 17},
+	MaximumTransactionAmount:           filterIdEnum{value_1rieh6jdsdkt6: 1},
+	UnconfirmedAddress:                 filterIdEnum{value_1rieh6jdsdkt6: 2},
+	CountryMonitor:                     filterIdEnum{value_1rieh6jdsdkt6: 3},
+	AvsNoMatch:                         filterIdEnum{value_1rieh6jdsdkt6: 4},
+	AvsPartialMatch:                    filterIdEnum{value_1rieh6jdsdkt6: 5},
+	AvsUnavailableOrUnsupported:        filterIdEnum{value_1rieh6jdsdkt6: 6},
+	CardSecurityCodeMismatch:           filterIdEnum{value_1rieh6jdsdkt6: 7},
+	BillingOrShippingAddressMismatch:   filterIdEnum{value_1rieh6jdsdkt6: 8},
+	RiskyZipCode:                       filterIdEnum{value_1rieh6jdsdkt6: 9},
+	SuspectedFreightForwarderCheck:     filterIdEnum{value_1rieh6jdsdkt6: 10},
+	RiskyEmailAddressDomainCheck:       filterIdEnum{value_1rieh6jdsdkt6: 11},
+	RiskyBankIdentificationNumberCheck: filterIdEnum{value_1rieh6jdsdkt6: 12},
+	RiskyIpAddressRange:                filterIdEnum{value_1rieh6jdsdkt6: 13},
+	LargeOrderNumber:                   filterIdEnum{value_1rieh6jdsdkt6: 14},
+	TotalPurchasePriceMinimum:          filterIdEnum{value_1rieh6jdsdkt6: 15},
+	IpAddressVelocity:                  filterIdEnum{value_1rieh6jdsdkt6: 16},
+	PaypalFraudModel:                   filterIdEnum{value_1rieh6jdsdkt6: 17},
 }
 
 func init() {
@@ -1609,17 +1609,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self filterIdEnum) Value() uint8 {
-	return self.value_19y6kcre2u4a4
+	return self.value_1rieh6jdsdkt6
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self filterIdEnum) IntValue() int {
-	return int(self.value_19y6kcre2u4a4)
+	return int(self.value_1rieh6jdsdkt6)
 }
 
 // Name returns the name of the variant as a string.
 func (self filterIdEnum) Name() string {
-	switch self.value_19y6kcre2u4a4 {
+	switch self.value_1rieh6jdsdkt6 {
 	case 1:
 		return "MaximumTransactionAmount"
 	case 2:
@@ -1672,13 +1672,13 @@ func (self filterIdEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self filterIdEnum) IsDefault() bool {
-	return self.value_19y6kcre2u4a4 == 0
+	return self.value_1rieh6jdsdkt6 == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self filterIdEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self filterIdEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -1686,7 +1686,7 @@ func (self filterIdEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self filterIdEnum) String() string {
-	switch self.value_19y6kcre2u4a4 {
+	switch self.value_1rieh6jdsdkt6 {
 	case 1:
 		return "MAXIMUM_TRANSACTION_AMOUNT"
 	case 2:
@@ -1729,7 +1729,7 @@ func (self filterIdEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self filterIdEnum) Description() string {
-	switch self.value_19y6kcre2u4a4 {
+	switch self.value_1rieh6jdsdkt6 {
 	case 1:
 		return "basic filter"
 	case 2:
@@ -1770,13 +1770,13 @@ func (self filterIdEnum) Description() string {
 
 // JSONEncode implements part of Golific's JSONEncodable interface.
 func (self filterIdEnum) JSONEncode(encoder *gJson.Encoder) bool {
-	encoder.EncodeInt(int64(self.value_19y6kcre2u4a4), false)
+	encoder.EncodeInt(int64(self.value_1rieh6jdsdkt6), false)
 	return true
 }
 
 // JSON marshaling methods
 func (self filterIdEnum) MarshalJSON() ([]byte, error) {
-	return []byte(strconv.Itoa(int(self.value_19y6kcre2u4a4))), nil
+	return []byte(strconv.Itoa(int(self.value_1rieh6jdsdkt6))), nil
 }
 
 func (self *filterIdEnum) UnmarshalJSON(b []byte) error {
@@ -1784,7 +1784,7 @@ func (self *filterIdEnum) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	self.value_19y6kcre2u4a4 = uint8(n)
+	self.value_1rieh6jdsdkt6 = uint8(n)
 	return nil
 }
 
@@ -1794,7 +1794,7 @@ normStatusEnum
 
 ******************************/
 
-type normStatusEnum struct{ value_1is4evjlwhptq uint8 }
+type normStatusEnum struct{ value_7ramyeyx7pft uint8 }
 
 var normStatus = struct {
 	Unknown                   normStatusEnum
@@ -1805,10 +1805,10 @@ var normStatus = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [4]normStatusEnum
 }{
-	Unknown:                   normStatusEnum{value_1is4evjlwhptq: 1},
-	UnnormalizedUserPreferred: normStatusEnum{value_1is4evjlwhptq: 2},
-	Normalized:                normStatusEnum{value_1is4evjlwhptq: 3},
-	Unnormalized:              normStatusEnum{value_1is4evjlwhptq: 4},
+	Unknown:                   normStatusEnum{value_7ramyeyx7pft: 1},
+	UnnormalizedUserPreferred: normStatusEnum{value_7ramyeyx7pft: 2},
+	Normalized:                normStatusEnum{value_7ramyeyx7pft: 3},
+	Unnormalized:              normStatusEnum{value_7ramyeyx7pft: 4},
 }
 
 func init() {
@@ -1819,17 +1819,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self normStatusEnum) Value() uint8 {
-	return self.value_1is4evjlwhptq
+	return self.value_7ramyeyx7pft
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self normStatusEnum) IntValue() int {
-	return int(self.value_1is4evjlwhptq)
+	return int(self.value_7ramyeyx7pft)
 }
 
 // Name returns the name of the variant as a string.
 func (self normStatusEnum) Name() string {
-	switch self.value_1is4evjlwhptq {
+	switch self.value_7ramyeyx7pft {
 	case 1:
 		return "Unknown"
 	case 2:
@@ -1856,13 +1856,13 @@ func (self normStatusEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self normStatusEnum) IsDefault() bool {
-	return self.value_1is4evjlwhptq == 0
+	return self.value_7ramyeyx7pft == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self normStatusEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self normStatusEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -1870,7 +1870,7 @@ func (self normStatusEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self normStatusEnum) String() string {
-	switch self.value_1is4evjlwhptq {
+	switch self.value_7ramyeyx7pft {
 	case 1:
 		return "UNKNOWN"
 	case 2:
@@ -1887,7 +1887,7 @@ func (self normStatusEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self normStatusEnum) Description() string {
-	switch self.value_1is4evjlwhptq {
+	switch self.value_7ramyeyx7pft {
 	case 1:
 		return "UNKNOWN"
 	case 2:
@@ -1923,16 +1923,16 @@ func (self *normStatusEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "unknown":
-		self.value_1is4evjlwhptq = 1
+		self.value_7ramyeyx7pft = 1
 		return nil
 	case "unnormalized_user_preferred":
-		self.value_1is4evjlwhptq = 2
+		self.value_7ramyeyx7pft = 2
 		return nil
 	case "normalized":
-		self.value_1is4evjlwhptq = 3
+		self.value_7ramyeyx7pft = 3
 		return nil
 	case "unnormalized":
-		self.value_1is4evjlwhptq = 4
+		self.value_7ramyeyx7pft = 4
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling normStatusEnum\n", s)
@@ -1947,7 +1947,7 @@ addressStatusEnum
 
 ******************************/
 
-type addressStatusEnum struct{ value_10oj63wqlrvoh uint8 }
+type addressStatusEnum struct{ value_4q5tq9xtmxuj uint8 }
 
 var addressStatus = struct {
 	Confirmed   addressStatusEnum
@@ -1956,8 +1956,8 @@ var addressStatus = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [2]addressStatusEnum
 }{
-	Confirmed:   addressStatusEnum{value_10oj63wqlrvoh: 1},
-	Unconfirmed: addressStatusEnum{value_10oj63wqlrvoh: 2},
+	Confirmed:   addressStatusEnum{value_4q5tq9xtmxuj: 1},
+	Unconfirmed: addressStatusEnum{value_4q5tq9xtmxuj: 2},
 }
 
 func init() {
@@ -1968,17 +1968,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self addressStatusEnum) Value() uint8 {
-	return self.value_10oj63wqlrvoh
+	return self.value_4q5tq9xtmxuj
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self addressStatusEnum) IntValue() int {
-	return int(self.value_10oj63wqlrvoh)
+	return int(self.value_4q5tq9xtmxuj)
 }
 
 // Name returns the name of the variant as a string.
 func (self addressStatusEnum) Name() string {
-	switch self.value_10oj63wqlrvoh {
+	switch self.value_4q5tq9xtmxuj {
 	case 1:
 		return "Confirmed"
 	case 2:
@@ -2001,13 +2001,13 @@ func (self addressStatusEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self addressStatusEnum) IsDefault() bool {
-	return self.value_10oj63wqlrvoh == 0
+	return self.value_4q5tq9xtmxuj == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self addressStatusEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self addressStatusEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -2015,7 +2015,7 @@ func (self addressStatusEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self addressStatusEnum) String() string {
-	switch self.value_10oj63wqlrvoh {
+	switch self.value_4q5tq9xtmxuj {
 	case 1:
 		return "CONFIRMED"
 	case 2:
@@ -2028,7 +2028,7 @@ func (self addressStatusEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self addressStatusEnum) Description() string {
-	switch self.value_10oj63wqlrvoh {
+	switch self.value_4q5tq9xtmxuj {
 	case 1:
 		return "CONFIRMED"
 	case 2:
@@ -2060,10 +2060,10 @@ func (self *addressStatusEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "confirmed":
-		self.value_10oj63wqlrvoh = 1
+		self.value_4q5tq9xtmxuj = 1
 		return nil
 	case "unconfirmed":
-		self.value_10oj63wqlrvoh = 2
+		self.value_4q5tq9xtmxuj = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling addressStatusEnum\n", s)
@@ -2078,7 +2078,7 @@ AddressTypeEnum
 
 ******************************/
 
-type AddressTypeEnum struct{ value_1txa6yuj3d72p uint8 }
+type AddressTypeEnum struct{ value_bvyka53d4nck uint8 }
 
 var AddressType = struct {
 	Residential AddressTypeEnum
@@ -2088,9 +2088,9 @@ var AddressType = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [3]AddressTypeEnum
 }{
-	Residential: AddressTypeEnum{value_1txa6yuj3d72p: 1},
-	Business:    AddressTypeEnum{value_1txa6yuj3d72p: 2},
-	Mailbox:     AddressTypeEnum{value_1txa6yuj3d72p: 3},
+	Residential: AddressTypeEnum{value_bvyka53d4nck: 1},
+	Business:    AddressTypeEnum{value_bvyka53d4nck: 2},
+	Mailbox:     AddressTypeEnum{value_bvyka53d4nck: 3},
 }
 
 func init() {
@@ -2101,17 +2101,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self AddressTypeEnum) Value() uint8 {
-	return self.value_1txa6yuj3d72p
+	return self.value_bvyka53d4nck
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self AddressTypeEnum) IntValue() int {
-	return int(self.value_1txa6yuj3d72p)
+	return int(self.value_bvyka53d4nck)
 }
 
 // Name returns the name of the variant as a string.
 func (self AddressTypeEnum) Name() string {
-	switch self.value_1txa6yuj3d72p {
+	switch self.value_bvyka53d4nck {
 	case 1:
 		return "Residential"
 	case 2:
@@ -2136,13 +2136,13 @@ func (self AddressTypeEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self AddressTypeEnum) IsDefault() bool {
-	return self.value_1txa6yuj3d72p == 0
+	return self.value_bvyka53d4nck == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self AddressTypeEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self AddressTypeEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -2150,7 +2150,7 @@ func (self AddressTypeEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self AddressTypeEnum) String() string {
-	switch self.value_1txa6yuj3d72p {
+	switch self.value_bvyka53d4nck {
 	case 1:
 		return "residential"
 	case 2:
@@ -2165,7 +2165,7 @@ func (self AddressTypeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self AddressTypeEnum) Description() string {
-	switch self.value_1txa6yuj3d72p {
+	switch self.value_bvyka53d4nck {
 	case 1:
 		return "residential"
 	case 2:
@@ -2199,13 +2199,13 @@ func (self *AddressTypeEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "residential":
-		self.value_1txa6yuj3d72p = 1
+		self.value_bvyka53d4nck = 1
 		return nil
 	case "business":
-		self.value_1txa6yuj3d72p = 2
+		self.value_bvyka53d4nck = 2
 		return nil
 	case "mailbox":
-		self.value_1txa6yuj3d72p = 3
+		self.value_bvyka53d4nck = 3
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling AddressTypeEnum\n", s)
@@ -2220,7 +2220,7 @@ PaymentMethodEnum
 
 ******************************/
 
-type PaymentMethodEnum struct{ value_6b6v5yqho0bd uint8 }
+type PaymentMethodEnum struct{ value_oqzaz3xll6qi uint8 }
 
 var PaymentMethod = struct {
 	CreditCard PaymentMethodEnum
@@ -2229,8 +2229,8 @@ var PaymentMethod = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [2]PaymentMethodEnum
 }{
-	CreditCard: PaymentMethodEnum{value_6b6v5yqho0bd: 1},
-	PayPal:     PaymentMethodEnum{value_6b6v5yqho0bd: 2},
+	CreditCard: PaymentMethodEnum{value_oqzaz3xll6qi: 1},
+	PayPal:     PaymentMethodEnum{value_oqzaz3xll6qi: 2},
 }
 
 func init() {
@@ -2241,17 +2241,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self PaymentMethodEnum) Value() uint8 {
-	return self.value_6b6v5yqho0bd
+	return self.value_oqzaz3xll6qi
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self PaymentMethodEnum) IntValue() int {
-	return int(self.value_6b6v5yqho0bd)
+	return int(self.value_oqzaz3xll6qi)
 }
 
 // Name returns the name of the variant as a string.
 func (self PaymentMethodEnum) Name() string {
-	switch self.value_6b6v5yqho0bd {
+	switch self.value_oqzaz3xll6qi {
 	case 1:
 		return "CreditCard"
 	case 2:
@@ -2274,13 +2274,13 @@ func (self PaymentMethodEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self PaymentMethodEnum) IsDefault() bool {
-	return self.value_6b6v5yqho0bd == 0
+	return self.value_oqzaz3xll6qi == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self PaymentMethodEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self PaymentMethodEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -2288,7 +2288,7 @@ func (self PaymentMethodEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self PaymentMethodEnum) String() string {
-	switch self.value_6b6v5yqho0bd {
+	switch self.value_oqzaz3xll6qi {
 	case 1:
 		return "credit_card"
 	case 2:
@@ -2301,7 +2301,7 @@ func (self PaymentMethodEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self PaymentMethodEnum) Description() string {
-	switch self.value_6b6v5yqho0bd {
+	switch self.value_oqzaz3xll6qi {
 	case 1:
 		return "credit_card"
 	case 2:
@@ -2333,10 +2333,10 @@ func (self *PaymentMethodEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "credit_card":
-		self.value_6b6v5yqho0bd = 1
+		self.value_oqzaz3xll6qi = 1
 		return nil
 	case "paypal":
-		self.value_6b6v5yqho0bd = 2
+		self.value_oqzaz3xll6qi = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling PaymentMethodEnum\n", s)
@@ -2351,7 +2351,7 @@ TaxIdTypeEnum
 
 ******************************/
 
-type TaxIdTypeEnum struct{ value_1x7qza5vp82e6 uint8 }
+type TaxIdTypeEnum struct{ value_jk7a66wj5h0v uint8 }
 
 var TaxIdType = struct {
 	BrCpf  TaxIdTypeEnum
@@ -2360,8 +2360,8 @@ var TaxIdType = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [2]TaxIdTypeEnum
 }{
-	BrCpf:  TaxIdTypeEnum{value_1x7qza5vp82e6: 1},
-	BrCnpj: TaxIdTypeEnum{value_1x7qza5vp82e6: 2},
+	BrCpf:  TaxIdTypeEnum{value_jk7a66wj5h0v: 1},
+	BrCnpj: TaxIdTypeEnum{value_jk7a66wj5h0v: 2},
 }
 
 func init() {
@@ -2372,17 +2372,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self TaxIdTypeEnum) Value() uint8 {
-	return self.value_1x7qza5vp82e6
+	return self.value_jk7a66wj5h0v
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self TaxIdTypeEnum) IntValue() int {
-	return int(self.value_1x7qza5vp82e6)
+	return int(self.value_jk7a66wj5h0v)
 }
 
 // Name returns the name of the variant as a string.
 func (self TaxIdTypeEnum) Name() string {
-	switch self.value_1x7qza5vp82e6 {
+	switch self.value_jk7a66wj5h0v {
 	case 1:
 		return "BrCpf"
 	case 2:
@@ -2405,13 +2405,13 @@ func (self TaxIdTypeEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self TaxIdTypeEnum) IsDefault() bool {
-	return self.value_1x7qza5vp82e6 == 0
+	return self.value_jk7a66wj5h0v == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self TaxIdTypeEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self TaxIdTypeEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -2419,7 +2419,7 @@ func (self TaxIdTypeEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self TaxIdTypeEnum) String() string {
-	switch self.value_1x7qza5vp82e6 {
+	switch self.value_jk7a66wj5h0v {
 	case 1:
 		return "BR_CPF"
 	case 2:
@@ -2432,7 +2432,7 @@ func (self TaxIdTypeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self TaxIdTypeEnum) Description() string {
-	switch self.value_1x7qza5vp82e6 {
+	switch self.value_jk7a66wj5h0v {
 	case 1:
 		return "BR_CPF"
 	case 2:
@@ -2464,10 +2464,10 @@ func (self *TaxIdTypeEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "br_cpf":
-		self.value_1x7qza5vp82e6 = 1
+		self.value_jk7a66wj5h0v = 1
 		return nil
 	case "br_cnpj":
-		self.value_1x7qza5vp82e6 = 2
+		self.value_jk7a66wj5h0v = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling TaxIdTypeEnum\n", s)
@@ -2482,7 +2482,7 @@ CreditCardTypeEnum
 
 ******************************/
 
-type CreditCardTypeEnum struct{ value_qzobpk7n20q uint8 }
+type CreditCardTypeEnum struct{ value_7hx7hgwjniz6 uint8 }
 
 var CreditCardType = struct {
 	Visa       CreditCardTypeEnum
@@ -2493,10 +2493,10 @@ var CreditCardType = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [4]CreditCardTypeEnum
 }{
-	Visa:       CreditCardTypeEnum{value_qzobpk7n20q: 1},
-	MasterCard: CreditCardTypeEnum{value_qzobpk7n20q: 2},
-	Discover:   CreditCardTypeEnum{value_qzobpk7n20q: 3},
-	Amex:       CreditCardTypeEnum{value_qzobpk7n20q: 4},
+	Visa:       CreditCardTypeEnum{value_7hx7hgwjniz6: 1},
+	MasterCard: CreditCardTypeEnum{value_7hx7hgwjniz6: 2},
+	Discover:   CreditCardTypeEnum{value_7hx7hgwjniz6: 3},
+	Amex:       CreditCardTypeEnum{value_7hx7hgwjniz6: 4},
 }
 
 func init() {
@@ -2507,17 +2507,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self CreditCardTypeEnum) Value() uint8 {
-	return self.value_qzobpk7n20q
+	return self.value_7hx7hgwjniz6
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self CreditCardTypeEnum) IntValue() int {
-	return int(self.value_qzobpk7n20q)
+	return int(self.value_7hx7hgwjniz6)
 }
 
 // Name returns the name of the variant as a string.
 func (self CreditCardTypeEnum) Name() string {
-	switch self.value_qzobpk7n20q {
+	switch self.value_7hx7hgwjniz6 {
 	case 1:
 		return "Visa"
 	case 2:
@@ -2544,13 +2544,13 @@ func (self CreditCardTypeEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self CreditCardTypeEnum) IsDefault() bool {
-	return self.value_qzobpk7n20q == 0
+	return self.value_7hx7hgwjniz6 == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self CreditCardTypeEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self CreditCardTypeEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -2558,7 +2558,7 @@ func (self CreditCardTypeEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self CreditCardTypeEnum) String() string {
-	switch self.value_qzobpk7n20q {
+	switch self.value_7hx7hgwjniz6 {
 	case 1:
 		return "visa"
 	case 2:
@@ -2575,7 +2575,7 @@ func (self CreditCardTypeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self CreditCardTypeEnum) Description() string {
-	switch self.value_qzobpk7n20q {
+	switch self.value_7hx7hgwjniz6 {
 	case 1:
 		return "visa"
 	case 2:
@@ -2611,16 +2611,16 @@ func (self *CreditCardTypeEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "visa":
-		self.value_qzobpk7n20q = 1
+		self.value_7hx7hgwjniz6 = 1
 		return nil
 	case "mastercard":
-		self.value_qzobpk7n20q = 2
+		self.value_7hx7hgwjniz6 = 2
 		return nil
 	case "discover":
-		self.value_qzobpk7n20q = 3
+		self.value_7hx7hgwjniz6 = 3
 		return nil
 	case "amex":
-		self.value_qzobpk7n20q = 4
+		self.value_7hx7hgwjniz6 = 4
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling CreditCardTypeEnum\n", s)
@@ -2635,7 +2635,7 @@ StateEnum
 
 ******************************/
 
-type StateEnum struct{ value_4aohdlu5frm5 uint8 }
+type StateEnum struct{ value_ulxhrexhn5ss uint8 }
 
 var State = struct {
 	Created           StateEnum
@@ -2657,21 +2657,21 @@ var State = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [15]StateEnum
 }{
-	Created:           StateEnum{value_4aohdlu5frm5: 1},
-	Approved:          StateEnum{value_4aohdlu5frm5: 2},
-	Canceled:          StateEnum{value_4aohdlu5frm5: 3},
-	InProgress:        StateEnum{value_4aohdlu5frm5: 4},
-	Failed:            StateEnum{value_4aohdlu5frm5: 5},
-	Pending:           StateEnum{value_4aohdlu5frm5: 6},
-	Completed:         StateEnum{value_4aohdlu5frm5: 7},
-	Refunded:          StateEnum{value_4aohdlu5frm5: 8},
-	PartiallyRefunded: StateEnum{value_4aohdlu5frm5: 9},
-	Expired:           StateEnum{value_4aohdlu5frm5: 10},
-	Ok:                StateEnum{value_4aohdlu5frm5: 11},
-	Authorized:        StateEnum{value_4aohdlu5frm5: 12},
-	Captured:          StateEnum{value_4aohdlu5frm5: 13},
-	PartiallyCaptured: StateEnum{value_4aohdlu5frm5: 14},
-	Voided:            StateEnum{value_4aohdlu5frm5: 15},
+	Created:           StateEnum{value_ulxhrexhn5ss: 1},
+	Approved:          StateEnum{value_ulxhrexhn5ss: 2},
+	Canceled:          StateEnum{value_ulxhrexhn5ss: 3},
+	InProgress:        StateEnum{value_ulxhrexhn5ss: 4},
+	Failed:            StateEnum{value_ulxhrexhn5ss: 5},
+	Pending:           StateEnum{value_ulxhrexhn5ss: 6},
+	Completed:         StateEnum{value_ulxhrexhn5ss: 7},
+	Refunded:          StateEnum{value_ulxhrexhn5ss: 8},
+	PartiallyRefunded: StateEnum{value_ulxhrexhn5ss: 9},
+	Expired:           StateEnum{value_ulxhrexhn5ss: 10},
+	Ok:                StateEnum{value_ulxhrexhn5ss: 11},
+	Authorized:        StateEnum{value_ulxhrexhn5ss: 12},
+	Captured:          StateEnum{value_ulxhrexhn5ss: 13},
+	PartiallyCaptured: StateEnum{value_ulxhrexhn5ss: 14},
+	Voided:            StateEnum{value_ulxhrexhn5ss: 15},
 }
 
 func init() {
@@ -2682,17 +2682,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self StateEnum) Value() uint8 {
-	return self.value_4aohdlu5frm5
+	return self.value_ulxhrexhn5ss
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self StateEnum) IntValue() int {
-	return int(self.value_4aohdlu5frm5)
+	return int(self.value_ulxhrexhn5ss)
 }
 
 // Name returns the name of the variant as a string.
 func (self StateEnum) Name() string {
-	switch self.value_4aohdlu5frm5 {
+	switch self.value_ulxhrexhn5ss {
 	case 1:
 		return "Created"
 	case 2:
@@ -2741,13 +2741,13 @@ func (self StateEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self StateEnum) IsDefault() bool {
-	return self.value_4aohdlu5frm5 == 0
+	return self.value_ulxhrexhn5ss == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self StateEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self StateEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -2755,7 +2755,7 @@ func (self StateEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self StateEnum) String() string {
-	switch self.value_4aohdlu5frm5 {
+	switch self.value_ulxhrexhn5ss {
 	case 1:
 		return "created"
 	case 2:
@@ -2794,7 +2794,7 @@ func (self StateEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self StateEnum) Description() string {
-	switch self.value_4aohdlu5frm5 {
+	switch self.value_ulxhrexhn5ss {
 	case 1:
 		return "created"
 	case 2:
@@ -2852,49 +2852,49 @@ func (self *StateEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "created":
-		self.value_4aohdlu5frm5 = 1
+		self.value_ulxhrexhn5ss = 1
 		return nil
 	case "approved":
-		self.value_4aohdlu5frm5 = 2
+		self.value_ulxhrexhn5ss = 2
 		return nil
 	case "canceled":
-		self.value_4aohdlu5frm5 = 3
+		self.value_ulxhrexhn5ss = 3
 		return nil
 	case "in_progress":
-		self.value_4aohdlu5frm5 = 4
+		self.value_ulxhrexhn5ss = 4
 		return nil
 	case "failed":
-		self.value_4aohdlu5frm5 = 5
+		self.value_ulxhrexhn5ss = 5
 		return nil
 	case "pending":
-		self.value_4aohdlu5frm5 = 6
+		self.value_ulxhrexhn5ss = 6
 		return nil
 	case "completed":
-		self.value_4aohdlu5frm5 = 7
+		self.value_ulxhrexhn5ss = 7
 		return nil
 	case "refunded":
-		self.value_4aohdlu5frm5 = 8
+		self.value_ulxhrexhn5ss = 8
 		return nil
 	case "partially_refunded":
-		self.value_4aohdlu5frm5 = 9
+		self.value_ulxhrexhn5ss = 9
 		return nil
 	case "expired":
-		self.value_4aohdlu5frm5 = 10
+		self.value_ulxhrexhn5ss = 10
 		return nil
 	case "ok":
-		self.value_4aohdlu5frm5 = 11
+		self.value_ulxhrexhn5ss = 11
 		return nil
 	case "authorized":
-		self.value_4aohdlu5frm5 = 12
+		self.value_ulxhrexhn5ss = 12
 		return nil
 	case "captured":
-		self.value_4aohdlu5frm5 = 13
+		self.value_ulxhrexhn5ss = 13
 		return nil
 	case "partially_captured":
-		self.value_4aohdlu5frm5 = 14
+		self.value_ulxhrexhn5ss = 14
 		return nil
 	case "voided":
-		self.value_4aohdlu5frm5 = 15
+		self.value_ulxhrexhn5ss = 15
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling StateEnum\n", s)
@@ -2909,7 +2909,7 @@ reasonCodeEnum
 
 ******************************/
 
-type reasonCodeEnum struct{ value_145qk4pxh7l63 uint8 }
+type reasonCodeEnum struct{ value_1lktzexl72pk4 uint8 }
 
 var reasonCode = struct {
 	Chargeback                              reasonCodeEnum
@@ -2928,18 +2928,18 @@ var reasonCode = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [12]reasonCodeEnum
 }{
-	Chargeback:                              reasonCodeEnum{value_145qk4pxh7l63: 1},
-	Guarantee:                               reasonCodeEnum{value_145qk4pxh7l63: 2},
-	BuyerComplaint:                          reasonCodeEnum{value_145qk4pxh7l63: 3},
-	RefundCode:                              reasonCodeEnum{value_145qk4pxh7l63: 4},
-	UnconfirmedShippingAddress:              reasonCodeEnum{value_145qk4pxh7l63: 5},
-	EcheckCode:                              reasonCodeEnum{value_145qk4pxh7l63: 6},
-	InternationalWithdrawal:                 reasonCodeEnum{value_145qk4pxh7l63: 7},
-	ReceivingPreferenceMandatesManualAction: reasonCodeEnum{value_145qk4pxh7l63: 8},
-	PaymentReview:                           reasonCodeEnum{value_145qk4pxh7l63: 9},
-	RegulatoryReview:                        reasonCodeEnum{value_145qk4pxh7l63: 10},
-	Unilateral:                              reasonCodeEnum{value_145qk4pxh7l63: 11},
-	VerificationRequired:                    reasonCodeEnum{value_145qk4pxh7l63: 12},
+	Chargeback:                              reasonCodeEnum{value_1lktzexl72pk4: 1},
+	Guarantee:                               reasonCodeEnum{value_1lktzexl72pk4: 2},
+	BuyerComplaint:                          reasonCodeEnum{value_1lktzexl72pk4: 3},
+	RefundCode:                              reasonCodeEnum{value_1lktzexl72pk4: 4},
+	UnconfirmedShippingAddress:              reasonCodeEnum{value_1lktzexl72pk4: 5},
+	EcheckCode:                              reasonCodeEnum{value_1lktzexl72pk4: 6},
+	InternationalWithdrawal:                 reasonCodeEnum{value_1lktzexl72pk4: 7},
+	ReceivingPreferenceMandatesManualAction: reasonCodeEnum{value_1lktzexl72pk4: 8},
+	PaymentReview:                           reasonCodeEnum{value_1lktzexl72pk4: 9},
+	RegulatoryReview:                        reasonCodeEnum{value_1lktzexl72pk4: 10},
+	Unilateral:                              reasonCodeEnum{value_1lktzexl72pk4: 11},
+	VerificationRequired:                    reasonCodeEnum{value_1lktzexl72pk4: 12},
 }
 
 func init() {
@@ -2950,17 +2950,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self reasonCodeEnum) Value() uint8 {
-	return self.value_145qk4pxh7l63
+	return self.value_1lktzexl72pk4
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self reasonCodeEnum) IntValue() int {
-	return int(self.value_145qk4pxh7l63)
+	return int(self.value_1lktzexl72pk4)
 }
 
 // Name returns the name of the variant as a string.
 func (self reasonCodeEnum) Name() string {
-	switch self.value_145qk4pxh7l63 {
+	switch self.value_1lktzexl72pk4 {
 	case 1:
 		return "Chargeback"
 	case 2:
@@ -3003,13 +3003,13 @@ func (self reasonCodeEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self reasonCodeEnum) IsDefault() bool {
-	return self.value_145qk4pxh7l63 == 0
+	return self.value_1lktzexl72pk4 == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self reasonCodeEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self reasonCodeEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -3017,7 +3017,7 @@ func (self reasonCodeEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self reasonCodeEnum) String() string {
-	switch self.value_145qk4pxh7l63 {
+	switch self.value_1lktzexl72pk4 {
 	case 1:
 		return "CHARGEBACK"
 	case 2:
@@ -3050,7 +3050,7 @@ func (self reasonCodeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self reasonCodeEnum) Description() string {
-	switch self.value_145qk4pxh7l63 {
+	switch self.value_1lktzexl72pk4 {
 	case 1:
 		return "CHARGEBACK"
 	case 2:
@@ -3102,40 +3102,40 @@ func (self *reasonCodeEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "chargeback":
-		self.value_145qk4pxh7l63 = 1
+		self.value_1lktzexl72pk4 = 1
 		return nil
 	case "guarantee":
-		self.value_145qk4pxh7l63 = 2
+		self.value_1lktzexl72pk4 = 2
 		return nil
 	case "buyer_complaint":
-		self.value_145qk4pxh7l63 = 3
+		self.value_1lktzexl72pk4 = 3
 		return nil
 	case "refund":
-		self.value_145qk4pxh7l63 = 4
+		self.value_1lktzexl72pk4 = 4
 		return nil
 	case "unconfirmed_shipping_address":
-		self.value_145qk4pxh7l63 = 5
+		self.value_1lktzexl72pk4 = 5
 		return nil
 	case "echeck":
-		self.value_145qk4pxh7l63 = 6
+		self.value_1lktzexl72pk4 = 6
 		return nil
 	case "international_withdrawal":
-		self.value_145qk4pxh7l63 = 7
+		self.value_1lktzexl72pk4 = 7
 		return nil
 	case "receiving_preference_mandates_manual_action":
-		self.value_145qk4pxh7l63 = 8
+		self.value_1lktzexl72pk4 = 8
 		return nil
 	case "payment_review":
-		self.value_145qk4pxh7l63 = 9
+		self.value_1lktzexl72pk4 = 9
 		return nil
 	case "regulatory_review":
-		self.value_145qk4pxh7l63 = 10
+		self.value_1lktzexl72pk4 = 10
 		return nil
 	case "unilateral":
-		self.value_145qk4pxh7l63 = 11
+		self.value_1lktzexl72pk4 = 11
 		return nil
 	case "verification_required":
-		self.value_145qk4pxh7l63 = 12
+		self.value_1lktzexl72pk4 = 12
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling reasonCodeEnum\n", s)
@@ -3150,7 +3150,7 @@ protectionEligEnum
 
 ******************************/
 
-type protectionEligEnum struct{ value_1aafeo7773p5x uint8 }
+type protectionEligEnum struct{ value_13b4a0ga7ep4v uint8 }
 
 var protectionElig = struct {
 	Eligible          protectionEligEnum
@@ -3160,9 +3160,9 @@ var protectionElig = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [3]protectionEligEnum
 }{
-	Eligible:          protectionEligEnum{value_1aafeo7773p5x: 1},
-	PartiallyEligible: protectionEligEnum{value_1aafeo7773p5x: 2},
-	Ineligibile:       protectionEligEnum{value_1aafeo7773p5x: 3},
+	Eligible:          protectionEligEnum{value_13b4a0ga7ep4v: 1},
+	PartiallyEligible: protectionEligEnum{value_13b4a0ga7ep4v: 2},
+	Ineligibile:       protectionEligEnum{value_13b4a0ga7ep4v: 3},
 }
 
 func init() {
@@ -3173,17 +3173,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self protectionEligEnum) Value() uint8 {
-	return self.value_1aafeo7773p5x
+	return self.value_13b4a0ga7ep4v
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self protectionEligEnum) IntValue() int {
-	return int(self.value_1aafeo7773p5x)
+	return int(self.value_13b4a0ga7ep4v)
 }
 
 // Name returns the name of the variant as a string.
 func (self protectionEligEnum) Name() string {
-	switch self.value_1aafeo7773p5x {
+	switch self.value_13b4a0ga7ep4v {
 	case 1:
 		return "Eligible"
 	case 2:
@@ -3208,13 +3208,13 @@ func (self protectionEligEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self protectionEligEnum) IsDefault() bool {
-	return self.value_1aafeo7773p5x == 0
+	return self.value_13b4a0ga7ep4v == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self protectionEligEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self protectionEligEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -3222,7 +3222,7 @@ func (self protectionEligEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self protectionEligEnum) String() string {
-	switch self.value_1aafeo7773p5x {
+	switch self.value_13b4a0ga7ep4v {
 	case 1:
 		return "ELIGIBLE"
 	case 2:
@@ -3237,7 +3237,7 @@ func (self protectionEligEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self protectionEligEnum) Description() string {
-	switch self.value_1aafeo7773p5x {
+	switch self.value_13b4a0ga7ep4v {
 	case 1:
 		return "Merchant is protected by PayPal's Seller Protection Policy for Unauthorized. Payments and Item Not Received."
 	case 2:
@@ -3271,13 +3271,13 @@ func (self *protectionEligEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "eligible":
-		self.value_1aafeo7773p5x = 1
+		self.value_13b4a0ga7ep4v = 1
 		return nil
 	case "partially_eligible":
-		self.value_1aafeo7773p5x = 2
+		self.value_13b4a0ga7ep4v = 2
 		return nil
 	case "ineligible":
-		self.value_1aafeo7773p5x = 3
+		self.value_13b4a0ga7ep4v = 3
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling protectionEligEnum\n", s)
@@ -3292,7 +3292,7 @@ protectionEligTypeEnum
 
 ******************************/
 
-type protectionEligTypeEnum struct{ value_poc8f352cat9 uint8 }
+type protectionEligTypeEnum struct{ value_r5dsloug5e5r uint8 }
 
 var protectionEligType = struct {
 	ItemNotReceivedEligible     protectionEligTypeEnum
@@ -3301,8 +3301,8 @@ var protectionEligType = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [2]protectionEligTypeEnum
 }{
-	ItemNotReceivedEligible:     protectionEligTypeEnum{value_poc8f352cat9: 1},
-	UnauthorizedPaymentEligible: protectionEligTypeEnum{value_poc8f352cat9: 2},
+	ItemNotReceivedEligible:     protectionEligTypeEnum{value_r5dsloug5e5r: 1},
+	UnauthorizedPaymentEligible: protectionEligTypeEnum{value_r5dsloug5e5r: 2},
 }
 
 func init() {
@@ -3313,17 +3313,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self protectionEligTypeEnum) Value() uint8 {
-	return self.value_poc8f352cat9
+	return self.value_r5dsloug5e5r
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self protectionEligTypeEnum) IntValue() int {
-	return int(self.value_poc8f352cat9)
+	return int(self.value_r5dsloug5e5r)
 }
 
 // Name returns the name of the variant as a string.
 func (self protectionEligTypeEnum) Name() string {
-	switch self.value_poc8f352cat9 {
+	switch self.value_r5dsloug5e5r {
 	case 1:
 		return "ItemNotReceivedEligible"
 	case 2:
@@ -3346,13 +3346,13 @@ func (self protectionEligTypeEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self protectionEligTypeEnum) IsDefault() bool {
-	return self.value_poc8f352cat9 == 0
+	return self.value_r5dsloug5e5r == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self protectionEligTypeEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self protectionEligTypeEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -3360,7 +3360,7 @@ func (self protectionEligTypeEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self protectionEligTypeEnum) String() string {
-	switch self.value_poc8f352cat9 {
+	switch self.value_r5dsloug5e5r {
 	case 1:
 		return "ITEM_NOT_RECEIVED_ELIGIBLE"
 	case 2:
@@ -3373,7 +3373,7 @@ func (self protectionEligTypeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self protectionEligTypeEnum) Description() string {
-	switch self.value_poc8f352cat9 {
+	switch self.value_r5dsloug5e5r {
 	case 1:
 		return "Sellers are protected against claims for items not received."
 	case 2:
@@ -3405,10 +3405,10 @@ func (self *protectionEligTypeEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "item_not_received_eligible":
-		self.value_poc8f352cat9 = 1
+		self.value_r5dsloug5e5r = 1
 		return nil
 	case "unauthorized_payment_eligible":
-		self.value_poc8f352cat9 = 2
+		self.value_r5dsloug5e5r = 2
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling protectionEligTypeEnum\n", s)
@@ -3423,7 +3423,7 @@ paymentModeEnum
 
 ******************************/
 
-type paymentModeEnum struct{ value_16zdf7x492lun uint8 }
+type paymentModeEnum struct{ value_1nehvd4uobtyv uint8 }
 
 var paymentMode = struct {
 	InstantTransfer    paymentModeEnum
@@ -3434,10 +3434,10 @@ var paymentMode = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [4]paymentModeEnum
 }{
-	InstantTransfer:    paymentModeEnum{value_16zdf7x492lun: 1},
-	ManualBankTransfer: paymentModeEnum{value_16zdf7x492lun: 2},
-	DelayedTransfer:    paymentModeEnum{value_16zdf7x492lun: 3},
-	Echeck:             paymentModeEnum{value_16zdf7x492lun: 4},
+	InstantTransfer:    paymentModeEnum{value_1nehvd4uobtyv: 1},
+	ManualBankTransfer: paymentModeEnum{value_1nehvd4uobtyv: 2},
+	DelayedTransfer:    paymentModeEnum{value_1nehvd4uobtyv: 3},
+	Echeck:             paymentModeEnum{value_1nehvd4uobtyv: 4},
 }
 
 func init() {
@@ -3448,17 +3448,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self paymentModeEnum) Value() uint8 {
-	return self.value_16zdf7x492lun
+	return self.value_1nehvd4uobtyv
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self paymentModeEnum) IntValue() int {
-	return int(self.value_16zdf7x492lun)
+	return int(self.value_1nehvd4uobtyv)
 }
 
 // Name returns the name of the variant as a string.
 func (self paymentModeEnum) Name() string {
-	switch self.value_16zdf7x492lun {
+	switch self.value_1nehvd4uobtyv {
 	case 1:
 		return "InstantTransfer"
 	case 2:
@@ -3485,13 +3485,13 @@ func (self paymentModeEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self paymentModeEnum) IsDefault() bool {
-	return self.value_16zdf7x492lun == 0
+	return self.value_1nehvd4uobtyv == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self paymentModeEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self paymentModeEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -3499,7 +3499,7 @@ func (self paymentModeEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self paymentModeEnum) String() string {
-	switch self.value_16zdf7x492lun {
+	switch self.value_1nehvd4uobtyv {
 	case 1:
 		return "INSTANT_TRANSFER"
 	case 2:
@@ -3516,7 +3516,7 @@ func (self paymentModeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self paymentModeEnum) Description() string {
-	switch self.value_16zdf7x492lun {
+	switch self.value_1nehvd4uobtyv {
 	case 1:
 		return "INSTANT_TRANSFER"
 	case 2:
@@ -3552,16 +3552,16 @@ func (self *paymentModeEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "instant_transfer":
-		self.value_16zdf7x492lun = 1
+		self.value_1nehvd4uobtyv = 1
 		return nil
 	case "manual_bank_transfer":
-		self.value_16zdf7x492lun = 2
+		self.value_1nehvd4uobtyv = 2
 		return nil
 	case "delayed_transfer":
-		self.value_16zdf7x492lun = 3
+		self.value_1nehvd4uobtyv = 3
 		return nil
 	case "echeck":
-		self.value_16zdf7x492lun = 4
+		self.value_1nehvd4uobtyv = 4
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling paymentModeEnum\n", s)
@@ -3576,7 +3576,7 @@ pendingReasonEnum
 
 ******************************/
 
-type pendingReasonEnum struct{ value_yngoia74e1pp uint8 }
+type pendingReasonEnum struct{ value_1dimgeet1jdut uint8 }
 
 var pendingReason = struct {
 	PayerShippingUnconfirmed pendingReasonEnum
@@ -3590,13 +3590,13 @@ var pendingReason = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [7]pendingReasonEnum
 }{
-	PayerShippingUnconfirmed: pendingReasonEnum{value_yngoia74e1pp: 1},
-	MultiCurrency:            pendingReasonEnum{value_yngoia74e1pp: 2},
-	RiskReview:               pendingReasonEnum{value_yngoia74e1pp: 3},
-	RegulatoryReview:         pendingReasonEnum{value_yngoia74e1pp: 4},
-	VerificationRequired:     pendingReasonEnum{value_yngoia74e1pp: 5},
-	OrderPending:             pendingReasonEnum{value_yngoia74e1pp: 6},
-	OtherPending:             pendingReasonEnum{value_yngoia74e1pp: 7},
+	PayerShippingUnconfirmed: pendingReasonEnum{value_1dimgeet1jdut: 1},
+	MultiCurrency:            pendingReasonEnum{value_1dimgeet1jdut: 2},
+	RiskReview:               pendingReasonEnum{value_1dimgeet1jdut: 3},
+	RegulatoryReview:         pendingReasonEnum{value_1dimgeet1jdut: 4},
+	VerificationRequired:     pendingReasonEnum{value_1dimgeet1jdut: 5},
+	OrderPending:             pendingReasonEnum{value_1dimgeet1jdut: 6},
+	OtherPending:             pendingReasonEnum{value_1dimgeet1jdut: 7},
 }
 
 func init() {
@@ -3607,17 +3607,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self pendingReasonEnum) Value() uint8 {
-	return self.value_yngoia74e1pp
+	return self.value_1dimgeet1jdut
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self pendingReasonEnum) IntValue() int {
-	return int(self.value_yngoia74e1pp)
+	return int(self.value_1dimgeet1jdut)
 }
 
 // Name returns the name of the variant as a string.
 func (self pendingReasonEnum) Name() string {
-	switch self.value_yngoia74e1pp {
+	switch self.value_1dimgeet1jdut {
 	case 1:
 		return "PayerShippingUnconfirmed"
 	case 2:
@@ -3650,13 +3650,13 @@ func (self pendingReasonEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self pendingReasonEnum) IsDefault() bool {
-	return self.value_yngoia74e1pp == 0
+	return self.value_1dimgeet1jdut == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self pendingReasonEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self pendingReasonEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -3664,7 +3664,7 @@ func (self pendingReasonEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self pendingReasonEnum) String() string {
-	switch self.value_yngoia74e1pp {
+	switch self.value_1dimgeet1jdut {
 	case 1:
 		return "PAYER-SHIPPING-UNCONFIRMED"
 	case 2:
@@ -3687,7 +3687,7 @@ func (self pendingReasonEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self pendingReasonEnum) Description() string {
-	switch self.value_yngoia74e1pp {
+	switch self.value_1dimgeet1jdut {
 	case 1:
 		return "PAYER-SHIPPING-UNCONFIRMED"
 	case 2:
@@ -3729,25 +3729,25 @@ func (self *pendingReasonEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "payer-shipping-unconfirmed":
-		self.value_yngoia74e1pp = 1
+		self.value_1dimgeet1jdut = 1
 		return nil
 	case "multi-currency":
-		self.value_yngoia74e1pp = 2
+		self.value_1dimgeet1jdut = 2
 		return nil
 	case "risk-review":
-		self.value_yngoia74e1pp = 3
+		self.value_1dimgeet1jdut = 3
 		return nil
 	case "regulatory-review":
-		self.value_yngoia74e1pp = 4
+		self.value_1dimgeet1jdut = 4
 		return nil
 	case "verification-required":
-		self.value_yngoia74e1pp = 5
+		self.value_1dimgeet1jdut = 5
 		return nil
 	case "order":
-		self.value_yngoia74e1pp = 6
+		self.value_1dimgeet1jdut = 6
 		return nil
 	case "other":
-		self.value_yngoia74e1pp = 7
+		self.value_1dimgeet1jdut = 7
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling pendingReasonEnum\n", s)
@@ -3762,7 +3762,7 @@ CurrencyTypeEnum
 
 ******************************/
 
-type CurrencyTypeEnum struct{ value_1b7ykwjvrj9za uint8 }
+type CurrencyTypeEnum struct{ value_oj4xl0vlc3ek uint8 }
 
 var CurrencyType = struct {
 	AUD CurrencyTypeEnum
@@ -3793,30 +3793,30 @@ var CurrencyType = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [24]CurrencyTypeEnum
 }{
-	AUD: CurrencyTypeEnum{value_1b7ykwjvrj9za: 1},
-	BRL: CurrencyTypeEnum{value_1b7ykwjvrj9za: 2},
-	CAD: CurrencyTypeEnum{value_1b7ykwjvrj9za: 3},
-	CZK: CurrencyTypeEnum{value_1b7ykwjvrj9za: 4},
-	DKK: CurrencyTypeEnum{value_1b7ykwjvrj9za: 5},
-	EUR: CurrencyTypeEnum{value_1b7ykwjvrj9za: 6},
-	HKD: CurrencyTypeEnum{value_1b7ykwjvrj9za: 7},
-	HUF: CurrencyTypeEnum{value_1b7ykwjvrj9za: 8},
-	ILS: CurrencyTypeEnum{value_1b7ykwjvrj9za: 9},
-	JPY: CurrencyTypeEnum{value_1b7ykwjvrj9za: 10},
-	MYR: CurrencyTypeEnum{value_1b7ykwjvrj9za: 11},
-	MXN: CurrencyTypeEnum{value_1b7ykwjvrj9za: 12},
-	TWD: CurrencyTypeEnum{value_1b7ykwjvrj9za: 13},
-	NZD: CurrencyTypeEnum{value_1b7ykwjvrj9za: 14},
-	NOK: CurrencyTypeEnum{value_1b7ykwjvrj9za: 15},
-	PHP: CurrencyTypeEnum{value_1b7ykwjvrj9za: 16},
-	PLN: CurrencyTypeEnum{value_1b7ykwjvrj9za: 17},
-	GBP: CurrencyTypeEnum{value_1b7ykwjvrj9za: 18},
-	SGD: CurrencyTypeEnum{value_1b7ykwjvrj9za: 19},
-	SEK: CurrencyTypeEnum{value_1b7ykwjvrj9za: 20},
-	CHF: CurrencyTypeEnum{value_1b7ykwjvrj9za: 21},
-	THB: CurrencyTypeEnum{value_1b7ykwjvrj9za: 22},
-	TRY: CurrencyTypeEnum{value_1b7ykwjvrj9za: 23},
-	USD: CurrencyTypeEnum{value_1b7ykwjvrj9za: 24},
+	AUD: CurrencyTypeEnum{value_oj4xl0vlc3ek: 1},
+	BRL: CurrencyTypeEnum{value_oj4xl0vlc3ek: 2},
+	CAD: CurrencyTypeEnum{value_oj4xl0vlc3ek: 3},
+	CZK: CurrencyTypeEnum{value_oj4xl0vlc3ek: 4},
+	DKK: CurrencyTypeEnum{value_oj4xl0vlc3ek: 5},
+	EUR: CurrencyTypeEnum{value_oj4xl0vlc3ek: 6},
+	HKD: CurrencyTypeEnum{value_oj4xl0vlc3ek: 7},
+	HUF: CurrencyTypeEnum{value_oj4xl0vlc3ek: 8},
+	ILS: CurrencyTypeEnum{value_oj4xl0vlc3ek: 9},
+	JPY: CurrencyTypeEnum{value_oj4xl0vlc3ek: 10},
+	MYR: CurrencyTypeEnum{value_oj4xl0vlc3ek: 11},
+	MXN: CurrencyTypeEnum{value_oj4xl0vlc3ek: 12},
+	TWD: CurrencyTypeEnum{value_oj4xl0vlc3ek: 13},
+	NZD: CurrencyTypeEnum{value_oj4xl0vlc3ek: 14},
+	NOK: CurrencyTypeEnum{value_oj4xl0vlc3ek: 15},
+	PHP: CurrencyTypeEnum{value_oj4xl0vlc3ek: 16},
+	PLN: CurrencyTypeEnum{value_oj4xl0vlc3ek: 17},
+	GBP: CurrencyTypeEnum{value_oj4xl0vlc3ek: 18},
+	SGD: CurrencyTypeEnum{value_oj4xl0vlc3ek: 19},
+	SEK: CurrencyTypeEnum{value_oj4xl0vlc3ek: 20},
+	CHF: CurrencyTypeEnum{value_oj4xl0vlc3ek: 21},
+	THB: CurrencyTypeEnum{value_oj4xl0vlc3ek: 22},
+	TRY: CurrencyTypeEnum{value_oj4xl0vlc3ek: 23},
+	USD: CurrencyTypeEnum{value_oj4xl0vlc3ek: 24},
 }
 
 func init() {
@@ -3827,17 +3827,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self CurrencyTypeEnum) Value() uint8 {
-	return self.value_1b7ykwjvrj9za
+	return self.value_oj4xl0vlc3ek
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self CurrencyTypeEnum) IntValue() int {
-	return int(self.value_1b7ykwjvrj9za)
+	return int(self.value_oj4xl0vlc3ek)
 }
 
 // Name returns the name of the variant as a string.
 func (self CurrencyTypeEnum) Name() string {
-	switch self.value_1b7ykwjvrj9za {
+	switch self.value_oj4xl0vlc3ek {
 	case 1:
 		return "AUD"
 	case 2:
@@ -3904,13 +3904,13 @@ func (self CurrencyTypeEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self CurrencyTypeEnum) IsDefault() bool {
-	return self.value_1b7ykwjvrj9za == 0
+	return self.value_oj4xl0vlc3ek == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self CurrencyTypeEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self CurrencyTypeEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -3918,7 +3918,7 @@ func (self CurrencyTypeEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self CurrencyTypeEnum) String() string {
-	switch self.value_1b7ykwjvrj9za {
+	switch self.value_oj4xl0vlc3ek {
 	case 1:
 		return "AUD"
 	case 2:
@@ -3975,7 +3975,7 @@ func (self CurrencyTypeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self CurrencyTypeEnum) Description() string {
-	switch self.value_1b7ykwjvrj9za {
+	switch self.value_oj4xl0vlc3ek {
 	case 1:
 		return "Australian dollar"
 	case 2:
@@ -4051,76 +4051,76 @@ func (self *CurrencyTypeEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "aud":
-		self.value_1b7ykwjvrj9za = 1
+		self.value_oj4xl0vlc3ek = 1
 		return nil
 	case "brl":
-		self.value_1b7ykwjvrj9za = 2
+		self.value_oj4xl0vlc3ek = 2
 		return nil
 	case "cad":
-		self.value_1b7ykwjvrj9za = 3
+		self.value_oj4xl0vlc3ek = 3
 		return nil
 	case "czk":
-		self.value_1b7ykwjvrj9za = 4
+		self.value_oj4xl0vlc3ek = 4
 		return nil
 	case "dkk":
-		self.value_1b7ykwjvrj9za = 5
+		self.value_oj4xl0vlc3ek = 5
 		return nil
 	case "eur":
-		self.value_1b7ykwjvrj9za = 6
+		self.value_oj4xl0vlc3ek = 6
 		return nil
 	case "hkd":
-		self.value_1b7ykwjvrj9za = 7
+		self.value_oj4xl0vlc3ek = 7
 		return nil
 	case "huf":
-		self.value_1b7ykwjvrj9za = 8
+		self.value_oj4xl0vlc3ek = 8
 		return nil
 	case "ils":
-		self.value_1b7ykwjvrj9za = 9
+		self.value_oj4xl0vlc3ek = 9
 		return nil
 	case "jpy":
-		self.value_1b7ykwjvrj9za = 10
+		self.value_oj4xl0vlc3ek = 10
 		return nil
 	case "myr":
-		self.value_1b7ykwjvrj9za = 11
+		self.value_oj4xl0vlc3ek = 11
 		return nil
 	case "mxn":
-		self.value_1b7ykwjvrj9za = 12
+		self.value_oj4xl0vlc3ek = 12
 		return nil
 	case "twd":
-		self.value_1b7ykwjvrj9za = 13
+		self.value_oj4xl0vlc3ek = 13
 		return nil
 	case "nzd":
-		self.value_1b7ykwjvrj9za = 14
+		self.value_oj4xl0vlc3ek = 14
 		return nil
 	case "nok":
-		self.value_1b7ykwjvrj9za = 15
+		self.value_oj4xl0vlc3ek = 15
 		return nil
 	case "php":
-		self.value_1b7ykwjvrj9za = 16
+		self.value_oj4xl0vlc3ek = 16
 		return nil
 	case "pln":
-		self.value_1b7ykwjvrj9za = 17
+		self.value_oj4xl0vlc3ek = 17
 		return nil
 	case "gbp":
-		self.value_1b7ykwjvrj9za = 18
+		self.value_oj4xl0vlc3ek = 18
 		return nil
 	case "sgd":
-		self.value_1b7ykwjvrj9za = 19
+		self.value_oj4xl0vlc3ek = 19
 		return nil
 	case "sek":
-		self.value_1b7ykwjvrj9za = 20
+		self.value_oj4xl0vlc3ek = 20
 		return nil
 	case "chf":
-		self.value_1b7ykwjvrj9za = 21
+		self.value_oj4xl0vlc3ek = 21
 		return nil
 	case "thb":
-		self.value_1b7ykwjvrj9za = 22
+		self.value_oj4xl0vlc3ek = 22
 		return nil
 	case "try":
-		self.value_1b7ykwjvrj9za = 23
+		self.value_oj4xl0vlc3ek = 23
 		return nil
 	case "usd":
-		self.value_1b7ykwjvrj9za = 24
+		self.value_oj4xl0vlc3ek = 24
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling CurrencyTypeEnum\n", s)
@@ -4135,7 +4135,7 @@ CountryCodeEnum
 
 ******************************/
 
-type CountryCodeEnum struct{ value_uey08x7raqt1 uint8 }
+type CountryCodeEnum struct{ value_66o969je30t6 uint8 }
 
 var CountryCode = struct {
 	AL CountryCodeEnum
@@ -4336,200 +4336,200 @@ var CountryCode = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [194]CountryCodeEnum
 }{
-	AL: CountryCodeEnum{value_uey08x7raqt1: 1},
-	DZ: CountryCodeEnum{value_uey08x7raqt1: 2},
-	AD: CountryCodeEnum{value_uey08x7raqt1: 3},
-	AO: CountryCodeEnum{value_uey08x7raqt1: 4},
-	AI: CountryCodeEnum{value_uey08x7raqt1: 5},
-	AG: CountryCodeEnum{value_uey08x7raqt1: 6},
-	AR: CountryCodeEnum{value_uey08x7raqt1: 7},
-	AM: CountryCodeEnum{value_uey08x7raqt1: 8},
-	AW: CountryCodeEnum{value_uey08x7raqt1: 9},
-	AU: CountryCodeEnum{value_uey08x7raqt1: 10},
-	AT: CountryCodeEnum{value_uey08x7raqt1: 11},
-	AZ: CountryCodeEnum{value_uey08x7raqt1: 12},
-	BS: CountryCodeEnum{value_uey08x7raqt1: 13},
-	BH: CountryCodeEnum{value_uey08x7raqt1: 14},
-	BB: CountryCodeEnum{value_uey08x7raqt1: 15},
-	BE: CountryCodeEnum{value_uey08x7raqt1: 16},
-	BZ: CountryCodeEnum{value_uey08x7raqt1: 17},
-	BJ: CountryCodeEnum{value_uey08x7raqt1: 18},
-	BM: CountryCodeEnum{value_uey08x7raqt1: 19},
-	BT: CountryCodeEnum{value_uey08x7raqt1: 20},
-	BO: CountryCodeEnum{value_uey08x7raqt1: 21},
-	BA: CountryCodeEnum{value_uey08x7raqt1: 22},
-	BW: CountryCodeEnum{value_uey08x7raqt1: 23},
-	BR: CountryCodeEnum{value_uey08x7raqt1: 24},
-	BN: CountryCodeEnum{value_uey08x7raqt1: 25},
-	BG: CountryCodeEnum{value_uey08x7raqt1: 26},
-	BF: CountryCodeEnum{value_uey08x7raqt1: 27},
-	BI: CountryCodeEnum{value_uey08x7raqt1: 28},
-	KH: CountryCodeEnum{value_uey08x7raqt1: 29},
-	CA: CountryCodeEnum{value_uey08x7raqt1: 30},
-	CV: CountryCodeEnum{value_uey08x7raqt1: 31},
-	KY: CountryCodeEnum{value_uey08x7raqt1: 32},
-	TD: CountryCodeEnum{value_uey08x7raqt1: 33},
-	CL: CountryCodeEnum{value_uey08x7raqt1: 34},
-	CN: CountryCodeEnum{value_uey08x7raqt1: 35},
-	C2: CountryCodeEnum{value_uey08x7raqt1: 36},
-	CO: CountryCodeEnum{value_uey08x7raqt1: 37},
-	KM: CountryCodeEnum{value_uey08x7raqt1: 38},
-	CD: CountryCodeEnum{value_uey08x7raqt1: 39},
-	CG: CountryCodeEnum{value_uey08x7raqt1: 40},
-	CK: CountryCodeEnum{value_uey08x7raqt1: 41},
-	CR: CountryCodeEnum{value_uey08x7raqt1: 42},
-	HR: CountryCodeEnum{value_uey08x7raqt1: 43},
-	CY: CountryCodeEnum{value_uey08x7raqt1: 44},
-	CZ: CountryCodeEnum{value_uey08x7raqt1: 45},
-	DK: CountryCodeEnum{value_uey08x7raqt1: 46},
-	DJ: CountryCodeEnum{value_uey08x7raqt1: 47},
-	DM: CountryCodeEnum{value_uey08x7raqt1: 48},
-	DO: CountryCodeEnum{value_uey08x7raqt1: 49},
-	EC: CountryCodeEnum{value_uey08x7raqt1: 50},
-	EG: CountryCodeEnum{value_uey08x7raqt1: 51},
-	SV: CountryCodeEnum{value_uey08x7raqt1: 52},
-	ER: CountryCodeEnum{value_uey08x7raqt1: 53},
-	EE: CountryCodeEnum{value_uey08x7raqt1: 54},
-	ET: CountryCodeEnum{value_uey08x7raqt1: 55},
-	FK: CountryCodeEnum{value_uey08x7raqt1: 56},
-	FJ: CountryCodeEnum{value_uey08x7raqt1: 57},
-	FI: CountryCodeEnum{value_uey08x7raqt1: 58},
-	FR: CountryCodeEnum{value_uey08x7raqt1: 59},
-	GF: CountryCodeEnum{value_uey08x7raqt1: 60},
-	PF: CountryCodeEnum{value_uey08x7raqt1: 61},
-	GA: CountryCodeEnum{value_uey08x7raqt1: 62},
-	GM: CountryCodeEnum{value_uey08x7raqt1: 63},
-	GE: CountryCodeEnum{value_uey08x7raqt1: 64},
-	DE: CountryCodeEnum{value_uey08x7raqt1: 65},
-	GI: CountryCodeEnum{value_uey08x7raqt1: 66},
-	GR: CountryCodeEnum{value_uey08x7raqt1: 67},
-	GL: CountryCodeEnum{value_uey08x7raqt1: 68},
-	GD: CountryCodeEnum{value_uey08x7raqt1: 69},
-	GP: CountryCodeEnum{value_uey08x7raqt1: 70},
-	GU: CountryCodeEnum{value_uey08x7raqt1: 71},
-	GT: CountryCodeEnum{value_uey08x7raqt1: 72},
-	GN: CountryCodeEnum{value_uey08x7raqt1: 73},
-	GW: CountryCodeEnum{value_uey08x7raqt1: 74},
-	GY: CountryCodeEnum{value_uey08x7raqt1: 75},
-	VA: CountryCodeEnum{value_uey08x7raqt1: 76},
-	HN: CountryCodeEnum{value_uey08x7raqt1: 77},
-	HK: CountryCodeEnum{value_uey08x7raqt1: 78},
-	HU: CountryCodeEnum{value_uey08x7raqt1: 79},
-	IS: CountryCodeEnum{value_uey08x7raqt1: 80},
-	IN: CountryCodeEnum{value_uey08x7raqt1: 81},
-	ID: CountryCodeEnum{value_uey08x7raqt1: 82},
-	IE: CountryCodeEnum{value_uey08x7raqt1: 83},
-	IL: CountryCodeEnum{value_uey08x7raqt1: 84},
-	IT: CountryCodeEnum{value_uey08x7raqt1: 85},
-	JM: CountryCodeEnum{value_uey08x7raqt1: 86},
-	JP: CountryCodeEnum{value_uey08x7raqt1: 87},
-	JO: CountryCodeEnum{value_uey08x7raqt1: 88},
-	KZ: CountryCodeEnum{value_uey08x7raqt1: 89},
-	KE: CountryCodeEnum{value_uey08x7raqt1: 90},
-	KI: CountryCodeEnum{value_uey08x7raqt1: 91},
-	KR: CountryCodeEnum{value_uey08x7raqt1: 92},
-	KW: CountryCodeEnum{value_uey08x7raqt1: 93},
-	KG: CountryCodeEnum{value_uey08x7raqt1: 94},
-	LA: CountryCodeEnum{value_uey08x7raqt1: 95},
-	LV: CountryCodeEnum{value_uey08x7raqt1: 96},
-	LS: CountryCodeEnum{value_uey08x7raqt1: 97},
-	LI: CountryCodeEnum{value_uey08x7raqt1: 98},
-	LT: CountryCodeEnum{value_uey08x7raqt1: 99},
-	LU: CountryCodeEnum{value_uey08x7raqt1: 100},
-	MG: CountryCodeEnum{value_uey08x7raqt1: 101},
-	MW: CountryCodeEnum{value_uey08x7raqt1: 102},
-	MY: CountryCodeEnum{value_uey08x7raqt1: 103},
-	MV: CountryCodeEnum{value_uey08x7raqt1: 104},
-	ML: CountryCodeEnum{value_uey08x7raqt1: 105},
-	MT: CountryCodeEnum{value_uey08x7raqt1: 106},
-	MH: CountryCodeEnum{value_uey08x7raqt1: 107},
-	MQ: CountryCodeEnum{value_uey08x7raqt1: 108},
-	MR: CountryCodeEnum{value_uey08x7raqt1: 109},
-	MU: CountryCodeEnum{value_uey08x7raqt1: 110},
-	YT: CountryCodeEnum{value_uey08x7raqt1: 111},
-	MX: CountryCodeEnum{value_uey08x7raqt1: 112},
-	FM: CountryCodeEnum{value_uey08x7raqt1: 113},
-	MN: CountryCodeEnum{value_uey08x7raqt1: 114},
-	MS: CountryCodeEnum{value_uey08x7raqt1: 115},
-	MA: CountryCodeEnum{value_uey08x7raqt1: 116},
-	MZ: CountryCodeEnum{value_uey08x7raqt1: 117},
-	NA: CountryCodeEnum{value_uey08x7raqt1: 118},
-	NR: CountryCodeEnum{value_uey08x7raqt1: 119},
-	NP: CountryCodeEnum{value_uey08x7raqt1: 120},
-	NL: CountryCodeEnum{value_uey08x7raqt1: 121},
-	AN: CountryCodeEnum{value_uey08x7raqt1: 122},
-	NC: CountryCodeEnum{value_uey08x7raqt1: 123},
-	NZ: CountryCodeEnum{value_uey08x7raqt1: 124},
-	NI: CountryCodeEnum{value_uey08x7raqt1: 125},
-	NE: CountryCodeEnum{value_uey08x7raqt1: 126},
-	NU: CountryCodeEnum{value_uey08x7raqt1: 127},
-	NF: CountryCodeEnum{value_uey08x7raqt1: 128},
-	NO: CountryCodeEnum{value_uey08x7raqt1: 129},
-	OM: CountryCodeEnum{value_uey08x7raqt1: 130},
-	PW: CountryCodeEnum{value_uey08x7raqt1: 131},
-	PA: CountryCodeEnum{value_uey08x7raqt1: 132},
-	PG: CountryCodeEnum{value_uey08x7raqt1: 133},
-	PE: CountryCodeEnum{value_uey08x7raqt1: 134},
-	PH: CountryCodeEnum{value_uey08x7raqt1: 135},
-	PN: CountryCodeEnum{value_uey08x7raqt1: 136},
-	PL: CountryCodeEnum{value_uey08x7raqt1: 137},
-	PT: CountryCodeEnum{value_uey08x7raqt1: 138},
-	QA: CountryCodeEnum{value_uey08x7raqt1: 139},
-	RE: CountryCodeEnum{value_uey08x7raqt1: 140},
-	RO: CountryCodeEnum{value_uey08x7raqt1: 141},
-	RU: CountryCodeEnum{value_uey08x7raqt1: 142},
-	RW: CountryCodeEnum{value_uey08x7raqt1: 143},
-	SH: CountryCodeEnum{value_uey08x7raqt1: 144},
-	KN: CountryCodeEnum{value_uey08x7raqt1: 145},
-	LC: CountryCodeEnum{value_uey08x7raqt1: 146},
-	PM: CountryCodeEnum{value_uey08x7raqt1: 147},
-	VC: CountryCodeEnum{value_uey08x7raqt1: 148},
-	WS: CountryCodeEnum{value_uey08x7raqt1: 149},
-	SM: CountryCodeEnum{value_uey08x7raqt1: 150},
-	ST: CountryCodeEnum{value_uey08x7raqt1: 151},
-	SA: CountryCodeEnum{value_uey08x7raqt1: 152},
-	SN: CountryCodeEnum{value_uey08x7raqt1: 153},
-	RS: CountryCodeEnum{value_uey08x7raqt1: 154},
-	SC: CountryCodeEnum{value_uey08x7raqt1: 155},
-	SL: CountryCodeEnum{value_uey08x7raqt1: 156},
-	SG: CountryCodeEnum{value_uey08x7raqt1: 157},
-	SK: CountryCodeEnum{value_uey08x7raqt1: 158},
-	SI: CountryCodeEnum{value_uey08x7raqt1: 159},
-	SB: CountryCodeEnum{value_uey08x7raqt1: 160},
-	SO: CountryCodeEnum{value_uey08x7raqt1: 161},
-	ZA: CountryCodeEnum{value_uey08x7raqt1: 162},
-	ES: CountryCodeEnum{value_uey08x7raqt1: 163},
-	LK: CountryCodeEnum{value_uey08x7raqt1: 164},
-	SR: CountryCodeEnum{value_uey08x7raqt1: 165},
-	SJ: CountryCodeEnum{value_uey08x7raqt1: 166},
-	SZ: CountryCodeEnum{value_uey08x7raqt1: 167},
-	SE: CountryCodeEnum{value_uey08x7raqt1: 168},
-	CH: CountryCodeEnum{value_uey08x7raqt1: 169},
-	TW: CountryCodeEnum{value_uey08x7raqt1: 170},
-	TJ: CountryCodeEnum{value_uey08x7raqt1: 171},
-	TZ: CountryCodeEnum{value_uey08x7raqt1: 172},
-	TH: CountryCodeEnum{value_uey08x7raqt1: 173},
-	TG: CountryCodeEnum{value_uey08x7raqt1: 174},
-	TO: CountryCodeEnum{value_uey08x7raqt1: 175},
-	TT: CountryCodeEnum{value_uey08x7raqt1: 176},
-	TN: CountryCodeEnum{value_uey08x7raqt1: 177},
-	TR: CountryCodeEnum{value_uey08x7raqt1: 178},
-	TM: CountryCodeEnum{value_uey08x7raqt1: 179},
-	TC: CountryCodeEnum{value_uey08x7raqt1: 180},
-	TV: CountryCodeEnum{value_uey08x7raqt1: 181},
-	UG: CountryCodeEnum{value_uey08x7raqt1: 182},
-	UA: CountryCodeEnum{value_uey08x7raqt1: 183},
-	AE: CountryCodeEnum{value_uey08x7raqt1: 184},
-	GB: CountryCodeEnum{value_uey08x7raqt1: 185},
-	US: CountryCodeEnum{value_uey08x7raqt1: 186},
-	UY: CountryCodeEnum{value_uey08x7raqt1: 187},
-	VU: CountryCodeEnum{value_uey08x7raqt1: 188},
-	VE: CountryCodeEnum{value_uey08x7raqt1: 189},
-	VN: CountryCodeEnum{value_uey08x7raqt1: 190},
-	VG: CountryCodeEnum{value_uey08x7raqt1: 191},
-	WF: CountryCodeEnum{value_uey08x7raqt1: 192},
-	YE: CountryCodeEnum{value_uey08x7raqt1: 193},
-	ZM: CountryCodeEnum{value_uey08x7raqt1: 194},
+	AL: CountryCodeEnum{value_66o969je30t6: 1},
+	DZ: CountryCodeEnum{value_66o969je30t6: 2},
+	AD: CountryCodeEnum{value_66o969je30t6: 3},
+	AO: CountryCodeEnum{value_66o969je30t6: 4},
+	AI: CountryCodeEnum{value_66o969je30t6: 5},
+	AG: CountryCodeEnum{value_66o969je30t6: 6},
+	AR: CountryCodeEnum{value_66o969je30t6: 7},
+	AM: CountryCodeEnum{value_66o969je30t6: 8},
+	AW: CountryCodeEnum{value_66o969je30t6: 9},
+	AU: CountryCodeEnum{value_66o969je30t6: 10},
+	AT: CountryCodeEnum{value_66o969je30t6: 11},
+	AZ: CountryCodeEnum{value_66o969je30t6: 12},
+	BS: CountryCodeEnum{value_66o969je30t6: 13},
+	BH: CountryCodeEnum{value_66o969je30t6: 14},
+	BB: CountryCodeEnum{value_66o969je30t6: 15},
+	BE: CountryCodeEnum{value_66o969je30t6: 16},
+	BZ: CountryCodeEnum{value_66o969je30t6: 17},
+	BJ: CountryCodeEnum{value_66o969je30t6: 18},
+	BM: CountryCodeEnum{value_66o969je30t6: 19},
+	BT: CountryCodeEnum{value_66o969je30t6: 20},
+	BO: CountryCodeEnum{value_66o969je30t6: 21},
+	BA: CountryCodeEnum{value_66o969je30t6: 22},
+	BW: CountryCodeEnum{value_66o969je30t6: 23},
+	BR: CountryCodeEnum{value_66o969je30t6: 24},
+	BN: CountryCodeEnum{value_66o969je30t6: 25},
+	BG: CountryCodeEnum{value_66o969je30t6: 26},
+	BF: CountryCodeEnum{value_66o969je30t6: 27},
+	BI: CountryCodeEnum{value_66o969je30t6: 28},
+	KH: CountryCodeEnum{value_66o969je30t6: 29},
+	CA: CountryCodeEnum{value_66o969je30t6: 30},
+	CV: CountryCodeEnum{value_66o969je30t6: 31},
+	KY: CountryCodeEnum{value_66o969je30t6: 32},
+	TD: CountryCodeEnum{value_66o969je30t6: 33},
+	CL: CountryCodeEnum{value_66o969je30t6: 34},
+	CN: CountryCodeEnum{value_66o969je30t6: 35},
+	C2: CountryCodeEnum{value_66o969je30t6: 36},
+	CO: CountryCodeEnum{value_66o969je30t6: 37},
+	KM: CountryCodeEnum{value_66o969je30t6: 38},
+	CD: CountryCodeEnum{value_66o969je30t6: 39},
+	CG: CountryCodeEnum{value_66o969je30t6: 40},
+	CK: CountryCodeEnum{value_66o969je30t6: 41},
+	CR: CountryCodeEnum{value_66o969je30t6: 42},
+	HR: CountryCodeEnum{value_66o969je30t6: 43},
+	CY: CountryCodeEnum{value_66o969je30t6: 44},
+	CZ: CountryCodeEnum{value_66o969je30t6: 45},
+	DK: CountryCodeEnum{value_66o969je30t6: 46},
+	DJ: CountryCodeEnum{value_66o969je30t6: 47},
+	DM: CountryCodeEnum{value_66o969je30t6: 48},
+	DO: CountryCodeEnum{value_66o969je30t6: 49},
+	EC: CountryCodeEnum{value_66o969je30t6: 50},
+	EG: CountryCodeEnum{value_66o969je30t6: 51},
+	SV: CountryCodeEnum{value_66o969je30t6: 52},
+	ER: CountryCodeEnum{value_66o969je30t6: 53},
+	EE: CountryCodeEnum{value_66o969je30t6: 54},
+	ET: CountryCodeEnum{value_66o969je30t6: 55},
+	FK: CountryCodeEnum{value_66o969je30t6: 56},
+	FJ: CountryCodeEnum{value_66o969je30t6: 57},
+	FI: CountryCodeEnum{value_66o969je30t6: 58},
+	FR: CountryCodeEnum{value_66o969je30t6: 59},
+	GF: CountryCodeEnum{value_66o969je30t6: 60},
+	PF: CountryCodeEnum{value_66o969je30t6: 61},
+	GA: CountryCodeEnum{value_66o969je30t6: 62},
+	GM: CountryCodeEnum{value_66o969je30t6: 63},
+	GE: CountryCodeEnum{value_66o969je30t6: 64},
+	DE: CountryCodeEnum{value_66o969je30t6: 65},
+	GI: CountryCodeEnum{value_66o969je30t6: 66},
+	GR: CountryCodeEnum{value_66o969je30t6: 67},
+	GL: CountryCodeEnum{value_66o969je30t6: 68},
+	GD: CountryCodeEnum{value_66o969je30t6: 69},
+	GP: CountryCodeEnum{value_66o969je30t6: 70},
+	GU: CountryCodeEnum{value_66o969je30t6: 71},
+	GT: CountryCodeEnum{value_66o969je30t6: 72},
+	GN: CountryCodeEnum{value_66o969je30t6: 73},
+	GW: CountryCodeEnum{value_66o969je30t6: 74},
+	GY: CountryCodeEnum{value_66o969je30t6: 75},
+	VA: CountryCodeEnum{value_66o969je30t6: 76},
+	HN: CountryCodeEnum{value_66o969je30t6: 77},
+	HK: CountryCodeEnum{value_66o969je30t6: 78},
+	HU: CountryCodeEnum{value_66o969je30t6: 79},
+	IS: CountryCodeEnum{value_66o969je30t6: 80},
+	IN: CountryCodeEnum{value_66o969je30t6: 81},
+	ID: CountryCodeEnum{value_66o969je30t6: 82},
+	IE: CountryCodeEnum{value_66o969je30t6: 83},
+	IL: CountryCodeEnum{value_66o969je30t6: 84},
+	IT: CountryCodeEnum{value_66o969je30t6: 85},
+	JM: CountryCodeEnum{value_66o969je30t6: 86},
+	JP: CountryCodeEnum{value_66o969je30t6: 87},
+	JO: CountryCodeEnum{value_66o969je30t6: 88},
+	KZ: CountryCodeEnum{value_66o969je30t6: 89},
+	KE: CountryCodeEnum{value_66o969je30t6: 90},
+	KI: CountryCodeEnum{value_66o969je30t6: 91},
+	KR: CountryCodeEnum{value_66o969je30t6: 92},
+	KW: CountryCodeEnum{value_66o969je30t6: 93},
+	KG: CountryCodeEnum{value_66o969je30t6: 94},
+	LA: CountryCodeEnum{value_66o969je30t6: 95},
+	LV: CountryCodeEnum{value_66o969je30t6: 96},
+	LS: CountryCodeEnum{value_66o969je30t6: 97},
+	LI: CountryCodeEnum{value_66o969je30t6: 98},
+	LT: CountryCodeEnum{value_66o969je30t6: 99},
+	LU: CountryCodeEnum{value_66o969je30t6: 100},
+	MG: CountryCodeEnum{value_66o969je30t6: 101},
+	MW: CountryCodeEnum{value_66o969je30t6: 102},
+	MY: CountryCodeEnum{value_66o969je30t6: 103},
+	MV: CountryCodeEnum{value_66o969je30t6: 104},
+	ML: CountryCodeEnum{value_66o969je30t6: 105},
+	MT: CountryCodeEnum{value_66o969je30t6: 106},
+	MH: CountryCodeEnum{value_66o969je30t6: 107},
+	MQ: CountryCodeEnum{value_66o969je30t6: 108},
+	MR: CountryCodeEnum{value_66o969je30t6: 109},
+	MU: CountryCodeEnum{value_66o969je30t6: 110},
+	YT: CountryCodeEnum{value_66o969je30t6: 111},
+	MX: CountryCodeEnum{value_66o969je30t6: 112},
+	FM: CountryCodeEnum{value_66o969je30t6: 113},
+	MN: CountryCodeEnum{value_66o969je30t6: 114},
+	MS: CountryCodeEnum{value_66o969je30t6: 115},
+	MA: CountryCodeEnum{value_66o969je30t6: 116},
+	MZ: CountryCodeEnum{value_66o969je30t6: 117},
+	NA: CountryCodeEnum{value_66o969je30t6: 118},
+	NR: CountryCodeEnum{value_66o969je30t6: 119},
+	NP: CountryCodeEnum{value_66o969je30t6: 120},
+	NL: CountryCodeEnum{value_66o969je30t6: 121},
+	AN: CountryCodeEnum{value_66o969je30t6: 122},
+	NC: CountryCodeEnum{value_66o969je30t6: 123},
+	NZ: CountryCodeEnum{value_66o969je30t6: 124},
+	NI: CountryCodeEnum{value_66o969je30t6: 125},
+	NE: CountryCodeEnum{value_66o969je30t6: 126},
+	NU: CountryCodeEnum{value_66o969je30t6: 127},
+	NF: CountryCodeEnum{value_66o969je30t6: 128},
+	NO: CountryCodeEnum{value_66o969je30t6: 129},
+	OM: CountryCodeEnum{value_66o969je30t6: 130},
+	PW: CountryCodeEnum{value_66o969je30t6: 131},
+	PA: CountryCodeEnum{value_66o969je30t6: 132},
+	PG: CountryCodeEnum{value_66o969je30t6: 133},
+	PE: CountryCodeEnum{value_66o969je30t6: 134},
+	PH: CountryCodeEnum{value_66o969je30t6: 135},
+	PN: CountryCodeEnum{value_66o969je30t6: 136},
+	PL: CountryCodeEnum{value_66o969je30t6: 137},
+	PT: CountryCodeEnum{value_66o969je30t6: 138},
+	QA: CountryCodeEnum{value_66o969je30t6: 139},
+	RE: CountryCodeEnum{value_66o969je30t6: 140},
+	RO: CountryCodeEnum{value_66o969je30t6: 141},
+	RU: CountryCodeEnum{value_66o969je30t6: 142},
+	RW: CountryCodeEnum{value_66o969je30t6: 143},
+	SH: CountryCodeEnum{value_66o969je30t6: 144},
+	KN: CountryCodeEnum{value_66o969je30t6: 145},
+	LC: CountryCodeEnum{value_66o969je30t6: 146},
+	PM: CountryCodeEnum{value_66o969je30t6: 147},
+	VC: CountryCodeEnum{value_66o969je30t6: 148},
+	WS: CountryCodeEnum{value_66o969je30t6: 149},
+	SM: CountryCodeEnum{value_66o969je30t6: 150},
+	ST: CountryCodeEnum{value_66o969je30t6: 151},
+	SA: CountryCodeEnum{value_66o969je30t6: 152},
+	SN: CountryCodeEnum{value_66o969je30t6: 153},
+	RS: CountryCodeEnum{value_66o969je30t6: 154},
+	SC: CountryCodeEnum{value_66o969je30t6: 155},
+	SL: CountryCodeEnum{value_66o969je30t6: 156},
+	SG: CountryCodeEnum{value_66o969je30t6: 157},
+	SK: CountryCodeEnum{value_66o969je30t6: 158},
+	SI: CountryCodeEnum{value_66o969je30t6: 159},
+	SB: CountryCodeEnum{value_66o969je30t6: 160},
+	SO: CountryCodeEnum{value_66o969je30t6: 161},
+	ZA: CountryCodeEnum{value_66o969je30t6: 162},
+	ES: CountryCodeEnum{value_66o969je30t6: 163},
+	LK: CountryCodeEnum{value_66o969je30t6: 164},
+	SR: CountryCodeEnum{value_66o969je30t6: 165},
+	SJ: CountryCodeEnum{value_66o969je30t6: 166},
+	SZ: CountryCodeEnum{value_66o969je30t6: 167},
+	SE: CountryCodeEnum{value_66o969je30t6: 168},
+	CH: CountryCodeEnum{value_66o969je30t6: 169},
+	TW: CountryCodeEnum{value_66o969je30t6: 170},
+	TJ: CountryCodeEnum{value_66o969je30t6: 171},
+	TZ: CountryCodeEnum{value_66o969je30t6: 172},
+	TH: CountryCodeEnum{value_66o969je30t6: 173},
+	TG: CountryCodeEnum{value_66o969je30t6: 174},
+	TO: CountryCodeEnum{value_66o969je30t6: 175},
+	TT: CountryCodeEnum{value_66o969je30t6: 176},
+	TN: CountryCodeEnum{value_66o969je30t6: 177},
+	TR: CountryCodeEnum{value_66o969je30t6: 178},
+	TM: CountryCodeEnum{value_66o969je30t6: 179},
+	TC: CountryCodeEnum{value_66o969je30t6: 180},
+	TV: CountryCodeEnum{value_66o969je30t6: 181},
+	UG: CountryCodeEnum{value_66o969je30t6: 182},
+	UA: CountryCodeEnum{value_66o969je30t6: 183},
+	AE: CountryCodeEnum{value_66o969je30t6: 184},
+	GB: CountryCodeEnum{value_66o969je30t6: 185},
+	US: CountryCodeEnum{value_66o969je30t6: 186},
+	UY: CountryCodeEnum{value_66o969je30t6: 187},
+	VU: CountryCodeEnum{value_66o969je30t6: 188},
+	VE: CountryCodeEnum{value_66o969je30t6: 189},
+	VN: CountryCodeEnum{value_66o969je30t6: 190},
+	VG: CountryCodeEnum{value_66o969je30t6: 191},
+	WF: CountryCodeEnum{value_66o969je30t6: 192},
+	YE: CountryCodeEnum{value_66o969je30t6: 193},
+	ZM: CountryCodeEnum{value_66o969je30t6: 194},
 }
 
 func init() {
@@ -4540,17 +4540,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self CountryCodeEnum) Value() uint8 {
-	return self.value_uey08x7raqt1
+	return self.value_66o969je30t6
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self CountryCodeEnum) IntValue() int {
-	return int(self.value_uey08x7raqt1)
+	return int(self.value_66o969je30t6)
 }
 
 // Name returns the name of the variant as a string.
 func (self CountryCodeEnum) Name() string {
-	switch self.value_uey08x7raqt1 {
+	switch self.value_66o969je30t6 {
 	case 1:
 		return "AL"
 	case 2:
@@ -4957,13 +4957,13 @@ func (self CountryCodeEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self CountryCodeEnum) IsDefault() bool {
-	return self.value_uey08x7raqt1 == 0
+	return self.value_66o969je30t6 == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self CountryCodeEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self CountryCodeEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -4971,7 +4971,7 @@ func (self CountryCodeEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self CountryCodeEnum) String() string {
-	switch self.value_uey08x7raqt1 {
+	switch self.value_66o969je30t6 {
 	case 1:
 		return "AL"
 	case 2:
@@ -5368,7 +5368,7 @@ func (self CountryCodeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self CountryCodeEnum) Description() string {
-	switch self.value_uey08x7raqt1 {
+	switch self.value_66o969je30t6 {
 	case 1:
 		return "ALBANIA"
 	case 2:
@@ -5784,586 +5784,586 @@ func (self *CountryCodeEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "al":
-		self.value_uey08x7raqt1 = 1
+		self.value_66o969je30t6 = 1
 		return nil
 	case "dz":
-		self.value_uey08x7raqt1 = 2
+		self.value_66o969je30t6 = 2
 		return nil
 	case "ad":
-		self.value_uey08x7raqt1 = 3
+		self.value_66o969je30t6 = 3
 		return nil
 	case "ao":
-		self.value_uey08x7raqt1 = 4
+		self.value_66o969je30t6 = 4
 		return nil
 	case "ai":
-		self.value_uey08x7raqt1 = 5
+		self.value_66o969je30t6 = 5
 		return nil
 	case "ag":
-		self.value_uey08x7raqt1 = 6
+		self.value_66o969je30t6 = 6
 		return nil
 	case "ar":
-		self.value_uey08x7raqt1 = 7
+		self.value_66o969je30t6 = 7
 		return nil
 	case "am":
-		self.value_uey08x7raqt1 = 8
+		self.value_66o969je30t6 = 8
 		return nil
 	case "aw":
-		self.value_uey08x7raqt1 = 9
+		self.value_66o969je30t6 = 9
 		return nil
 	case "au":
-		self.value_uey08x7raqt1 = 10
+		self.value_66o969je30t6 = 10
 		return nil
 	case "at":
-		self.value_uey08x7raqt1 = 11
+		self.value_66o969je30t6 = 11
 		return nil
 	case "az":
-		self.value_uey08x7raqt1 = 12
+		self.value_66o969je30t6 = 12
 		return nil
 	case "bs":
-		self.value_uey08x7raqt1 = 13
+		self.value_66o969je30t6 = 13
 		return nil
 	case "bh":
-		self.value_uey08x7raqt1 = 14
+		self.value_66o969je30t6 = 14
 		return nil
 	case "bb":
-		self.value_uey08x7raqt1 = 15
+		self.value_66o969je30t6 = 15
 		return nil
 	case "be":
-		self.value_uey08x7raqt1 = 16
+		self.value_66o969je30t6 = 16
 		return nil
 	case "bz":
-		self.value_uey08x7raqt1 = 17
+		self.value_66o969je30t6 = 17
 		return nil
 	case "bj":
-		self.value_uey08x7raqt1 = 18
+		self.value_66o969je30t6 = 18
 		return nil
 	case "bm":
-		self.value_uey08x7raqt1 = 19
+		self.value_66o969je30t6 = 19
 		return nil
 	case "bt":
-		self.value_uey08x7raqt1 = 20
+		self.value_66o969je30t6 = 20
 		return nil
 	case "bo":
-		self.value_uey08x7raqt1 = 21
+		self.value_66o969je30t6 = 21
 		return nil
 	case "ba":
-		self.value_uey08x7raqt1 = 22
+		self.value_66o969je30t6 = 22
 		return nil
 	case "bw":
-		self.value_uey08x7raqt1 = 23
+		self.value_66o969je30t6 = 23
 		return nil
 	case "br":
-		self.value_uey08x7raqt1 = 24
+		self.value_66o969je30t6 = 24
 		return nil
 	case "bn":
-		self.value_uey08x7raqt1 = 25
+		self.value_66o969je30t6 = 25
 		return nil
 	case "bg":
-		self.value_uey08x7raqt1 = 26
+		self.value_66o969je30t6 = 26
 		return nil
 	case "bf":
-		self.value_uey08x7raqt1 = 27
+		self.value_66o969je30t6 = 27
 		return nil
 	case "bi":
-		self.value_uey08x7raqt1 = 28
+		self.value_66o969je30t6 = 28
 		return nil
 	case "kh":
-		self.value_uey08x7raqt1 = 29
+		self.value_66o969je30t6 = 29
 		return nil
 	case "ca":
-		self.value_uey08x7raqt1 = 30
+		self.value_66o969je30t6 = 30
 		return nil
 	case "cv":
-		self.value_uey08x7raqt1 = 31
+		self.value_66o969je30t6 = 31
 		return nil
 	case "ky":
-		self.value_uey08x7raqt1 = 32
+		self.value_66o969je30t6 = 32
 		return nil
 	case "td":
-		self.value_uey08x7raqt1 = 33
+		self.value_66o969je30t6 = 33
 		return nil
 	case "cl":
-		self.value_uey08x7raqt1 = 34
+		self.value_66o969je30t6 = 34
 		return nil
 	case "cn":
-		self.value_uey08x7raqt1 = 35
+		self.value_66o969je30t6 = 35
 		return nil
 	case "c2":
-		self.value_uey08x7raqt1 = 36
+		self.value_66o969je30t6 = 36
 		return nil
 	case "co":
-		self.value_uey08x7raqt1 = 37
+		self.value_66o969je30t6 = 37
 		return nil
 	case "km":
-		self.value_uey08x7raqt1 = 38
+		self.value_66o969je30t6 = 38
 		return nil
 	case "cd":
-		self.value_uey08x7raqt1 = 39
+		self.value_66o969je30t6 = 39
 		return nil
 	case "cg":
-		self.value_uey08x7raqt1 = 40
+		self.value_66o969je30t6 = 40
 		return nil
 	case "ck":
-		self.value_uey08x7raqt1 = 41
+		self.value_66o969je30t6 = 41
 		return nil
 	case "cr":
-		self.value_uey08x7raqt1 = 42
+		self.value_66o969je30t6 = 42
 		return nil
 	case "hr":
-		self.value_uey08x7raqt1 = 43
+		self.value_66o969je30t6 = 43
 		return nil
 	case "cy":
-		self.value_uey08x7raqt1 = 44
+		self.value_66o969je30t6 = 44
 		return nil
 	case "cz":
-		self.value_uey08x7raqt1 = 45
+		self.value_66o969je30t6 = 45
 		return nil
 	case "dk":
-		self.value_uey08x7raqt1 = 46
+		self.value_66o969je30t6 = 46
 		return nil
 	case "dj":
-		self.value_uey08x7raqt1 = 47
+		self.value_66o969je30t6 = 47
 		return nil
 	case "dm":
-		self.value_uey08x7raqt1 = 48
+		self.value_66o969je30t6 = 48
 		return nil
 	case "do":
-		self.value_uey08x7raqt1 = 49
+		self.value_66o969je30t6 = 49
 		return nil
 	case "ec":
-		self.value_uey08x7raqt1 = 50
+		self.value_66o969je30t6 = 50
 		return nil
 	case "eg":
-		self.value_uey08x7raqt1 = 51
+		self.value_66o969je30t6 = 51
 		return nil
 	case "sv":
-		self.value_uey08x7raqt1 = 52
+		self.value_66o969je30t6 = 52
 		return nil
 	case "er":
-		self.value_uey08x7raqt1 = 53
+		self.value_66o969je30t6 = 53
 		return nil
 	case "ee":
-		self.value_uey08x7raqt1 = 54
+		self.value_66o969je30t6 = 54
 		return nil
 	case "et":
-		self.value_uey08x7raqt1 = 55
+		self.value_66o969je30t6 = 55
 		return nil
 	case "fk":
-		self.value_uey08x7raqt1 = 56
+		self.value_66o969je30t6 = 56
 		return nil
 	case "fj":
-		self.value_uey08x7raqt1 = 57
+		self.value_66o969je30t6 = 57
 		return nil
 	case "fi":
-		self.value_uey08x7raqt1 = 58
+		self.value_66o969je30t6 = 58
 		return nil
 	case "fr":
-		self.value_uey08x7raqt1 = 59
+		self.value_66o969je30t6 = 59
 		return nil
 	case "gf":
-		self.value_uey08x7raqt1 = 60
+		self.value_66o969je30t6 = 60
 		return nil
 	case "pf":
-		self.value_uey08x7raqt1 = 61
+		self.value_66o969je30t6 = 61
 		return nil
 	case "ga":
-		self.value_uey08x7raqt1 = 62
+		self.value_66o969je30t6 = 62
 		return nil
 	case "gm":
-		self.value_uey08x7raqt1 = 63
+		self.value_66o969je30t6 = 63
 		return nil
 	case "ge":
-		self.value_uey08x7raqt1 = 64
+		self.value_66o969je30t6 = 64
 		return nil
 	case "de":
-		self.value_uey08x7raqt1 = 65
+		self.value_66o969je30t6 = 65
 		return nil
 	case "gi":
-		self.value_uey08x7raqt1 = 66
+		self.value_66o969je30t6 = 66
 		return nil
 	case "gr":
-		self.value_uey08x7raqt1 = 67
+		self.value_66o969je30t6 = 67
 		return nil
 	case "gl":
-		self.value_uey08x7raqt1 = 68
+		self.value_66o969je30t6 = 68
 		return nil
 	case "gd":
-		self.value_uey08x7raqt1 = 69
+		self.value_66o969je30t6 = 69
 		return nil
 	case "gp":
-		self.value_uey08x7raqt1 = 70
+		self.value_66o969je30t6 = 70
 		return nil
 	case "gu":
-		self.value_uey08x7raqt1 = 71
+		self.value_66o969je30t6 = 71
 		return nil
 	case "gt":
-		self.value_uey08x7raqt1 = 72
+		self.value_66o969je30t6 = 72
 		return nil
 	case "gn":
-		self.value_uey08x7raqt1 = 73
+		self.value_66o969je30t6 = 73
 		return nil
 	case "gw":
-		self.value_uey08x7raqt1 = 74
+		self.value_66o969je30t6 = 74
 		return nil
 	case "gy":
-		self.value_uey08x7raqt1 = 75
+		self.value_66o969je30t6 = 75
 		return nil
 	case "va":
-		self.value_uey08x7raqt1 = 76
+		self.value_66o969je30t6 = 76
 		return nil
 	case "hn":
-		self.value_uey08x7raqt1 = 77
+		self.value_66o969je30t6 = 77
 		return nil
 	case "hk":
-		self.value_uey08x7raqt1 = 78
+		self.value_66o969je30t6 = 78
 		return nil
 	case "hu":
-		self.value_uey08x7raqt1 = 79
+		self.value_66o969je30t6 = 79
 		return nil
 	case "is":
-		self.value_uey08x7raqt1 = 80
+		self.value_66o969je30t6 = 80
 		return nil
 	case "in":
-		self.value_uey08x7raqt1 = 81
+		self.value_66o969je30t6 = 81
 		return nil
 	case "id":
-		self.value_uey08x7raqt1 = 82
+		self.value_66o969je30t6 = 82
 		return nil
 	case "ie":
-		self.value_uey08x7raqt1 = 83
+		self.value_66o969je30t6 = 83
 		return nil
 	case "il":
-		self.value_uey08x7raqt1 = 84
+		self.value_66o969je30t6 = 84
 		return nil
 	case "it":
-		self.value_uey08x7raqt1 = 85
+		self.value_66o969je30t6 = 85
 		return nil
 	case "jm":
-		self.value_uey08x7raqt1 = 86
+		self.value_66o969je30t6 = 86
 		return nil
 	case "jp":
-		self.value_uey08x7raqt1 = 87
+		self.value_66o969je30t6 = 87
 		return nil
 	case "jo":
-		self.value_uey08x7raqt1 = 88
+		self.value_66o969je30t6 = 88
 		return nil
 	case "kz":
-		self.value_uey08x7raqt1 = 89
+		self.value_66o969je30t6 = 89
 		return nil
 	case "ke":
-		self.value_uey08x7raqt1 = 90
+		self.value_66o969je30t6 = 90
 		return nil
 	case "ki":
-		self.value_uey08x7raqt1 = 91
+		self.value_66o969je30t6 = 91
 		return nil
 	case "kr":
-		self.value_uey08x7raqt1 = 92
+		self.value_66o969je30t6 = 92
 		return nil
 	case "kw":
-		self.value_uey08x7raqt1 = 93
+		self.value_66o969je30t6 = 93
 		return nil
 	case "kg":
-		self.value_uey08x7raqt1 = 94
+		self.value_66o969je30t6 = 94
 		return nil
 	case "la":
-		self.value_uey08x7raqt1 = 95
+		self.value_66o969je30t6 = 95
 		return nil
 	case "lv":
-		self.value_uey08x7raqt1 = 96
+		self.value_66o969je30t6 = 96
 		return nil
 	case "ls":
-		self.value_uey08x7raqt1 = 97
+		self.value_66o969je30t6 = 97
 		return nil
 	case "li":
-		self.value_uey08x7raqt1 = 98
+		self.value_66o969je30t6 = 98
 		return nil
 	case "lt":
-		self.value_uey08x7raqt1 = 99
+		self.value_66o969je30t6 = 99
 		return nil
 	case "lu":
-		self.value_uey08x7raqt1 = 100
+		self.value_66o969je30t6 = 100
 		return nil
 	case "mg":
-		self.value_uey08x7raqt1 = 101
+		self.value_66o969je30t6 = 101
 		return nil
 	case "mw":
-		self.value_uey08x7raqt1 = 102
+		self.value_66o969je30t6 = 102
 		return nil
 	case "my":
-		self.value_uey08x7raqt1 = 103
+		self.value_66o969je30t6 = 103
 		return nil
 	case "mv":
-		self.value_uey08x7raqt1 = 104
+		self.value_66o969je30t6 = 104
 		return nil
 	case "ml":
-		self.value_uey08x7raqt1 = 105
+		self.value_66o969je30t6 = 105
 		return nil
 	case "mt":
-		self.value_uey08x7raqt1 = 106
+		self.value_66o969je30t6 = 106
 		return nil
 	case "mh":
-		self.value_uey08x7raqt1 = 107
+		self.value_66o969je30t6 = 107
 		return nil
 	case "mq":
-		self.value_uey08x7raqt1 = 108
+		self.value_66o969je30t6 = 108
 		return nil
 	case "mr":
-		self.value_uey08x7raqt1 = 109
+		self.value_66o969je30t6 = 109
 		return nil
 	case "mu":
-		self.value_uey08x7raqt1 = 110
+		self.value_66o969je30t6 = 110
 		return nil
 	case "yt":
-		self.value_uey08x7raqt1 = 111
+		self.value_66o969je30t6 = 111
 		return nil
 	case "mx":
-		self.value_uey08x7raqt1 = 112
+		self.value_66o969je30t6 = 112
 		return nil
 	case "fm":
-		self.value_uey08x7raqt1 = 113
+		self.value_66o969je30t6 = 113
 		return nil
 	case "mn":
-		self.value_uey08x7raqt1 = 114
+		self.value_66o969je30t6 = 114
 		return nil
 	case "ms":
-		self.value_uey08x7raqt1 = 115
+		self.value_66o969je30t6 = 115
 		return nil
 	case "ma":
-		self.value_uey08x7raqt1 = 116
+		self.value_66o969je30t6 = 116
 		return nil
 	case "mz":
-		self.value_uey08x7raqt1 = 117
+		self.value_66o969je30t6 = 117
 		return nil
 	case "na":
-		self.value_uey08x7raqt1 = 118
+		self.value_66o969je30t6 = 118
 		return nil
 	case "nr":
-		self.value_uey08x7raqt1 = 119
+		self.value_66o969je30t6 = 119
 		return nil
 	case "np":
-		self.value_uey08x7raqt1 = 120
+		self.value_66o969je30t6 = 120
 		return nil
 	case "nl":
-		self.value_uey08x7raqt1 = 121
+		self.value_66o969je30t6 = 121
 		return nil
 	case "an":
-		self.value_uey08x7raqt1 = 122
+		self.value_66o969je30t6 = 122
 		return nil
 	case "nc":
-		self.value_uey08x7raqt1 = 123
+		self.value_66o969je30t6 = 123
 		return nil
 	case "nz":
-		self.value_uey08x7raqt1 = 124
+		self.value_66o969je30t6 = 124
 		return nil
 	case "ni":
-		self.value_uey08x7raqt1 = 125
+		self.value_66o969je30t6 = 125
 		return nil
 	case "ne":
-		self.value_uey08x7raqt1 = 126
+		self.value_66o969je30t6 = 126
 		return nil
 	case "nu":
-		self.value_uey08x7raqt1 = 127
+		self.value_66o969je30t6 = 127
 		return nil
 	case "nf":
-		self.value_uey08x7raqt1 = 128
+		self.value_66o969je30t6 = 128
 		return nil
 	case "no":
-		self.value_uey08x7raqt1 = 129
+		self.value_66o969je30t6 = 129
 		return nil
 	case "om":
-		self.value_uey08x7raqt1 = 130
+		self.value_66o969je30t6 = 130
 		return nil
 	case "pw":
-		self.value_uey08x7raqt1 = 131
+		self.value_66o969je30t6 = 131
 		return nil
 	case "pa":
-		self.value_uey08x7raqt1 = 132
+		self.value_66o969je30t6 = 132
 		return nil
 	case "pg":
-		self.value_uey08x7raqt1 = 133
+		self.value_66o969je30t6 = 133
 		return nil
 	case "pe":
-		self.value_uey08x7raqt1 = 134
+		self.value_66o969je30t6 = 134
 		return nil
 	case "ph":
-		self.value_uey08x7raqt1 = 135
+		self.value_66o969je30t6 = 135
 		return nil
 	case "pn":
-		self.value_uey08x7raqt1 = 136
+		self.value_66o969je30t6 = 136
 		return nil
 	case "pl":
-		self.value_uey08x7raqt1 = 137
+		self.value_66o969je30t6 = 137
 		return nil
 	case "pt":
-		self.value_uey08x7raqt1 = 138
+		self.value_66o969je30t6 = 138
 		return nil
 	case "qa":
-		self.value_uey08x7raqt1 = 139
+		self.value_66o969je30t6 = 139
 		return nil
 	case "re":
-		self.value_uey08x7raqt1 = 140
+		self.value_66o969je30t6 = 140
 		return nil
 	case "ro":
-		self.value_uey08x7raqt1 = 141
+		self.value_66o969je30t6 = 141
 		return nil
 	case "ru":
-		self.value_uey08x7raqt1 = 142
+		self.value_66o969je30t6 = 142
 		return nil
 	case "rw":
-		self.value_uey08x7raqt1 = 143
+		self.value_66o969je30t6 = 143
 		return nil
 	case "sh":
-		self.value_uey08x7raqt1 = 144
+		self.value_66o969je30t6 = 144
 		return nil
 	case "kn":
-		self.value_uey08x7raqt1 = 145
+		self.value_66o969je30t6 = 145
 		return nil
 	case "lc":
-		self.value_uey08x7raqt1 = 146
+		self.value_66o969je30t6 = 146
 		return nil
 	case "pm":
-		self.value_uey08x7raqt1 = 147
+		self.value_66o969je30t6 = 147
 		return nil
 	case "vc":
-		self.value_uey08x7raqt1 = 148
+		self.value_66o969je30t6 = 148
 		return nil
 	case "ws":
-		self.value_uey08x7raqt1 = 149
+		self.value_66o969je30t6 = 149
 		return nil
 	case "sm":
-		self.value_uey08x7raqt1 = 150
+		self.value_66o969je30t6 = 150
 		return nil
 	case "st":
-		self.value_uey08x7raqt1 = 151
+		self.value_66o969je30t6 = 151
 		return nil
 	case "sa":
-		self.value_uey08x7raqt1 = 152
+		self.value_66o969je30t6 = 152
 		return nil
 	case "sn":
-		self.value_uey08x7raqt1 = 153
+		self.value_66o969je30t6 = 153
 		return nil
 	case "rs":
-		self.value_uey08x7raqt1 = 154
+		self.value_66o969je30t6 = 154
 		return nil
 	case "sc":
-		self.value_uey08x7raqt1 = 155
+		self.value_66o969je30t6 = 155
 		return nil
 	case "sl":
-		self.value_uey08x7raqt1 = 156
+		self.value_66o969je30t6 = 156
 		return nil
 	case "sg":
-		self.value_uey08x7raqt1 = 157
+		self.value_66o969je30t6 = 157
 		return nil
 	case "sk":
-		self.value_uey08x7raqt1 = 158
+		self.value_66o969je30t6 = 158
 		return nil
 	case "si":
-		self.value_uey08x7raqt1 = 159
+		self.value_66o969je30t6 = 159
 		return nil
 	case "sb":
-		self.value_uey08x7raqt1 = 160
+		self.value_66o969je30t6 = 160
 		return nil
 	case "so":
-		self.value_uey08x7raqt1 = 161
+		self.value_66o969je30t6 = 161
 		return nil
 	case "za":
-		self.value_uey08x7raqt1 = 162
+		self.value_66o969je30t6 = 162
 		return nil
 	case "es":
-		self.value_uey08x7raqt1 = 163
+		self.value_66o969je30t6 = 163
 		return nil
 	case "lk":
-		self.value_uey08x7raqt1 = 164
+		self.value_66o969je30t6 = 164
 		return nil
 	case "sr":
-		self.value_uey08x7raqt1 = 165
+		self.value_66o969je30t6 = 165
 		return nil
 	case "sj":
-		self.value_uey08x7raqt1 = 166
+		self.value_66o969je30t6 = 166
 		return nil
 	case "sz":
-		self.value_uey08x7raqt1 = 167
+		self.value_66o969je30t6 = 167
 		return nil
 	case "se":
-		self.value_uey08x7raqt1 = 168
+		self.value_66o969je30t6 = 168
 		return nil
 	case "ch":
-		self.value_uey08x7raqt1 = 169
+		self.value_66o969je30t6 = 169
 		return nil
 	case "tw":
-		self.value_uey08x7raqt1 = 170
+		self.value_66o969je30t6 = 170
 		return nil
 	case "tj":
-		self.value_uey08x7raqt1 = 171
+		self.value_66o969je30t6 = 171
 		return nil
 	case "tz":
-		self.value_uey08x7raqt1 = 172
+		self.value_66o969je30t6 = 172
 		return nil
 	case "th":
-		self.value_uey08x7raqt1 = 173
+		self.value_66o969je30t6 = 173
 		return nil
 	case "tg":
-		self.value_uey08x7raqt1 = 174
+		self.value_66o969je30t6 = 174
 		return nil
 	case "to":
-		self.value_uey08x7raqt1 = 175
+		self.value_66o969je30t6 = 175
 		return nil
 	case "tt":
-		self.value_uey08x7raqt1 = 176
+		self.value_66o969je30t6 = 176
 		return nil
 	case "tn":
-		self.value_uey08x7raqt1 = 177
+		self.value_66o969je30t6 = 177
 		return nil
 	case "tr":
-		self.value_uey08x7raqt1 = 178
+		self.value_66o969je30t6 = 178
 		return nil
 	case "tm":
-		self.value_uey08x7raqt1 = 179
+		self.value_66o969je30t6 = 179
 		return nil
 	case "tc":
-		self.value_uey08x7raqt1 = 180
+		self.value_66o969je30t6 = 180
 		return nil
 	case "tv":
-		self.value_uey08x7raqt1 = 181
+		self.value_66o969je30t6 = 181
 		return nil
 	case "ug":
-		self.value_uey08x7raqt1 = 182
+		self.value_66o969je30t6 = 182
 		return nil
 	case "ua":
-		self.value_uey08x7raqt1 = 183
+		self.value_66o969je30t6 = 183
 		return nil
 	case "ae":
-		self.value_uey08x7raqt1 = 184
+		self.value_66o969je30t6 = 184
 		return nil
 	case "gb":
-		self.value_uey08x7raqt1 = 185
+		self.value_66o969je30t6 = 185
 		return nil
 	case "us":
-		self.value_uey08x7raqt1 = 186
+		self.value_66o969je30t6 = 186
 		return nil
 	case "uy":
-		self.value_uey08x7raqt1 = 187
+		self.value_66o969je30t6 = 187
 		return nil
 	case "vu":
-		self.value_uey08x7raqt1 = 188
+		self.value_66o969je30t6 = 188
 		return nil
 	case "ve":
-		self.value_uey08x7raqt1 = 189
+		self.value_66o969je30t6 = 189
 		return nil
 	case "vn":
-		self.value_uey08x7raqt1 = 190
+		self.value_66o969je30t6 = 190
 		return nil
 	case "vg":
-		self.value_uey08x7raqt1 = 191
+		self.value_66o969je30t6 = 191
 		return nil
 	case "wf":
-		self.value_uey08x7raqt1 = 192
+		self.value_66o969je30t6 = 192
 		return nil
 	case "ye":
-		self.value_uey08x7raqt1 = 193
+		self.value_66o969je30t6 = 193
 		return nil
 	case "zm":
-		self.value_uey08x7raqt1 = 194
+		self.value_66o969je30t6 = 194
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling CountryCodeEnum\n", s)
@@ -6378,7 +6378,7 @@ StateCodeEnum
 
 ******************************/
 
-type StateCodeEnum struct{ value_1rw6mkco4ckp0 uint8 }
+type StateCodeEnum struct{ value_ppcqqwdfvzyu uint8 }
 
 var StateCode = struct {
 	AL StateCodeEnum
@@ -6443,64 +6443,64 @@ var StateCode = struct {
 	// Values is an array of all variants. Useful in range loops.
 	Values [58]StateCodeEnum
 }{
-	AL: StateCodeEnum{value_1rw6mkco4ckp0: 1},
-	AK: StateCodeEnum{value_1rw6mkco4ckp0: 2},
-	AZ: StateCodeEnum{value_1rw6mkco4ckp0: 3},
-	AR: StateCodeEnum{value_1rw6mkco4ckp0: 4},
-	CA: StateCodeEnum{value_1rw6mkco4ckp0: 5},
-	CO: StateCodeEnum{value_1rw6mkco4ckp0: 6},
-	CT: StateCodeEnum{value_1rw6mkco4ckp0: 7},
-	DE: StateCodeEnum{value_1rw6mkco4ckp0: 8},
-	FL: StateCodeEnum{value_1rw6mkco4ckp0: 9},
-	GA: StateCodeEnum{value_1rw6mkco4ckp0: 10},
-	HI: StateCodeEnum{value_1rw6mkco4ckp0: 11},
-	ID: StateCodeEnum{value_1rw6mkco4ckp0: 12},
-	IL: StateCodeEnum{value_1rw6mkco4ckp0: 13},
-	IN: StateCodeEnum{value_1rw6mkco4ckp0: 14},
-	IA: StateCodeEnum{value_1rw6mkco4ckp0: 15},
-	KS: StateCodeEnum{value_1rw6mkco4ckp0: 16},
-	KY: StateCodeEnum{value_1rw6mkco4ckp0: 17},
-	LA: StateCodeEnum{value_1rw6mkco4ckp0: 18},
-	ME: StateCodeEnum{value_1rw6mkco4ckp0: 19},
-	MD: StateCodeEnum{value_1rw6mkco4ckp0: 20},
-	MA: StateCodeEnum{value_1rw6mkco4ckp0: 21},
-	MI: StateCodeEnum{value_1rw6mkco4ckp0: 22},
-	MN: StateCodeEnum{value_1rw6mkco4ckp0: 23},
-	MS: StateCodeEnum{value_1rw6mkco4ckp0: 24},
-	MO: StateCodeEnum{value_1rw6mkco4ckp0: 25},
-	MT: StateCodeEnum{value_1rw6mkco4ckp0: 26},
-	NE: StateCodeEnum{value_1rw6mkco4ckp0: 27},
-	NV: StateCodeEnum{value_1rw6mkco4ckp0: 28},
-	NH: StateCodeEnum{value_1rw6mkco4ckp0: 29},
-	NJ: StateCodeEnum{value_1rw6mkco4ckp0: 30},
-	NM: StateCodeEnum{value_1rw6mkco4ckp0: 31},
-	NY: StateCodeEnum{value_1rw6mkco4ckp0: 32},
-	NC: StateCodeEnum{value_1rw6mkco4ckp0: 33},
-	ND: StateCodeEnum{value_1rw6mkco4ckp0: 34},
-	OH: StateCodeEnum{value_1rw6mkco4ckp0: 35},
-	OK: StateCodeEnum{value_1rw6mkco4ckp0: 36},
-	OR: StateCodeEnum{value_1rw6mkco4ckp0: 37},
-	PA: StateCodeEnum{value_1rw6mkco4ckp0: 38},
-	RI: StateCodeEnum{value_1rw6mkco4ckp0: 39},
-	SC: StateCodeEnum{value_1rw6mkco4ckp0: 40},
-	SD: StateCodeEnum{value_1rw6mkco4ckp0: 41},
-	TN: StateCodeEnum{value_1rw6mkco4ckp0: 42},
-	TX: StateCodeEnum{value_1rw6mkco4ckp0: 43},
-	UT: StateCodeEnum{value_1rw6mkco4ckp0: 44},
-	VT: StateCodeEnum{value_1rw6mkco4ckp0: 45},
-	VA: StateCodeEnum{value_1rw6mkco4ckp0: 46},
-	WA: StateCodeEnum{value_1rw6mkco4ckp0: 47},
-	WV: StateCodeEnum{value_1rw6mkco4ckp0: 48},
-	WI: StateCodeEnum{value_1rw6mkco4ckp0: 49},
-	WY: StateCodeEnum{value_1rw6mkco4ckp0: 50},
-	AS: StateCodeEnum{value_1rw6mkco4ckp0: 51},
-	DC: StateCodeEnum{value_1rw6mkco4ckp0: 52},
-	FM: StateCodeEnum{value_1rw6mkco4ckp0: 53},
-	GU: StateCodeEnum{value_1rw6mkco4ckp0: 54},
-	MH: StateCodeEnum{value_1rw6mkco4ckp0: 55},
-	MP: StateCodeEnum{value_1rw6mkco4ckp0: 56},
-	PW: StateCodeEnum{value_1rw6mkco4ckp0: 57},
-	PR: StateCodeEnum{value_1rw6mkco4ckp0: 58},
+	AL: StateCodeEnum{value_ppcqqwdfvzyu: 1},
+	AK: StateCodeEnum{value_ppcqqwdfvzyu: 2},
+	AZ: StateCodeEnum{value_ppcqqwdfvzyu: 3},
+	AR: StateCodeEnum{value_ppcqqwdfvzyu: 4},
+	CA: StateCodeEnum{value_ppcqqwdfvzyu: 5},
+	CO: StateCodeEnum{value_ppcqqwdfvzyu: 6},
+	CT: StateCodeEnum{value_ppcqqwdfvzyu: 7},
+	DE: StateCodeEnum{value_ppcqqwdfvzyu: 8},
+	FL: StateCodeEnum{value_ppcqqwdfvzyu: 9},
+	GA: StateCodeEnum{value_ppcqqwdfvzyu: 10},
+	HI: StateCodeEnum{value_ppcqqwdfvzyu: 11},
+	ID: StateCodeEnum{value_ppcqqwdfvzyu: 12},
+	IL: StateCodeEnum{value_ppcqqwdfvzyu: 13},
+	IN: StateCodeEnum{value_ppcqqwdfvzyu: 14},
+	IA: StateCodeEnum{value_ppcqqwdfvzyu: 15},
+	KS: StateCodeEnum{value_ppcqqwdfvzyu: 16},
+	KY: StateCodeEnum{value_ppcqqwdfvzyu: 17},
+	LA: StateCodeEnum{value_ppcqqwdfvzyu: 18},
+	ME: StateCodeEnum{value_ppcqqwdfvzyu: 19},
+	MD: StateCodeEnum{value_ppcqqwdfvzyu: 20},
+	MA: StateCodeEnum{value_ppcqqwdfvzyu: 21},
+	MI: StateCodeEnum{value_ppcqqwdfvzyu: 22},
+	MN: StateCodeEnum{value_ppcqqwdfvzyu: 23},
+	MS: StateCodeEnum{value_ppcqqwdfvzyu: 24},
+	MO: StateCodeEnum{value_ppcqqwdfvzyu: 25},
+	MT: StateCodeEnum{value_ppcqqwdfvzyu: 26},
+	NE: StateCodeEnum{value_ppcqqwdfvzyu: 27},
+	NV: StateCodeEnum{value_ppcqqwdfvzyu: 28},
+	NH: StateCodeEnum{value_ppcqqwdfvzyu: 29},
+	NJ: StateCodeEnum{value_ppcqqwdfvzyu: 30},
+	NM: StateCodeEnum{value_ppcqqwdfvzyu: 31},
+	NY: StateCodeEnum{value_ppcqqwdfvzyu: 32},
+	NC: StateCodeEnum{value_ppcqqwdfvzyu: 33},
+	ND: StateCodeEnum{value_ppcqqwdfvzyu: 34},
+	OH: StateCodeEnum{value_ppcqqwdfvzyu: 35},
+	OK: StateCodeEnum{value_ppcqqwdfvzyu: 36},
+	OR: StateCodeEnum{value_ppcqqwdfvzyu: 37},
+	PA: StateCodeEnum{value_ppcqqwdfvzyu: 38},
+	RI: StateCodeEnum{value_ppcqqwdfvzyu: 39},
+	SC: StateCodeEnum{value_ppcqqwdfvzyu: 40},
+	SD: StateCodeEnum{value_ppcqqwdfvzyu: 41},
+	TN: StateCodeEnum{value_ppcqqwdfvzyu: 42},
+	TX: StateCodeEnum{value_ppcqqwdfvzyu: 43},
+	UT: StateCodeEnum{value_ppcqqwdfvzyu: 44},
+	VT: StateCodeEnum{value_ppcqqwdfvzyu: 45},
+	VA: StateCodeEnum{value_ppcqqwdfvzyu: 46},
+	WA: StateCodeEnum{value_ppcqqwdfvzyu: 47},
+	WV: StateCodeEnum{value_ppcqqwdfvzyu: 48},
+	WI: StateCodeEnum{value_ppcqqwdfvzyu: 49},
+	WY: StateCodeEnum{value_ppcqqwdfvzyu: 50},
+	AS: StateCodeEnum{value_ppcqqwdfvzyu: 51},
+	DC: StateCodeEnum{value_ppcqqwdfvzyu: 52},
+	FM: StateCodeEnum{value_ppcqqwdfvzyu: 53},
+	GU: StateCodeEnum{value_ppcqqwdfvzyu: 54},
+	MH: StateCodeEnum{value_ppcqqwdfvzyu: 55},
+	MP: StateCodeEnum{value_ppcqqwdfvzyu: 56},
+	PW: StateCodeEnum{value_ppcqqwdfvzyu: 57},
+	PR: StateCodeEnum{value_ppcqqwdfvzyu: 58},
 }
 
 func init() {
@@ -6511,17 +6511,17 @@ func init() {
 
 // Value returns the numeric value of the variant as a uint8.
 func (self StateCodeEnum) Value() uint8 {
-	return self.value_1rw6mkco4ckp0
+	return self.value_ppcqqwdfvzyu
 }
 
 // IntValue is the same as 'Value()', except that the value is cast to an 'int'.
 func (self StateCodeEnum) IntValue() int {
-	return int(self.value_1rw6mkco4ckp0)
+	return int(self.value_ppcqqwdfvzyu)
 }
 
 // Name returns the name of the variant as a string.
 func (self StateCodeEnum) Name() string {
-	switch self.value_1rw6mkco4ckp0 {
+	switch self.value_ppcqqwdfvzyu {
 	case 1:
 		return "AL"
 	case 2:
@@ -6656,13 +6656,13 @@ func (self StateCodeEnum) Namespace() string {
 // IsDefault returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
 func (self StateCodeEnum) IsDefault() bool {
-	return self.value_1rw6mkco4ckp0 == 0
+	return self.value_ppcqqwdfvzyu == 0
 }
 
-// CanElide returns true if the variant was designated as the default value, or if
+// IsZero returns true if the variant was designated as the default value, or if
 // there's no explicit default, and it has the zero value.
-// This implements the Elidable interface.
-func (self StateCodeEnum) CanElide() bool {
+// This implements the Zeroable interface.
+func (self StateCodeEnum) IsZero() bool {
 	return self.IsDefault()
 }
 
@@ -6670,7 +6670,7 @@ func (self StateCodeEnum) CanElide() bool {
 // its return value is as though 'Name()' had been called.
 
 func (self StateCodeEnum) String() string {
-	switch self.value_1rw6mkco4ckp0 {
+	switch self.value_ppcqqwdfvzyu {
 	case 1:
 		return "AL"
 	case 2:
@@ -6795,7 +6795,7 @@ func (self StateCodeEnum) String() string {
 // Description returns the description of the variant. If none has been set, its
 // return value is as though 'String()' had been called.
 func (self StateCodeEnum) Description() string {
-	switch self.value_1rw6mkco4ckp0 {
+	switch self.value_ppcqqwdfvzyu {
 	case 1:
 		return "Alabama"
 	case 2:
@@ -6939,178 +6939,178 @@ func (self *StateCodeEnum) UnmarshalJSON(b []byte) error {
 
 	switch strings.ToLower(s) {
 	case "al":
-		self.value_1rw6mkco4ckp0 = 1
+		self.value_ppcqqwdfvzyu = 1
 		return nil
 	case "ak":
-		self.value_1rw6mkco4ckp0 = 2
+		self.value_ppcqqwdfvzyu = 2
 		return nil
 	case "az":
-		self.value_1rw6mkco4ckp0 = 3
+		self.value_ppcqqwdfvzyu = 3
 		return nil
 	case "ar":
-		self.value_1rw6mkco4ckp0 = 4
+		self.value_ppcqqwdfvzyu = 4
 		return nil
 	case "ca":
-		self.value_1rw6mkco4ckp0 = 5
+		self.value_ppcqqwdfvzyu = 5
 		return nil
 	case "co":
-		self.value_1rw6mkco4ckp0 = 6
+		self.value_ppcqqwdfvzyu = 6
 		return nil
 	case "ct":
-		self.value_1rw6mkco4ckp0 = 7
+		self.value_ppcqqwdfvzyu = 7
 		return nil
 	case "de":
-		self.value_1rw6mkco4ckp0 = 8
+		self.value_ppcqqwdfvzyu = 8
 		return nil
 	case "fl":
-		self.value_1rw6mkco4ckp0 = 9
+		self.value_ppcqqwdfvzyu = 9
 		return nil
 	case "ga":
-		self.value_1rw6mkco4ckp0 = 10
+		self.value_ppcqqwdfvzyu = 10
 		return nil
 	case "hi":
-		self.value_1rw6mkco4ckp0 = 11
+		self.value_ppcqqwdfvzyu = 11
 		return nil
 	case "id":
-		self.value_1rw6mkco4ckp0 = 12
+		self.value_ppcqqwdfvzyu = 12
 		return nil
 	case "il":
-		self.value_1rw6mkco4ckp0 = 13
+		self.value_ppcqqwdfvzyu = 13
 		return nil
 	case "in":
-		self.value_1rw6mkco4ckp0 = 14
+		self.value_ppcqqwdfvzyu = 14
 		return nil
 	case "ia":
-		self.value_1rw6mkco4ckp0 = 15
+		self.value_ppcqqwdfvzyu = 15
 		return nil
 	case "ks":
-		self.value_1rw6mkco4ckp0 = 16
+		self.value_ppcqqwdfvzyu = 16
 		return nil
 	case "ky":
-		self.value_1rw6mkco4ckp0 = 17
+		self.value_ppcqqwdfvzyu = 17
 		return nil
 	case "la":
-		self.value_1rw6mkco4ckp0 = 18
+		self.value_ppcqqwdfvzyu = 18
 		return nil
 	case "me":
-		self.value_1rw6mkco4ckp0 = 19
+		self.value_ppcqqwdfvzyu = 19
 		return nil
 	case "md":
-		self.value_1rw6mkco4ckp0 = 20
+		self.value_ppcqqwdfvzyu = 20
 		return nil
 	case "ma":
-		self.value_1rw6mkco4ckp0 = 21
+		self.value_ppcqqwdfvzyu = 21
 		return nil
 	case "mi":
-		self.value_1rw6mkco4ckp0 = 22
+		self.value_ppcqqwdfvzyu = 22
 		return nil
 	case "mn":
-		self.value_1rw6mkco4ckp0 = 23
+		self.value_ppcqqwdfvzyu = 23
 		return nil
 	case "ms":
-		self.value_1rw6mkco4ckp0 = 24
+		self.value_ppcqqwdfvzyu = 24
 		return nil
 	case "mo":
-		self.value_1rw6mkco4ckp0 = 25
+		self.value_ppcqqwdfvzyu = 25
 		return nil
 	case "mt":
-		self.value_1rw6mkco4ckp0 = 26
+		self.value_ppcqqwdfvzyu = 26
 		return nil
 	case "ne":
-		self.value_1rw6mkco4ckp0 = 27
+		self.value_ppcqqwdfvzyu = 27
 		return nil
 	case "nv":
-		self.value_1rw6mkco4ckp0 = 28
+		self.value_ppcqqwdfvzyu = 28
 		return nil
 	case "nh":
-		self.value_1rw6mkco4ckp0 = 29
+		self.value_ppcqqwdfvzyu = 29
 		return nil
 	case "nj":
-		self.value_1rw6mkco4ckp0 = 30
+		self.value_ppcqqwdfvzyu = 30
 		return nil
 	case "nm":
-		self.value_1rw6mkco4ckp0 = 31
+		self.value_ppcqqwdfvzyu = 31
 		return nil
 	case "ny":
-		self.value_1rw6mkco4ckp0 = 32
+		self.value_ppcqqwdfvzyu = 32
 		return nil
 	case "nc":
-		self.value_1rw6mkco4ckp0 = 33
+		self.value_ppcqqwdfvzyu = 33
 		return nil
 	case "nd":
-		self.value_1rw6mkco4ckp0 = 34
+		self.value_ppcqqwdfvzyu = 34
 		return nil
 	case "oh":
-		self.value_1rw6mkco4ckp0 = 35
+		self.value_ppcqqwdfvzyu = 35
 		return nil
 	case "ok":
-		self.value_1rw6mkco4ckp0 = 36
+		self.value_ppcqqwdfvzyu = 36
 		return nil
 	case "or":
-		self.value_1rw6mkco4ckp0 = 37
+		self.value_ppcqqwdfvzyu = 37
 		return nil
 	case "pa":
-		self.value_1rw6mkco4ckp0 = 38
+		self.value_ppcqqwdfvzyu = 38
 		return nil
 	case "ri":
-		self.value_1rw6mkco4ckp0 = 39
+		self.value_ppcqqwdfvzyu = 39
 		return nil
 	case "sc":
-		self.value_1rw6mkco4ckp0 = 40
+		self.value_ppcqqwdfvzyu = 40
 		return nil
 	case "sd":
-		self.value_1rw6mkco4ckp0 = 41
+		self.value_ppcqqwdfvzyu = 41
 		return nil
 	case "tn":
-		self.value_1rw6mkco4ckp0 = 42
+		self.value_ppcqqwdfvzyu = 42
 		return nil
 	case "tx":
-		self.value_1rw6mkco4ckp0 = 43
+		self.value_ppcqqwdfvzyu = 43
 		return nil
 	case "ut":
-		self.value_1rw6mkco4ckp0 = 44
+		self.value_ppcqqwdfvzyu = 44
 		return nil
 	case "vt":
-		self.value_1rw6mkco4ckp0 = 45
+		self.value_ppcqqwdfvzyu = 45
 		return nil
 	case "va":
-		self.value_1rw6mkco4ckp0 = 46
+		self.value_ppcqqwdfvzyu = 46
 		return nil
 	case "wa":
-		self.value_1rw6mkco4ckp0 = 47
+		self.value_ppcqqwdfvzyu = 47
 		return nil
 	case "wv":
-		self.value_1rw6mkco4ckp0 = 48
+		self.value_ppcqqwdfvzyu = 48
 		return nil
 	case "wi":
-		self.value_1rw6mkco4ckp0 = 49
+		self.value_ppcqqwdfvzyu = 49
 		return nil
 	case "wy":
-		self.value_1rw6mkco4ckp0 = 50
+		self.value_ppcqqwdfvzyu = 50
 		return nil
 	case "as":
-		self.value_1rw6mkco4ckp0 = 51
+		self.value_ppcqqwdfvzyu = 51
 		return nil
 	case "dc":
-		self.value_1rw6mkco4ckp0 = 52
+		self.value_ppcqqwdfvzyu = 52
 		return nil
 	case "fm":
-		self.value_1rw6mkco4ckp0 = 53
+		self.value_ppcqqwdfvzyu = 53
 		return nil
 	case "gu":
-		self.value_1rw6mkco4ckp0 = 54
+		self.value_ppcqqwdfvzyu = 54
 		return nil
 	case "mh":
-		self.value_1rw6mkco4ckp0 = 55
+		self.value_ppcqqwdfvzyu = 55
 		return nil
 	case "mp":
-		self.value_1rw6mkco4ckp0 = 56
+		self.value_ppcqqwdfvzyu = 56
 		return nil
 	case "pw":
-		self.value_1rw6mkco4ckp0 = 57
+		self.value_ppcqqwdfvzyu = 57
 		return nil
 	case "pr":
-		self.value_1rw6mkco4ckp0 = 58
+		self.value_ppcqqwdfvzyu = 58
 		return nil
 	default:
 		log.Printf("Unexpected value: %q while unmarshaling StateCodeEnum\n", s)

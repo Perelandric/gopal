@@ -17,23 +17,26 @@ import "path"
 @struct
 */
 // State values are: pending, completed, refunded, partially_refunded
-type __Capture struct {
+type Capture struct {
 	_shared
-	Amount         amount   `gRead json:"amount"`
-	TransactionFee currency `gRead gWrite json:"transaction_fee"`
-	IsFinalCapture bool     `gRead gWrite json:"is_final_capture,omitempty"`
+	Amount         amount   `json:"amount"`
+	TransactionFee currency `json:"transaction_fee"`
+	IsFinalCapture bool     `json:"is_final_capture,omitempty"`
 }
 
 // Implement the resource interface
 
 func (self *Capture) getPath() string {
-	return path.Join(_capturePath, self._shared.private.Id)
+	return path.Join(_capturePath, self._shared.Id)
+}
+func (c *Capture) GetAmount() amount {
+	return c.Amount
 }
 
 // Implement `refundable` interface
 
 func (self *Capture) getRefundPath() string {
-	return path.Join(_capturePath, self._shared.private.Id, _refund)
+	return path.Join(_capturePath, self._shared.Id, _refund)
 }
 
 /*************************************************************
@@ -74,5 +77,5 @@ func (self *Capture) Refund(amt float64) (*Refund, error) {
 }
 
 func (self *Capture) FullRefund() (*Refund, error) {
-	return self.doRefund(self, self.private.Amount.private.Total)
+	return self.doRefund(self, self.Amount.Total)
 }

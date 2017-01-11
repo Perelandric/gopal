@@ -26,19 +26,22 @@ import (
 @struct
 */
 // State items are: pending; completed; failed
-type __Refund struct {
+type Refund struct {
 	_shared
-	Amount      amount `gRead json:"amount"`
-	Description string `gRead gWrite json:"description,omitempty"`
-	Reason      string `gRead gWrite json:"reason,omitempty"`
-	SaleId      string `gRead json:"sale_id,omitempty"`
-	CaptureId   string `gRead json:"capture_id,omitempty"`
+	Amount      amount `json:"amount"`
+	Description string `json:"description,omitempty"`
+	Reason      string `json:"reason,omitempty"`
+	SaleId      string `json:"sale_id,omitempty"`
+	CaptureId   string `json:"capture_id,omitempty"`
 }
 
 // Implement the resource interface
 
 func (self *Refund) getPath() string {
-	return path.Join(_refundPath, self._shared.private.Id)
+	return path.Join(_refundPath, self._shared.Id)
+}
+func (r *Refund) GetAmount() amount {
+	return r.Amount
 }
 
 // General purpose function for performing a refund.
@@ -50,10 +53,10 @@ func (self *connection) doRefund(obj refundable, amt float64) (*Refund, error) {
 
 	ref := &Refund{}
 
-	ref.private.Amount.private.Currency = obj.Amount().private.Currency
-	ref.private.Amount.private.Total = amt
+	ref.Amount.Currency = obj.GetAmount().Currency
+	ref.Amount.Total = amt
 
-	if err := ref.private.Amount.validate(); err != nil {
+	if err := ref.Amount.validate(); err != nil {
 		return nil, err
 	}
 

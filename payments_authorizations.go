@@ -19,23 +19,26 @@ import "path"
 */
 // State items are:
 // pending, authorized, captured, partially_captured, expired, voided
-type __Authorization struct {
+type Authorization struct {
 	_shared
-	Amount             amount                 `gRead json:"amount"`
-	BillingAgreementId string                 `gRead json:"billing_agreement_id"`
-	PaymentMode        paymentModeEnum        `gRead json:"payment_mode"`
-	ReasonCode         reasonCodeEnum         `gRead json:"reason_code"`
-	ValidUntil         dateTime               `gRead json:"valid_until"`
-	ClearingTime       string                 `gRead json:"clearing_time"`
-	ProtectionElig     protectionEligEnum     `gRead json:"protection_eligibility"`
-	ProtectionEligType protectionEligTypeEnum `gRead json:"protection_eligibility_type"`
-	FmfDetails         fmfDetails             `gRead json:"fmf_details"`
+	Amount             amount                 `json:"amount"`
+	BillingAgreementId string                 `json:"billing_agreement_id"`
+	PaymentMode        paymentModeEnum        `json:"payment_mode"`
+	ReasonCode         reasonCodeEnum         `json:"reason_code"`
+	ValidUntil         dateTime               `json:"valid_until"`
+	ClearingTime       string                 `json:"clearing_time"`
+	ProtectionElig     protectionEligEnum     `json:"protection_eligibility"`
+	ProtectionEligType protectionEligTypeEnum `json:"protection_eligibility_type"`
+	FmfDetails         fmfDetails             `json:"fmf_details"`
 }
 
 // Implement the resource interface
 
 func (self *Authorization) getPath() string {
-	return path.Join(_authorizationPath, self._shared.private.Id)
+	return path.Join(_authorizationPath, self._shared.Id)
+}
+func (a *Authorization) GetAmount() amount {
+	return a.Amount
 }
 
 /*************************************************************
@@ -80,13 +83,13 @@ func (self *Authorization) Capture(amt *amount, is_final bool) (*Capture, error)
 		_shared:        _shared{},
 		IsFinalCapture: is_final,
 	}
-	capt_req.private.Amount = *amt
+	capt_req.Amount = *amt
 
 	var capt_resp = new(Capture)
 
 	if err := self.send(&request{
 		method:   method.Post,
-		path:     path.Join(_authorizationPath, self._shared.private.Id, _capture),
+		path:     path.Join(_authorizationPath, self._shared.Id, _capture),
 		body:     capt_req,
 		response: capt_resp,
 	}); err != nil {
@@ -110,7 +113,7 @@ func (self *Authorization) Void() (*Authorization, error) {
 
 	if err := self.send(&request{
 		method:   method.Post,
-		path:     path.Join(_authorizationPath, self._shared.private.Id, _void),
+		path:     path.Join(_authorizationPath, self._shared.Id, _void),
 		body:     nil,
 		response: void_resp,
 	}); err != nil {
@@ -142,15 +145,15 @@ authorized amount, not to exceed an increase of $75 USD.
 func (self *Authorization) ReauthorizeAmount(amt *amount) (*Authorization, error) {
 	var auth_req = new(Authorization)
 	if amt == nil {
-		auth_req.private.Amount = self.private.Amount
+		auth_req.Amount = self.Amount
 	} else {
-		auth_req.private.Amount = *amt
+		auth_req.Amount = *amt
 	}
 	var auth_resp = new(Authorization)
 
 	if err := self.send(&request{
 		method:   method.Post,
-		path:     path.Join(_authorizationPath, self._shared.private.Id, _reauthorize),
+		path:     path.Join(_authorizationPath, self._shared.Id, _reauthorize),
 		body:     auth_req,
 		response: auth_resp,
 	}); err != nil {

@@ -24,34 +24,37 @@ import "path"
 // TODO: PendingReason appears in the old docs under the general Sale object description
 // but not under the lower "sale object" definition. The new docs have it
 // marked as [DEPRECATED] in one area, but not another.
-type __Sale struct {
+type Sale struct {
 	_shared
-	Amount                    amount                 `gRead json:"amount"`
-	Description               string                 `gRead gWrite json:"description,omitempty"`
-	TransactionFee            currency               `gRead gWrite json:"transaction_fee"`
-	ReceivableAmount          currency               `gRead gWrite json:"receivable_amount"`
-	PendingReason             pendingReasonEnum      `gRead json:"pending_reason"`
-	PaymentMode               paymentModeEnum        `gRead json:"payment_mode"`
-	ExchangeRate              string                 `gRead json:"exchange_rate"`
-	FmfDetails                fmfDetails             `gRead json:"fmf_details"`
-	ReceiptId                 string                 `gRead json:"receipt_id"`
-	ReasonCode                reasonCodeEnum         `gRead json:"reason_code"`
-	ProtectionEligibility     protectionEligEnum     `gRead json:"protection_eligibility"`
-	ProtectionEligibilityType protectionEligTypeEnum `gRead json:"protection_eligibility_type"`
-	ClearingTime              string                 `gRead json:"clearing_time"`
-	BillingAgreementId        string                 `gRead json:"billing_agreement_id"`
+	Amount                    amount                 `json:"amount"`
+	Description               string                 `json:"description,omitempty"`
+	TransactionFee            currency               `json:"transaction_fee"`
+	ReceivableAmount          currency               `json:"receivable_amount"`
+	PendingReason             pendingReasonEnum      `json:"pending_reason"`
+	PaymentMode               paymentModeEnum        `json:"payment_mode"`
+	ExchangeRate              string                 `json:"exchange_rate"`
+	FmfDetails                fmfDetails             `json:"fmf_details"`
+	ReceiptId                 string                 `json:"receipt_id"`
+	ReasonCode                reasonCodeEnum         `json:"reason_code"`
+	ProtectionEligibility     protectionEligEnum     `json:"protection_eligibility"`
+	ProtectionEligibilityType protectionEligTypeEnum `json:"protection_eligibility_type"`
+	ClearingTime              string                 `json:"clearing_time"`
+	BillingAgreementId        string                 `json:"billing_agreement_id"`
 }
 
 // Implement the resource interface
 
 func (self *Sale) getPath() string {
-	return path.Join(_salePath, self._shared.private.Id)
+	return path.Join(_salePath, self._shared.Id)
+}
+func (s *Sale) GetAmount() amount {
+	return s.Amount
 }
 
 // Implement `refundable` interface
 
 func (self *Sale) getRefundPath() string {
-	return path.Join(_salePath, self._shared.private.Id, _refund)
+	return path.Join(_salePath, self._shared.Id, _refund)
 }
 
 /*************************************************************
@@ -95,5 +98,5 @@ func (self *Sale) Refund(amt float64) (*Refund, error) {
 }
 
 func (self *Sale) FullRefund() (*Refund, error) {
-	return self.doRefund(self, self.private.Amount.private.Total)
+	return self.doRefund(self, self.Amount.Total)
 }

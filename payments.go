@@ -1,6 +1,7 @@
 package gopal
 
 import (
+	"Golific/gJson"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -11,8 +12,14 @@ import (
 //go:generate Golific $GOFILE
 
 type dateTime string // TODO: How should this be done? [Un]Marshalers?
-func (d dateTime) CanElide() bool {
+func (d dateTime) IsZero() bool {
 	return len(d) == 0
+}
+func (d dateTime) Encode(enc *gJson.Encoder) bool {
+	if d.IsZero() {
+		return false
+	}
+	return enc.EncodeString(string(d), false)
 }
 
 // TODO: only needed until Golific acknowledges more types
@@ -21,13 +28,13 @@ type fundingInstruments []*fundingInstrument
 /*
 @struct
 */
-type __CreditCardItem struct {
-	Currency CurrencyTypeEnum `gRead json:"currency"`
-	Quantity int64            `gRead gWrite json:"quantity"`
-	Name     string           `gRead gWrite json:"name"`
-	Price    float64          `gRead gWrite json:"price,string"`
-	Sku      string           `gRead gWrite json:"sku,omitempty"`
-	Url      string           `gRead gWrite json:"url,omitempty"`
+type CreditCardItem struct {
+	Currency CurrencyTypeEnum `json:"currency"`
+	Quantity int64            `json:"quantity"`
+	Name     string           `json:"name"`
+	Price    float64          `json:"price,string"`
+	Sku      string           `json:"sku,omitempty"`
+	Url      string           `json:"url,omitempty"`
 }
 
 func (ti *CreditCardItem) validate() (err error) {
@@ -48,15 +55,15 @@ func (ti *CreditCardItem) validate() (err error) {
 /*
 @struct
 */
-type __PaypalItem struct {
-	Currency    CurrencyTypeEnum `gRead json:"currency"`
-	Quantity    int64            `gRead gWrite json:"quantity"`
-	Name        string           `gRead gWrite json:"name"`
-	Price       float64          `gRead gWrite json:"price,string"`
-	Sku         string           `gRead gWrite json:"sku,omitempty"`
-	Url         string           `gRead gWrite json:"url,omitempty"`
-	Tax         float64          `gRead gWrite json:"tax,string,omitempty"`
-	Description string           `gRead gWrite json:"description,omitempty"`
+type PaypalItem struct {
+	Currency    CurrencyTypeEnum `json:"currency"`
+	Quantity    int64            `json:"quantity"`
+	Name        string           `json:"name"`
+	Price       float64          `json:"price,string"`
+	Sku         string           `json:"sku,omitempty"`
+	Url         string           `json:"url,omitempty"`
+	Tax         float64          `json:"tax,string,omitempty"`
+	Description string           `json:"description,omitempty"`
 }
 
 func (pi *PaypalItem) validate() (err error) {
@@ -82,7 +89,7 @@ func (pi *PaypalItem) validate() (err error) {
 type resource interface {
 	errorable
 	getPath() string
-	Amount() amount
+	GetAmount() amount
 }
 
 type Payment interface {
@@ -187,19 +194,19 @@ func (self *connection) FetchPayment(payment_id string) (Payment, error) {
 /*
 @struct drop_ctor
 */
-type ___shared struct {
+type _shared struct {
 	*connection
-	Id            string    `gRead json:"id,omitempty"`
-	CreateTime    dateTime  `gRead json:"create_time,omitempty"`
-	UpdateTime    dateTime  `gRead json:"update_time,omitempty"`
-	State         StateEnum `gRead json:"state,omitempty"`
-	ParentPayment string    `gRead json:"parent_payment,omitempty"`
+	Id            string    `json:"id,omitempty"`
+	CreateTime    dateTime  `json:"create_time,omitempty"`
+	UpdateTime    dateTime  `json:"update_time,omitempty"`
+	State         StateEnum `json:"state,omitempty"`
+	ParentPayment string    `json:"parent_payment,omitempty"`
 	Links         links     `json:"links,omitempty"`
 	*identity_error
 }
 
 func (self *_shared) FetchParentPayment() (Payment, error) {
-	return self.FetchPayment(self.private.ParentPayment)
+	return self.FetchPayment(self.ParentPayment)
 }
 
 /*
@@ -211,18 +218,18 @@ func (self *_shared) FetchParentPayment() (Payment, error) {
 //
 //	All other uses of `Amount` do have `shipping`, `shipping_discount` and
 // `subtotal` to calculate the `Total`.
-type __amount struct {
-	Currency CurrencyTypeEnum `gRead json:"currency"`
-	Total    float64          `gRead json:"total,string"`
-	Details  *details         `gRead gWrite json:"details,omitempty"`
+type amount struct {
+	Currency CurrencyTypeEnum `json:"currency"`
+	Total    float64          `json:"total,string"`
+	Details  *details         `json:"details,omitempty"`
 }
 
 func (self amount) validate() (err error) {
-	if err = self.private.Currency.validate(); err != nil {
+	if err = self.Currency.validate(); err != nil {
 		return err
 	}
 
-	err = checkFloat7_10("Amount.Total", &self.private.Total, false)
+	err = checkFloat7_10("Amount.Total", &self.Total, false)
 	if err != nil {
 		return err
 	}
@@ -235,31 +242,31 @@ func (self amount) validate() (err error) {
 // The Details can all be read/write because the Amount object is read only,
 // so it gets a copy anyway.
 // No need to validate because its values are calculated or validated when set.
-type __details struct {
+type details struct {
 	// Amount of the subtotal of the items. REQUIRED if line items are specified.
 	// 10 chars max, with support for 2 decimal places
-	Subtotal float64 `gRead json:"subtotal,string,omitempty"`
+	Subtotal float64 `json:"subtotal,string,omitempty"`
 
 	// Amount charged for tax. 10 chars max, with support for 2 decimal places
-	Tax float64 `gRead json:"tax,string,omitempty"`
+	Tax float64 `json:"tax,string,omitempty"`
 
 	// Amount charged for shipping. 10 chars max, with support for 2 decimal places
-	Shipping float64 `gRead gWrite json:"shipping,string,omitempty"`
+	Shipping float64 `json:"shipping,string,omitempty"`
 
 	// Amount being charged for handling fee. When `payment_method` is `paypal`
-	HandlingFee float64 `gRead gWrite json:"handling_fee,string,omitempty"`
+	HandlingFee float64 `json:"handling_fee,string,omitempty"`
 
 	// Amount being charged for insurance fee. When `payment_method` is `paypal`
-	Insurance float64 `gRead gWrite json:"insurance,string,omitempty"`
+	Insurance float64 `json:"insurance,string,omitempty"`
 
 	// Amount being discounted for shipping fee. When `payment_method` is `paypal`
-	ShippingDiscount float64 `gRead gWrite json:"shipping_discount,string,omitempty"`
+	ShippingDiscount float64 `json:"shipping_discount,string,omitempty"`
 }
 
 /*
 @struct
 */
-type __link struct {
+type link struct {
 	Href   string      `json:"href,omitempty"`
 	Rel    relTypeEnum `json:"rel,omitempty"`
 	Method string      `json:"method,omitempty"`
@@ -273,8 +280,8 @@ func (l links) CanElide() bool {
 
 func (l links) get(r relTypeEnum) (string, string) {
 	for i, _ := range l {
-		if l[i].private.Rel == r {
-			return l[i].private.Href, l[i].private.Method
+		if l[i].Rel == r {
+			return l[i].Href, l[i].Method
 		}
 	}
 	return "", ""
@@ -284,20 +291,20 @@ func (l links) get(r relTypeEnum) (string, string) {
 @struct
 */
 // Base object for all financial value related fields (balance, payment due, etc.)
-type __currency struct {
-	Currency string `gRead gWrite json:"currency"`
-	Value    string `gRead gWrite json:"value"`
+type currency struct {
+	Currency string `json:"currency"`
+	Value    string `json:"value"`
 }
 
 /*
 @struct
 */
 // This object represents Fraud Management Filter (FMF) details for a payment.
-type __fmfDetails struct {
-	FilterType  fmfFilterEnum `gRead json:"filter_type"`
-	FilterID    filterIdEnum  `gRead json:"filter_id"`
-	Name        string        `gRead json:"name"`
-	Description string        `gRead json:"description"`
+type fmfDetails struct {
+	FilterType  fmfFilterEnum `json:"filter_type"`
+	FilterID    filterIdEnum  `json:"filter_id"`
+	Name        string        `json:"name"`
+	Description string        `json:"description"`
 }
 
 // Address: This object is used for billing or shipping addresses.
